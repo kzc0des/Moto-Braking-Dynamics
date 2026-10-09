@@ -14,7 +14,7 @@ export interface TrackRenderParams {
 export class TrackRenderer {
   render(params: TrackRenderParams): void {
     const { ctx, width, height, maxDistance, hazardDistance, numLanes, roadGradeAngle = 0, pothole } = params;
-    const paddingLeft = 60;
+    const paddingLeft = 90;
     const paddingRight = 60;
     const trackWidth = width - paddingLeft - paddingRight;
 
@@ -48,44 +48,44 @@ export class TrackRenderer {
       const roadTop = laneY + (laneHeight > 260 ? Math.floor(laneHeight * 0.65) : laneHeight - roadHeight - 12);
       const groundBottom = laneY + laneHeight - 2;
 
-      // 1. Terrain Sub-stratum (Hill Climb Racing underground cross-section)
+      // 1. Terrain Sub-stratum across full canvas
       ctx.fillStyle = '#0a0e17';
-      ctx.fillRect(paddingLeft - 20, roadTop + roadHeight, trackWidth + 40, groundBottom - (roadTop + roadHeight));
+      ctx.fillRect(0, roadTop + roadHeight, width, groundBottom - (roadTop + roadHeight));
 
       // Underground geological diagonal hatching
       ctx.strokeStyle = '#161f30';
       ctx.lineWidth = 1;
       const hatchStep = 18;
       ctx.beginPath();
-      for (let x = paddingLeft - 20; x < width - paddingRight + 40; x += hatchStep) {
+      for (let x = 0; x < width + 20; x += hatchStep) {
         ctx.moveTo(x, roadTop + roadHeight);
         ctx.lineTo(x - 14, groundBottom);
       }
       ctx.stroke();
 
-      // 2. Asphalt Road Surface Band
+      // 2. Asphalt Road Surface Band across full canvas
       const roadGrad = ctx.createLinearGradient(0, roadTop, 0, roadTop + roadHeight);
       roadGrad.addColorStop(0, '#1e293b');
       roadGrad.addColorStop(0.3, '#141c2b');
       roadGrad.addColorStop(1, '#0f141f');
       ctx.fillStyle = roadGrad;
-      ctx.fillRect(paddingLeft - 20, roadTop, trackWidth + 40, roadHeight);
+      ctx.fillRect(0, roadTop, width, roadHeight);
 
       // Top road edge highlight
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(paddingLeft - 20, roadTop);
-      ctx.lineTo(width - paddingRight + 20, roadTop);
+      ctx.moveTo(0, roadTop);
+      ctx.lineTo(width, roadTop);
       ctx.stroke();
 
-      // Motorsport Rumble Kerb (alternating red & white blocks along track edge)
+      // Motorsport Rumble Kerb across full canvas width
       const kerbWidth = 12;
       const kerbHeight = 4;
-      const kerbCount = Math.floor((trackWidth + 40) / kerbWidth);
+      const kerbCount = Math.ceil(width / kerbWidth);
       for (let k = 0; k < kerbCount; k++) {
         ctx.fillStyle = k % 2 === 0 ? '#dc2626' : '#f8fafc';
-        ctx.fillRect(paddingLeft - 20 + k * kerbWidth, roadTop - kerbHeight, kerbWidth, kerbHeight);
+        ctx.fillRect(k * kerbWidth, roadTop - kerbHeight, kerbWidth, kerbHeight);
       }
 
       // Dashed lane centerline
