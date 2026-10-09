@@ -4,7 +4,7 @@ export const DEFAULT_SUPERBIKE: BenchmarkInstanceConfig = {
   id: 'instance-1',
   name: 'Superbike 1000cc',
   enabled: true,
-  colorAccent: '#4ade80', // Kawasaki Lime Green
+  colorAccent: '#F2554A', // Coral (series-1)
   spriteKey: 'ninja',
   vehicle: {
     mass: 205.0,
@@ -62,7 +62,7 @@ export const DEFAULT_CRUISER: BenchmarkInstanceConfig = {
   id: 'instance-2',
   name: 'Cruiser 650cc',
   enabled: false,
-  colorAccent: '#cbd5e1', // Chrome Silver / Metallic Steel
+  colorAccent: '#2E2C33', // Ink Charcoal (series-2)
   spriteKey: 'cruiser',
   vehicle: {
     mass: 260.0,
@@ -120,7 +120,7 @@ export const DEFAULT_SCOOTER: BenchmarkInstanceConfig = {
   id: 'instance-3',
   name: 'Urban Scooter 125cc',
   enabled: false,
-  colorAccent: '#38bdf8', // Electric Royal Blue
+  colorAccent: '#6F8FAF', // Slate Blue (series-3)
   spriteKey: 'scooter',
   vehicle: {
     mass: 130.0,
