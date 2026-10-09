@@ -1,4 +1,4 @@
-import { InterpolatedScrubFrame, TerminalOutcome } from '../../../core/models/telemetry.types';
+import { InterpolatedScrubFrame } from '../../../core/models/telemetry.types';
 
 export interface VehicleRenderParams {
   ctx: CanvasRenderingContext2D;
@@ -8,13 +8,73 @@ export interface VehicleRenderParams {
   maxDistance: number;
   colorAccent: string;
   name: string;
+  spriteKey?: 'ninja' | 'cruiser' | 'scooter';
+  forceIdle?: boolean;
+  animTime?: number;
   frame: InterpolatedScrubFrame;
 }
 
+interface SpriteConfig {
+  sheetPath: string;
+  frameWidth: number;
+  frameHeight: number;
+  idleFrames: number;
+  rideFrames: number;
+  anchorXRatio: number;
+  scaleMultiplier: number;
+}
+
 export class VehicleRenderer {
+  private readonly spriteConfigs: Record<'ninja' | 'cruiser' | 'scooter', SpriteConfig> = {
+    ninja: {
+      sheetPath: 'sprites/ninja_sheet.png',
+      frameWidth: 96,
+      frameHeight: 48,
+      idleFrames: 6,
+      rideFrames: 8,
+      anchorXRatio: 44 / 96,
+      scaleMultiplier: 1.0
+    },
+    cruiser: {
+      sheetPath: 'sprites/cruiser_sheet.png',
+      frameWidth: 96,
+      frameHeight: 48,
+      idleFrames: 6,
+      rideFrames: 8,
+      anchorXRatio: 44 / 96,
+      scaleMultiplier: 1.0
+    },
+    scooter: {
+      sheetPath: 'sprites/scooter_sheet.png',
+      frameWidth: 80,
+      frameHeight: 40,
+      idleFrames: 6,
+      rideFrames: 8,
+      anchorXRatio: 36 / 80,
+      scaleMultiplier: 1.15
+    }
+  };
+
+  private readonly loadedImages = new Map<string, HTMLImageElement>();
+
+  constructor() {
+    this.preloadSpriteSheets();
+  }
+
+  private preloadSpriteSheets(): void {
+    if (typeof window === 'undefined') return;
+
+    for (const key of ['ninja', 'cruiser', 'scooter'] as const) {
+      const cfg = this.spriteConfigs[key];
+      const img = new Image();
+      img.src = cfg.sheetPath;
+      this.loadedImages.set(key, img);
+    }
+  }
+
   render(params: VehicleRenderParams): void {
-    const { ctx, laneY, laneHeight, width, maxDistance, colorAccent, name, frame } = params;
-    const paddingLeft = 60;
+    const { ctx, laneY, laneHeight, width, maxDistance, colorAccent, name, spriteKey, frame } = params;
+    const paddingLeft = 90;
     const paddingRight = 60;
     const trackWidth = width - paddingLeft - paddingRight;
 
@@ -25,278 +85,188 @@ export class VehicleRenderer {
     const roadTop = laneY + (laneHeight > 260 ? Math.floor(laneHeight * 0.65) : laneHeight - roadHeight - 12);
     const groundY = roadTop;
 
-    // Responsive scaling based on lane height (Hill Climb Racing prominent vehicle size)
-    const scale = Math.min(2.0, Math.max(1.0, laneHeight / 140));
+    // Resolve sprite archetype
+    const resolvedKey = this.resolveSpriteKey(spriteKey, name);
+    const cfg = this.spriteConfigs[resolvedKey];
 
-    const bikeLength = 54 * scale;
-    const halfL = bikeLength / 2;
-    const wheelR = 12 * scale;
-    const cogH = 22 * scale;
+    // Responsive scaling based on lane height (prominent vehicle size)
+    const baseScale = Math.min(2.1, Math.max(1.1, laneHeight / 135));
+    const scale = baseScale * cfg.scaleMultiplier;
 
-    // Pitch angle from deceleration (fork dive / chassis pitch)
-    const pitchAngle = Math.min(0.14, Math.max(-0.06, (frame.deceleration / 9.81) * 0.09));
+    const drawW = cfg.frameWidth * scale;
+    const drawH = cfg.frameHeight * scale;
+    const anchorX = cfg.frameWidth * cfg.anchorXRatio * scale;
 
-    // Dynamic fork compression: distance along fork decreases under deceleration
-    const forkCompression = Math.min(8 * scale, (frame.deceleration / 9.81) * 6 * scale);
+    // Deceleration pitch angle (fork dive)
+    const pitchAngle = Math.min(0.12, Math.max(-0.04, (frame.deceleration / 9.81) * 0.08));
+
+    // Wheel positions relative to posX
+    const rearWheelX = posX - anchorX + 16 * scale;
+    const frontWheelX = posX - anchorX + (cfg.frameWidth - 14) * scale;
 
     // 1. Tire Skid Marks (if severe slip or lockup)
     const isSlippingFront = Math.abs(frame.slipRatioFront) > 0.14;
     const isSlippingRear = Math.abs(frame.slipRatioRear) > 0.14;
 
     if (isSlippingRear) {
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-      ctx.fillRect(posX - halfL - 24 * scale, groundY - 2, 26 * scale, 3);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(rearWheelX - 20 * scale, groundY - 2, 24 * scale, 3);
 
       // Skid smoke particles
-      ctx.fillStyle = 'rgba(203, 213, 225, 0.35)';
+      ctx.fillStyle = 'rgba(203, 213, 225, 0.40)';
       ctx.beginPath();
-      ctx.arc(posX - halfL - 8, groundY - 4, 5 * scale, 0, Math.PI * 2);
-      ctx.arc(posX - halfL - 18, groundY - 7, 7 * scale, 0, Math.PI * 2);
+      ctx.arc(rearWheelX - 8, groundY - 4, 5 * scale, 0, Math.PI * 2);
+      ctx.arc(rearWheelX - 18, groundY - 7, 7 * scale, 0, Math.PI * 2);
       ctx.fill();
     }
 
     if (isSlippingFront) {
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-      ctx.fillRect(posX + halfL - 20 * scale, groundY - 2, 22 * scale, 3);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(frontWheelX - 16 * scale, groundY - 2, 20 * scale, 3);
     }
 
-    // 2. Motorcycle Chassis & Rider Assembly
+    // 2. Animated Sprite Sheet Rendering
+    const img = this.loadedImages.get(resolvedKey);
+    const isImgReady = img && img.complete && img.naturalWidth > 0;
+
+    const isMoving = !params.forceIdle && frame.velocity > 0.08;
+    const fps = isMoving ? 13.0 : 6.25;
+    const frameCount = isMoving ? cfg.rideFrames : cfg.idleFrames;
+    const animClock = isMoving ? frame.time : (params.animTime ?? (typeof performance !== 'undefined' ? performance.now() / 1000 : frame.time));
+    const frameIdx = Math.floor(animClock * fps) % frameCount;
+
+    const sx = frameIdx * cfg.frameWidth;
+    const sy = isMoving ? cfg.frameHeight : 0; // Row 1 = Ride, Row 0 = Idle
+
     ctx.save();
     ctx.translate(posX, groundY);
     ctx.rotate(-pitchAngle);
 
-    // Wheel rotation angle
-    const rotAngle = frame.time * frame.omega;
+    if (isImgReady) {
+      // Ensure pixel-perfect sharp sprite scaling without blur
+      ctx.imageSmoothingEnabled = false;
+      const anyCtx = ctx as unknown as { mozImageSmoothingEnabled?: boolean; webkitImageSmoothingEnabled?: boolean };
+      if (anyCtx.mozImageSmoothingEnabled !== undefined) anyCtx.mozImageSmoothingEnabled = false;
+      if (anyCtx.webkitImageSmoothingEnabled !== undefined) anyCtx.webkitImageSmoothingEnabled = false;
 
-    // Rear Wheel (Tire + Rim + Rotor + Spokes)
-    this.renderWheel(ctx, -halfL, -wheelR, wheelR, rotAngle, '#06b6d4', scale);
+      ctx.drawImage(
+        img,
+        sx,
+        sy,
+        cfg.frameWidth,
+        cfg.frameHeight,
+        -anchorX,
+        -drawH,
+        drawW,
+        drawH
+      );
+    } else {
+      // Graceful fallback while asset loads
+      ctx.fillStyle = colorAccent;
+      ctx.fillRect(-anchorX, -drawH * 0.8, drawW * 0.9, drawH * 0.7);
+    }
 
-    // Front Wheel (Tire + Rim + Rotor + Spokes)
-    this.renderWheel(ctx, halfL, -wheelR + forkCompression * 0.3, wheelR, rotAngle, '#fbbf24', scale);
-
-    // Rear Swingarm & Shock
-    ctx.strokeStyle = '#64748b';
-    ctx.lineWidth = 3 * scale;
-    ctx.beginPath();
-    ctx.moveTo(-halfL, -wheelR);
-    ctx.lineTo(-halfL + 22 * scale, -cogH * 0.55);
-    ctx.stroke();
-
-    // Shock spring
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 2 * scale;
-    ctx.beginPath();
-    ctx.moveTo(-halfL + 12 * scale, -wheelR);
-    ctx.lineTo(-halfL + 16 * scale, -cogH * 0.7);
-    ctx.stroke();
-
-    // Front Inverted Suspension Fork (telescopic stanchion)
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 3.5 * scale;
-    ctx.beginPath();
-    ctx.moveTo(halfL * 0.65, -cogH * 1.05);
-    ctx.lineTo(halfL, -wheelR + forkCompression * 0.3);
-    ctx.stroke();
-
-    // Frame Main Trellis Spars
-    ctx.strokeStyle = colorAccent;
-    ctx.lineWidth = 3.5 * scale;
-    ctx.beginPath();
-    ctx.moveTo(-halfL + 18 * scale, -cogH * 0.55);
-    ctx.lineTo(0, -cogH);
-    ctx.lineTo(halfL * 0.65, -cogH * 1.05);
-    ctx.lineTo(-halfL + 10 * scale, -cogH * 0.55);
-    ctx.closePath();
-    ctx.stroke();
-
-    // Engine Block
-    ctx.fillStyle = '#1e293b';
-    ctx.beginPath();
-    ctx.roundRect(-8 * scale, -cogH * 0.85, 18 * scale, 13 * scale, 2 * scale);
-    ctx.fill();
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Exhaust Pipe & Silencer
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 2.5 * scale;
-    ctx.beginPath();
-    ctx.moveTo(6 * scale, -cogH * 0.35);
-    ctx.lineTo(-halfL * 0.8, -wheelR * 0.85);
-    ctx.stroke();
-
-    // Fuel Tank & Fairing
+    // Center of Gravity (CoG) Target Crosshair
+    const cogY = -drawH * 0.45;
     ctx.fillStyle = colorAccent;
     ctx.beginPath();
-    ctx.moveTo(-halfL * 0.15, -cogH * 1.15);
-    ctx.lineTo(halfL * 0.5, -cogH * 1.18);
-    ctx.lineTo(halfL * 0.65, -cogH * 1.05);
-    ctx.lineTo(0, -cogH * 0.85);
-    ctx.closePath();
-    ctx.fill();
-
-    // Windscreen
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2 * scale;
-    ctx.beginPath();
-    ctx.moveTo(halfL * 0.45, -cogH * 1.25);
-    ctx.lineTo(halfL * 0.68, -cogH * 1.45);
-    ctx.stroke();
-
-    // Rider Torso (tucked aerodynamic posture)
-    ctx.fillStyle = '#0f172a';
-    ctx.beginPath();
-    ctx.moveTo(-halfL * 0.45, -cogH * 0.9);
-    ctx.lineTo(-halfL * 0.1, -cogH * 1.5);
-    ctx.lineTo(halfL * 0.25, -cogH * 1.35);
-    ctx.lineTo(halfL * 0.3, -cogH * 1.0);
-    ctx.closePath();
-    ctx.fill();
-
-    // Rider Helmet
-    ctx.fillStyle = colorAccent;
-    ctx.beginPath();
-    ctx.arc(0, -cogH * 1.62, 5.5 * scale, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Helmet Dark Visor
-    ctx.fillStyle = '#020617';
-    ctx.beginPath();
-    ctx.arc(2.5 * scale, -cogH * 1.62, 3.2 * scale, -0.4, 0.8);
-    ctx.fill();
-
-    // Center of Gravity Target Crosshair
-    ctx.fillStyle = '#fbbf24';
-    ctx.beginPath();
-    ctx.arc(0, -cogH, 3 * scale, 0, Math.PI * 2);
+    ctx.arc(0, cogY, 3 * scale, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(-5 * scale, -cogH);
-    ctx.lineTo(5 * scale, -cogH);
-    ctx.moveTo(0, -cogH - 5 * scale);
-    ctx.lineTo(0, -cogH + 5 * scale);
+    ctx.moveTo(-5 * scale, cogY);
+    ctx.lineTo(5 * scale, cogY);
+    ctx.moveTo(0, cogY - 5 * scale);
+    ctx.lineTo(0, cogY + 5 * scale);
     ctx.stroke();
 
     ctx.restore();
 
     // 3. Dynamic Normal Load Vectors (F_z)
     const maxFz = 2500;
-    const arrowMaxHeight = 28 * scale;
+    const arrowMaxHeight = 26 * scale;
     const frontFzLen = Math.min(36 * scale, (frame.normalLoadFront / maxFz) * arrowMaxHeight);
     const rearFzLen = Math.min(36 * scale, (frame.normalLoadRear / maxFz) * arrowMaxHeight);
 
-    // Front Normal Load (Electric Volt Amber)
+    // Front Normal Load (Gold)
     ctx.strokeStyle = '#fbbf24';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.moveTo(posX + halfL, groundY);
-    ctx.lineTo(posX + halfL, groundY + frontFzLen);
+    ctx.moveTo(frontWheelX, groundY);
+    ctx.lineTo(frontWheelX, groundY + frontFzLen);
     ctx.stroke();
     // Arrowhead
     ctx.fillStyle = '#fbbf24';
     ctx.beginPath();
-    ctx.moveTo(posX + halfL, groundY + frontFzLen + 4);
-    ctx.lineTo(posX + halfL - 3, groundY + frontFzLen);
-    ctx.lineTo(posX + halfL + 3, groundY + frontFzLen);
+    ctx.moveTo(frontWheelX, groundY + frontFzLen + 4);
+    ctx.lineTo(frontWheelX - 3, groundY + frontFzLen);
+    ctx.lineTo(frontWheelX + 3, groundY + frontFzLen);
     ctx.closePath();
     ctx.fill();
 
-    // Rear Normal Load (Laser Cyan)
+    // Rear Normal Load (Cyan)
     ctx.strokeStyle = '#06b6d4';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.moveTo(posX - halfL, groundY);
-    ctx.lineTo(posX - halfL, groundY + rearFzLen);
+    ctx.moveTo(rearWheelX, groundY);
+    ctx.lineTo(rearWheelX, groundY + rearFzLen);
     ctx.stroke();
     // Arrowhead
     ctx.fillStyle = '#06b6d4';
     ctx.beginPath();
-    ctx.moveTo(posX - halfL, groundY + rearFzLen + 4);
-    ctx.lineTo(posX - halfL - 3, groundY + rearFzLen);
-    ctx.lineTo(posX - halfL + 3, groundY + rearFzLen);
+    ctx.moveTo(rearWheelX, groundY + rearFzLen + 4);
+    ctx.lineTo(rearWheelX - 3, groundY + rearFzLen);
+    ctx.lineTo(rearWheelX + 3, groundY + rearFzLen);
     ctx.closePath();
     ctx.fill();
 
     // 4. Floating Vehicle Telemetry HUD Tag above bike
-    const tagY = groundY - cogH * 1.85 - 18 * scale;
     const speedKmh = (frame.velocity * 3.6).toFixed(1);
     const decelG = (frame.deceleration / 9.81).toFixed(2);
+    const titleText = name;
+    const subText = isMoving ? `${speedKmh} km/h | -${decelG}g` : '0.0 km/h | IDLE STANCE';
 
-    ctx.fillStyle = '#0b0f17';
+    ctx.font = `bold ${Math.round(9 * scale)}px monospace`;
+    const titleWidth = ctx.measureText(titleText).width;
+
+    ctx.font = `${Math.round(8 * scale)}px monospace`;
+    const subWidth = ctx.measureText(subText).width;
+
+    const padX = 8 * scale;
+    const padY = 4 * scale;
+    const tagW = Math.max(titleWidth, subWidth) + padX * 2;
+    const tagH = 22 * scale + padY;
+    const padEdge = 12;
+    const tagX = Math.max(padEdge, Math.min(width - tagW - padEdge, posX - tagW / 2));
+    const tagY = groundY - drawH - 26 * scale;
+
+    ctx.fillStyle = 'rgba(11, 15, 23, 0.94)';
     ctx.strokeStyle = colorAccent;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.roundRect(posX - 48 * scale, tagY, 96 * scale, 22 * scale, 3 * scale);
+    ctx.roundRect(tagX, tagY, tagW, tagH, 4 * scale);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = colorAccent;
     ctx.font = `bold ${Math.round(9 * scale)}px monospace`;
     ctx.textAlign = 'left';
-    ctx.fillText(name, posX - 44 * scale, tagY + 10 * scale);
+    ctx.textBaseline = 'top';
+    ctx.fillText(titleText, tagX + padX, tagY + padY);
 
     ctx.fillStyle = '#f8fafc';
     ctx.font = `${Math.round(8 * scale)}px monospace`;
-    ctx.fillText(`${speedKmh} km/h | -${decelG}g`, posX - 44 * scale, tagY + 18 * scale);
+    ctx.fillText(subText, tagX + padX, tagY + padY + 10 * scale);
+    ctx.textBaseline = 'alphabetic';
   }
 
-  private renderWheel(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    r: number,
-    angle: number,
-    accentColor: string,
-    scale: number
-  ): void {
-    ctx.save();
-    ctx.translate(x, y);
-
-    // Outer Rubber Tire
-    ctx.fillStyle = '#0f172a';
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 3.5 * scale;
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    // Inner Alloy Rim
-    ctx.strokeStyle = '#64748b';
-    ctx.lineWidth = 1.5 * scale;
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Brake Disc Rotor
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 1.2 * scale;
-    ctx.setLineDash([2 * scale, 2 * scale]);
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.52, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Rotating Wheel Spokes
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 1.2 * scale;
-    for (let i = 0; i < 3; i++) {
-      const a = angle + (i * Math.PI) / 3;
-      ctx.beginPath();
-      ctx.moveTo(-Math.cos(a) * r * 0.7, -Math.sin(a) * r * 0.7);
-      ctx.lineTo(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.7);
-      ctx.stroke();
-    }
-
-    // Wheel Hub
-    ctx.fillStyle = accentColor;
-    ctx.beginPath();
-    ctx.arc(0, 0, 2.5 * scale, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+  private resolveSpriteKey(spriteKey?: 'ninja' | 'cruiser' | 'scooter', name?: string): 'ninja' | 'cruiser' | 'scooter' {
+    if (spriteKey) return spriteKey;
+    if (!name) return 'ninja';
+    const lower = name.toLowerCase();
+    if (lower.includes('scooter')) return 'scooter';
+    if (lower.includes('cruiser')) return 'cruiser';
+    return 'ninja';
   }
 }
