@@ -1,4 +1,5 @@
-import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Injectable, inject, signal, computed, effect, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Subject, of } from 'rxjs';
 import { debounceTime, switchMap, catchError, tap } from 'rxjs/operators';
 import { BenchmarkInstanceConfig } from '../core/models/benchmark.types';
@@ -13,6 +14,7 @@ import { DiagnosticsService } from '../features/diagnostics/diagnostics.service'
 export class BenchmarkStore {
   private readonly api = inject(SimulationApiService);
   private readonly diagnostics = inject(DiagnosticsService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   // --- Benchmark State ---
   readonly instances = signal<BenchmarkInstanceConfig[]>([
@@ -81,6 +83,11 @@ export class BenchmarkStore {
       switchMap(() => {
         const enabled = this.enabledInstances();
         if (enabled.length === 0) return of(null);
+
+        if (!isPlatformBrowser(this.platformId)) {
+          this.generateLocalFallbackResults();
+          return of(null);
+        }
 
         this.isLoading.set(true);
         const startTime = performance.now();
@@ -214,7 +221,19 @@ export class BenchmarkStore {
   }
 
   togglePlay(): void {
+    if (!this.isPlaying() && this.scrubTime() >= this.maxRunTime() - 0.05) {
+      this.scrubTime.set(0);
+    }
     this.isPlaying.update(p => !p);
+  }
+
+  pause(): void {
+    this.isPlaying.set(false);
+  }
+
+  resetPlayback(): void {
+    this.isPlaying.set(false);
+    this.scrubTime.set(0);
   }
 
   setPlaybackSpeed(speed: number): void {
