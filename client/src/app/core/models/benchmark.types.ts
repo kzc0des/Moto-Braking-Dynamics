@@ -69,7 +69,8 @@ export interface BenchmarkInstanceConfig {
   id: string;                  // 'instance-1' | 'instance-2' | 'instance-3'
   name: string;                // e.g. "Superbike 1000cc"
   enabled: boolean;
-  colorAccent: string;         // Hex code, e.g. #fbbf24, #06b6d4, #a855f7
+  colorAccent: string;         // Hex code, e.g. #4ade80, #cbd5e1, #38bdf8
+  spriteKey?: 'ninja' | 'cruiser' | 'scooter';
   vehicle: VehicleParams;
   brake: BrakeAssembly;
   actuation: ActuationParams;
