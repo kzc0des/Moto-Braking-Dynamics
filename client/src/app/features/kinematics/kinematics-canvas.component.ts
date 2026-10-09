@@ -23,6 +23,19 @@ export type ViewportHeight = 'hero' | 'immersive' | 'full';
           <span class="px-1.5 py-0.5 text-[10px] bg-slate-800 text-slate-300 rounded-xs border border-slate-700">
             60 FPS SOLVER REPLAY
           </span>
+          <!-- Idle Mode Toggle Button -->
+          <button
+            type="button"
+            (click)="isIdleMode.set(!isIdleMode())"
+            class="flex items-center gap-1.5 px-2 py-0.5 rounded-xs border text-[11px] font-mono font-bold transition-all"
+            [style.borderColor]="isIdleMode() ? store.selectedInstance().colorAccent : 'rgba(71, 85, 105, 0.6)'"
+            [style.backgroundColor]="isIdleMode() ? store.selectedInstance().colorAccent + '20' : 'rgba(15, 23, 42, 0.7)'"
+            [style.color]="isIdleMode() ? store.selectedInstance().colorAccent : '#94a3b8'"
+            title="Toggle Idle Mode to inspect stationary engine and rider breathing animation"
+          >
+            <span class="w-1.5 h-1.5 rounded-full" [style.backgroundColor]="isIdleMode() ? store.selectedInstance().colorAccent : '#64748b'"></span>
+            <span>{{ isIdleMode() ? 'IDLE: ON' : 'IDLE: OFF' }}</span>
+          </button>
         </div>
 
         <div class="flex items-center gap-3 text-slate-300">
@@ -30,11 +43,41 @@ export type ViewportHeight = 'hero' | 'immersive' | 'full';
             <span class="text-slate-500">T:</span>
             <span class="text-amber-400 font-bold tabular-nums">{{ store.scrubTime().toFixed(2) }}s</span>
             <span class="text-slate-600">/ {{ store.maxRunTime().toFixed(2) }}s</span>
+            <button
+              type="button"
+              (click)="store.resetPlayback()"
+              class="ml-1 px-1.5 py-0.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xs border border-slate-700 text-[10px] font-mono transition-colors cursor-pointer"
+              title="Reset to starting line (t = 0.00s)"
+            >
+              ↺ RESET
+            </button>
           </div>
 
           <div class="hidden sm:flex items-center gap-1.5">
             <span class="text-slate-500">HAZARD:</span>
             <span class="text-rose-400 font-bold tabular-nums">{{ store.selectedInstance().simulation.hazardDistance }}m</span>
+          </div>
+
+          <!-- Vehicle Archetype Selector Pills matching sprite colors -->
+          <div class="hidden md:flex items-center gap-1">
+            @for (inst of store.instances(); track inst.id) {
+              <button
+                type="button"
+                (click)="store.setSelectedInstanceId(inst.id)"
+                class="flex items-center gap-1.5 px-2 py-0.5 rounded-xs border text-[11px] font-mono transition-all"
+                [style.borderColor]="store.selectedInstanceId() === inst.id ? inst.colorAccent : 'rgba(51, 65, 85, 0.6)'"
+                [style.backgroundColor]="store.selectedInstanceId() === inst.id ? inst.colorAccent + '20' : 'rgba(15, 23, 42, 0.6)'"
+                [style.color]="store.selectedInstanceId() === inst.id ? inst.colorAccent : '#94a3b8'"
+                [title]="'Select ' + inst.name"
+              >
+                <img
+                  [src]="'sprites/' + (inst.spriteKey || (inst.name.toLowerCase().includes('scooter') ? 'scooter' : inst.name.toLowerCase().includes('cruiser') ? 'cruiser' : 'ninja')) + '_idle_preview.gif'"
+                  class="w-4 h-3 object-contain"
+                  [alt]="inst.name"
+                />
+                <span class="font-bold">{{ inst.name.split(' ')[0] }}</span>
+              </button>
+            }
           </div>
 
           <!-- Viewport Height Scale Toggles / Fullscreen Indicator -->
@@ -109,6 +152,7 @@ export class KinematicsCanvasComponent implements OnDestroy {
   readonly store = inject(BenchmarkStore);
   readonly isTelemetryCollapsed = input<boolean>(false);
   readonly heightMode = signal<ViewportHeight>('immersive');
+  readonly isIdleMode = signal<boolean>(false);
 
   private readonly trackRenderer = new TrackRenderer();
   private readonly vehicleRenderer = new VehicleRenderer();
@@ -158,7 +202,8 @@ export class KinematicsCanvasComponent implements OnDestroy {
         const dt = 0.016 * this.store.playbackSpeed();
         const nextT = this.store.scrubTime() + dt;
         if (nextT >= this.store.maxRunTime()) {
-          this.store.setScrubTime(0);
+          this.store.setScrubTime(this.store.maxRunTime());
+          this.store.pause();
         } else {
           this.store.setScrubTime(nextT);
         }
@@ -198,9 +243,18 @@ export class KinematicsCanvasComponent implements OnDestroy {
 
     // 2. Render Vehicles on Lanes
     const laneHeight = height / Math.max(1, enabledInsts.length);
+    const isPaused = !this.store.isPlaying();
+
     enabledInsts.forEach((inst, idx) => {
       const frame = frames[inst.id];
       if (!frame) return;
+
+      const shouldIdle = this.isIdleMode() || isPaused || frame.velocity <= 0.08;
+      const renderFrame = this.isIdleMode()
+        ? { ...frame, distance: 0, velocity: 0, deceleration: 0 }
+        : isPaused
+        ? { ...frame, velocity: 0, deceleration: 0 }
+        : frame;
 
       this.vehicleRenderer.render({
         ctx,
@@ -210,7 +264,10 @@ export class KinematicsCanvasComponent implements OnDestroy {
         maxDistance: maxDist,
         colorAccent: inst.colorAccent,
         name: inst.name,
-        frame
+        spriteKey: inst.spriteKey,
+        forceIdle: shouldIdle,
+        animTime: performance.now() / 1000,
+        frame: renderFrame
       });
     });
   }
@@ -238,7 +295,7 @@ export class KinematicsCanvasComponent implements OnDestroy {
     const canvas = this.canvasRef().nativeElement;
     const rect = canvas.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
-    const paddingLeft = 60;
+    const paddingLeft = 90;
     const paddingRight = 60;
     const trackWidth = rect.width - paddingLeft - paddingRight;
 
