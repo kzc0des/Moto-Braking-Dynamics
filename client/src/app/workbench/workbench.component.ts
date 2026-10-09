@@ -20,15 +20,15 @@ import { TrajectoryScrubberComponent } from '../features/telemetry/trajectory-sc
     ParameterCockpitComponent
   ],
   template: `
-    <div class="bg-[#FAF7F2] text-[#22201E] flex flex-col font-sans select-none overflow-hidden h-[100dvh] max-h-[100dvh]">
+    <div class="bg-[#FAF7F2] text-[#22201E] flex flex-col font-sans select-none min-h-[100dvh] lg:h-[100dvh] lg:max-h-[100dvh] overflow-x-hidden lg:overflow-hidden">
       <!-- Top Application Header -->
-      <header class="flex items-center justify-between px-6 py-3 bg-[#FFFFFF] border-b border-[#E6DFD3] shrink-0">
+      <header class="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3 bg-[#FFFFFF] border-b border-[#E6DFD3] shrink-0">
         <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 bg-[#F2554A] rounded-md shrink-0"></span>
+          <div class="flex items-center gap-2 sm:gap-2.5">
+            <span class="w-4 sm:w-5 h-4 sm:h-5 bg-[#F2554A] rounded-md shrink-0"></span>
             <div>
-              <div class="text-sm sm:text-base font-bold tracking-tight text-[#22201E]">Moto-Braking Dynamics</div>
-              <div class="text-xs text-[#6B645C]">Computational benchmark workbench</div>
+              <div class="text-xs sm:text-base font-bold tracking-tight text-[#22201E]">Moto-Braking Dynamics</div>
+              <div class="text-[10px] sm:text-xs text-[#6B645C] hidden sm:block">Computational benchmark workbench</div>
             </div>
           </div>
         </div>
@@ -37,31 +37,31 @@ import { TrajectoryScrubberComponent } from '../features/telemetry/trajectory-sc
         <button
           type="button"
           (click)="toggleMembersDrawer()"
-          class="px-3.5 py-1.5 bg-[#FFFFFF] border border-[#E6DFD3] hover:border-[#F2554A] hover:bg-[#FDEBE8] text-[#22201E] rounded-lg transition-colors text-xs font-semibold flex items-center gap-2 shadow-2xs cursor-pointer group"
+          class="px-2.5 sm:px-3.5 py-1.5 bg-[#FFFFFF] border border-[#E6DFD3] hover:border-[#F2554A] hover:bg-[#FDEBE8] text-[#22201E] rounded-lg transition-colors text-xs font-semibold flex items-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer group"
           title="View Project Team Members (Esc to close)"
         >
           <svg class="w-4 h-4 text-[#F2554A] shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 16v-1a5 5 0 00-2.316-4.175A3.992 3.992 0 0115 11a4 4 0 014 4v1h-3zM4.316 10.825A5 5 0 002 15v1h3v-1a4 4 0 011-2.9 3.992 3.992 0 01-1.684-1.275z" />
           </svg>
-          <span>Team Members</span>
+          <span class="text-[11px] sm:text-xs">Team Members</span>
         </button>
       </header>
 
       <!-- Main Workbench Layout -->
       <main
-        class="flex-1 min-h-0 p-3 sm:p-4 flex flex-col gap-3.5 max-w-[1840px] w-full mx-auto transition-all duration-300 ease-in-out"
-        [style.paddingBottom]="isBottomDrawerOpen() ? 'min(55vh, 420px)' : '2.5rem'"
+        class="flex-1 min-h-0 p-2 sm:p-4 flex flex-col gap-2.5 sm:gap-3.5 max-w-[1840px] w-full mx-auto transition-all duration-300 ease-in-out"
+        [style.paddingBottom]="isBottomDrawerOpen() ? 'min(55vh, 420px)' : '3.5rem'"
       >
         <!-- 2D Kinematics Track Viewport & Centered Anatomy Inspector -->
-        <div class="flex flex-col lg:flex-row gap-3.5 items-center w-full flex-1 min-h-0">
+        <div class="flex flex-col lg:flex-row gap-2.5 sm:gap-3.5 items-stretch lg:items-center w-full flex-1 min-h-0">
           <!-- 2D Kinematics Track Viewport (occupies space) -->
-          <div class="flex-1 min-w-0 transition-all duration-300 flex flex-col min-h-0 h-full self-stretch">
+          <div class="flex-1 min-w-0 transition-all duration-300 flex flex-col min-h-0 min-h-[360px] lg:h-full self-stretch">
             <app-kinematics-canvas class="flex-1 min-h-0 flex flex-col h-full" />
           </div>
 
-          <!-- Interactive Anatomy Inspector (vertically centered) -->
+          <!-- Interactive Anatomy Inspector (vertically centered on desktop, stacked on mobile) -->
           <div
-            class="transition-all duration-300 shrink-0 self-center"
+            class="transition-all duration-300 shrink-0 self-stretch lg:self-center"
             [ngClass]="isAnatomyMinimized() ? 'w-full lg:w-12' : 'w-full lg:w-[380px]'"
           >
             <app-anatomy-inspector
