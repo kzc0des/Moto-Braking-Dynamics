@@ -1,149 +1,198 @@
-import { Component, ElementRef, viewChild, inject, afterNextRender, signal, effect, OnDestroy, input } from '@angular/core';
+import { Component, ElementRef, viewChild, inject, afterNextRender, signal, computed, OnDestroy, input, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
 import { TrackRenderer } from './renderers/track.renderer';
 import { VehicleRenderer } from './renderers/vehicle.renderer';
-
-export type ViewportHeight = 'hero' | 'immersive' | 'full';
 
 @Component({
   selector: 'app-kinematics-canvas',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div
-      class="relative w-full bg-slate-950 border border-slate-800 rounded-sm overflow-hidden shadow-lg flex flex-col"
-      [ngClass]="isTelemetryCollapsed() ? 'h-full flex-1 min-h-0' : ''"
-    >
-      <!-- High-Precision Telemetry & Viewport Toolbar -->
-      <div class="flex flex-wrap items-center justify-between px-3.5 py-2 bg-[#121926] border-b border-[#232f42] text-xs font-mono gap-2 shrink-0">
+    <div class="relative w-full h-full flex-1 min-h-0 bg-[#FFFFFF] border border-[#E6DFD3] rounded-xl shadow-xs p-4 flex flex-col gap-3 select-none">
+      <!-- Top Track Viewport Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-1 border-b border-[#E6DFD3]/60 shrink-0">
+        <!-- Left: Title, Status Badge & Archetype Pills -->
         <div class="flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 bg-amber-400 rounded-xs"></span>
-          <span class="text-slate-100 font-bold tracking-wider">2D KINEMATICS TRACK VIEWPORT</span>
-          <span class="px-1.5 py-0.5 text-[10px] bg-slate-800 text-slate-300 rounded-xs border border-slate-700">
-            60 FPS SOLVER REPLAY
-          </span>
-          <!-- Idle Mode Toggle Button -->
-          <button
-            type="button"
-            (click)="isIdleMode.set(!isIdleMode())"
-            class="flex items-center gap-1.5 px-2 py-0.5 rounded-xs border text-[11px] font-mono font-bold transition-all"
-            [style.borderColor]="isIdleMode() ? store.selectedInstance().colorAccent : 'rgba(71, 85, 105, 0.6)'"
-            [style.backgroundColor]="isIdleMode() ? store.selectedInstance().colorAccent + '20' : 'rgba(15, 23, 42, 0.7)'"
-            [style.color]="isIdleMode() ? store.selectedInstance().colorAccent : '#94a3b8'"
-            title="Toggle Idle Mode to inspect stationary engine and rider breathing animation"
-          >
-            <span class="w-1.5 h-1.5 rounded-full" [style.backgroundColor]="isIdleMode() ? store.selectedInstance().colorAccent : '#64748b'"></span>
-            <span>{{ isIdleMode() ? 'IDLE: ON' : 'IDLE: OFF' }}</span>
-          </button>
-        </div>
+          <span class="font-bold text-[#22201E] text-base">Track viewport</span>
 
-        <div class="flex items-center gap-3 text-slate-300">
-          <div class="flex items-center gap-1.5">
-            <span class="text-slate-500">T:</span>
-            <span class="text-amber-400 font-bold tabular-nums">{{ store.scrubTime().toFixed(2) }}s</span>
-            <span class="text-slate-600">/ {{ store.maxRunTime().toFixed(2) }}s</span>
-            <button
-              type="button"
-              (click)="store.resetPlayback()"
-              class="ml-1 px-1.5 py-0.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xs border border-slate-700 text-[10px] font-mono transition-colors cursor-pointer"
-              title="Reset to starting line (t = 0.00s)"
-            >
-              ↺ RESET
-            </button>
-          </div>
-
-          <div class="hidden sm:flex items-center gap-1.5">
-            <span class="text-slate-500">HAZARD:</span>
-            <span class="text-rose-400 font-bold tabular-nums">{{ store.selectedInstance().simulation.hazardDistance }}m</span>
-          </div>
-
-          <!-- Vehicle Archetype Selector Pills matching sprite colors -->
-          <div class="hidden md:flex items-center gap-1">
-            @for (inst of store.instances(); track inst.id) {
-              <button
-                type="button"
-                (click)="store.setSelectedInstanceId(inst.id)"
-                class="flex items-center gap-1.5 px-2 py-0.5 rounded-xs border text-[11px] font-mono transition-all"
-                [style.borderColor]="store.selectedInstanceId() === inst.id ? inst.colorAccent : 'rgba(51, 65, 85, 0.6)'"
-                [style.backgroundColor]="store.selectedInstanceId() === inst.id ? inst.colorAccent + '20' : 'rgba(15, 23, 42, 0.6)'"
-                [style.color]="store.selectedInstanceId() === inst.id ? inst.colorAccent : '#94a3b8'"
-                [title]="'Select ' + inst.name"
-              >
-                <img
-                  [src]="'sprites/' + (inst.spriteKey || (inst.name.toLowerCase().includes('scooter') ? 'scooter' : inst.name.toLowerCase().includes('cruiser') ? 'cruiser' : 'ninja')) + '_idle_preview.gif'"
-                  class="w-4 h-3 object-contain"
-                  [alt]="inst.name"
-                />
-                <span class="font-bold">{{ inst.name.split(' ')[0] }}</span>
-              </button>
-            }
-          </div>
-
-          <!-- Viewport Height Scale Toggles / Fullscreen Indicator -->
-          @if (!isTelemetryCollapsed()) {
-            <div class="flex items-center border border-slate-700 rounded-xs overflow-hidden text-[11px]">
-              <button
-                type="button"
-                (click)="heightMode.set('hero')"
-                class="px-2 py-0.5 transition-colors"
-                [ngClass]="heightMode() === 'hero' ? 'bg-amber-500/20 text-amber-300 font-bold border-r border-slate-700' : 'bg-slate-900 text-slate-400 hover:text-slate-200 border-r border-slate-700'"
-                title="Standard Viewport Height (440px)"
-              >
-                440px
-              </button>
-              <button
-                type="button"
-                (click)="heightMode.set('immersive')"
-                class="px-2 py-0.5 transition-colors"
-                [ngClass]="heightMode() === 'immersive' ? 'bg-amber-500/20 text-amber-300 font-bold border-r border-slate-700' : 'bg-slate-900 text-slate-400 hover:text-slate-200 border-r border-slate-700'"
-                title="Immersive Hill Climb Racing Viewport (560px)"
-              >
-                560px
-              </button>
-              <button
-                type="button"
-                (click)="heightMode.set('full')"
-                class="px-2 py-0.5 transition-colors"
-                [ngClass]="heightMode() === 'full' ? 'bg-amber-500/20 text-amber-300 font-bold' : 'bg-slate-900 text-slate-400 hover:text-slate-200'"
-                title="Full Stage Viewport (700px)"
-              >
-                700px
-              </button>
+          @if (store.enabledInstances().length === 3) {
+            <!-- Archetype Pills when all on track -->
+            <div class="flex items-center gap-1.5">
+              @for (inst of store.instances(); track inst.id) {
+                <button
+                  type="button"
+                  (click)="store.setSelectedInstanceId(inst.id)"
+                  class="px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors cursor-pointer"
+                  [ngClass]="store.selectedInstanceId() === inst.id ? 'bg-[#FAF7F2] text-[#22201E] border-[#E6DFD3] font-semibold' : 'bg-transparent text-[#6B645C] border-transparent hover:text-[#22201E]'"
+                >
+                  {{ inst.name.split(' ')[0] }}
+                </button>
+              }
             </div>
           } @else {
-            <div class="flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/40 rounded-xs text-[11px] text-amber-300 font-mono font-bold">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-              <span>100dvh TOTAL SCREEN VIEWPORT</span>
+            <!-- "X of 3 on track" Badge -->
+            <span class="px-2.5 py-0.5 text-xs bg-[#F3EEE6] text-[#6B645C] rounded-full font-medium">
+              {{ store.enabledInstances().length }} of {{ store.instances().length }} on track
+            </span>
+          }
+        </div>
+
+        <!-- Right: Hazard distance, time readout, Play button, Reset button, and + Summon button -->
+        <div class="flex items-center gap-2.5 text-xs">
+          <div class="flex items-center gap-1 text-[#6B645C]">
+            <span>Hazard</span>
+            <span class="font-bold text-[#22201E] tabular-nums">{{ store.selectedInstance().simulation.hazardDistance }} m</span>
+          </div>
+
+          <div class="flex items-center gap-1 text-[#6B645C]">
+            <span>t</span>
+            <span class="font-bold text-[#22201E] tabular-nums">{{ store.scrubTime().toFixed(2) }} s</span>
+            <span class="text-[#A39B90]">/ {{ store.maxRunTime().toFixed(2) }} s</span>
+          </div>
+
+          <!-- Play / Pause / Replay Button -->
+          <button
+            type="button"
+            (click)="handlePlay()"
+            class="px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+            [ngClass]="
+              store.isPlaying()
+                ? 'bg-[#22201E] hover:bg-[#000000] text-white'
+                : isAtEnd()
+                  ? 'bg-[#FDEBE8] text-[#C93A30] border border-[#F2554A] hover:bg-[#F2554A] hover:text-white'
+                  : 'bg-[#F2554A] hover:bg-[#C93A30] text-white'
+            "
+            [title]="store.isPlaying() ? 'Pause playback (Space)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory (Space)')"
+          >
+            <span>{{ store.isPlaying() ? '❚❚ Pause' : (isAtEnd() ? '↺ Replay' : '► Play') }}</span>
+          </button>
+
+          <!-- Reset Button -->
+          <button
+            type="button"
+            (click)="store.resetPlayback()"
+            class="px-2.5 py-1 bg-white hover:bg-[#FAF7F2] text-[#22201E] rounded-md border border-[#E6DFD3] text-xs font-medium transition-colors cursor-pointer"
+            title="Reset to start line"
+          >
+            Reset
+          </button>
+
+          <!-- Summon Trigger Button & Dropdown Popover -->
+          <div class="relative">
+            <button
+              type="button"
+              (click)="toggleSummon($event)"
+              [disabled]="unsummonedInstances().length === 0"
+              class="px-3 py-1 text-xs font-semibold rounded-md transition-colors flex items-center gap-1 shadow-2xs"
+              [ngClass]="
+                unsummonedInstances().length === 0
+                  ? 'bg-[#F3EEE6] text-[#A39B90] border border-[#E6DFD3] cursor-not-allowed shadow-none'
+                  : 'bg-[#F2554A] hover:bg-[#C93A30] text-white cursor-pointer'
+              "
+              [title]="unsummonedInstances().length === 0 ? 'All 3 vehicles are on the track' : 'Add another vehicle to the track'"
+            >
+              <span>+ Summon</span>
+            </button>
+
+            <!-- Summon Dropdown Popover matching screenshot -->
+            @if (isSummonOpen() && unsummonedInstances().length > 0) {
+              <div
+                class="absolute right-0 top-full mt-2 w-72 bg-white border border-[#E6DFD3] rounded-xl shadow-xl z-50 p-2 select-none"
+                (click)="$event.stopPropagation()"
+              >
+                <div class="px-3 pt-1.5 pb-2 text-[11px] font-bold text-[#6B645C] tracking-wider uppercase border-b border-[#E6DFD3]/60 mb-1">
+                  Add to Track
+                </div>
+
+                @for (inst of unsummonedInstances(); track inst.id) {
+                  <button
+                    type="button"
+                    (click)="summonBike(inst.id, $event)"
+                    class="w-full px-3 py-2.5 text-left hover:bg-[#FAF7F2] rounded-lg flex flex-col gap-0.5 cursor-pointer transition-colors group border border-transparent hover:border-[#E6DFD3]"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs sm:text-sm font-bold text-[#22201E] group-hover:text-[#F2554A] transition-colors">
+                        {{ inst.name }}
+                      </span>
+                      <span
+                        class="w-2.5 h-2.5 rounded-full shrink-0 border border-white shadow-2xs"
+                        [style.backgroundColor]="inst.colorAccent"
+                      ></span>
+                    </div>
+                    <span class="text-[11px] sm:text-xs text-[#6B645C] leading-snug">
+                      {{ getSubtitleFor(inst.name) }}
+                    </span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Track Grid: Left Vehicle Column + Right Canvas Viewport (Fills available space) -->
+      <div
+        class="w-full flex-1 min-h-[300px] flex border border-[#E6DFD3] rounded-lg overflow-hidden bg-white"
+      >
+        <!-- Vehicle Info Column -->
+        <div class="w-40 sm:w-48 border-r border-[#E6DFD3] bg-[#FAF7F2]/40 shrink-0 flex flex-col h-full">
+          <div class="h-6 px-3 flex items-center text-[11px] font-bold text-[#A39B90] uppercase tracking-wider border-b border-[#E6DFD3] shrink-0">
+            Vehicle
+          </div>
+
+          <!-- Dynamic Lane Vehicle Rows distributing available height -->
+          @for (inst of store.enabledInstances(); track inst.id; let idx = $index) {
+            <div
+              class="px-3 py-3 flex flex-col justify-center border-b border-[#E6DFD3] last:border-b-0 flex-1 min-h-0"
+            >
+              <div class="text-xs sm:text-sm font-bold text-[#22201E] leading-snug">
+                {{ inst.name }}
+              </div>
+              <div class="text-xs text-[#6B645C]">
+                {{ getVehicleSpeedText(inst.id) }}
+              </div>
+              @if (store.enabledInstances().length > 1) {
+                <button
+                  type="button"
+                  (click)="removeBike(inst.id)"
+                  class="text-xs text-[#C93A30] hover:text-[#F2554A] hover:underline text-left mt-1 cursor-pointer"
+                >
+                  Remove
+                </button>
+              }
             </div>
           }
         </div>
-      </div>
 
-      <!-- Main Canvas Container -->
-      <div
-        class="relative w-full bg-[#070a10] overflow-hidden transition-all duration-300"
-        [ngClass]="{
-          'flex-1 min-h-0 h-full': isTelemetryCollapsed(),
-          'h-[440px]': !isTelemetryCollapsed() && heightMode() === 'hero',
-          'h-[560px]': !isTelemetryCollapsed() && heightMode() === 'immersive',
-          'h-[700px]': !isTelemetryCollapsed() && heightMode() === 'full'
-        }"
-      >
-        <canvas
-          #canvas
-          (click)="onCanvasClick($event)"
-          (mousemove)="onCanvasMouseMove($event)"
-          (mousedown)="onCanvasMouseDown($event)"
-          (mouseup)="onCanvasMouseUp()"
-          class="w-full h-full block cursor-crosshair select-none"
-        ></canvas>
-
-        <!-- Floating Scrubber Position Bar Overlay Indicator -->
-        <div class="absolute bottom-2 left-4 text-[10px] font-mono text-slate-400 bg-slate-950/80 px-2 py-1 rounded-xs border border-slate-800 pointer-events-none">
-          CLICK OR DRAG HORIZONTALLY TO SCRUB TRAJECTORY
+        <!-- Canvas Track Lanes Area -->
+        <div class="flex-1 relative bg-white overflow-hidden h-full">
+          <canvas
+            #canvas
+            (click)="onCanvasClick($event)"
+            (mousemove)="onCanvasMouseMove($event)"
+            (mousedown)="onCanvasMouseDown($event)"
+            (mouseup)="onCanvasMouseUp()"
+            class="w-full h-full block cursor-crosshair select-none"
+          ></canvas>
         </div>
       </div>
+
+      <!-- Empty Lane Slot when fewer than 3 bikes are present -->
+      @if (unsummonedInstances().length > 0) {
+        <div class="w-full bg-[#FAF7F2] border border-dashed border-[#E6DFD3] rounded-lg py-3 px-4 flex flex-wrap items-center justify-center gap-3 shrink-0">
+          <span class="text-xs text-[#6B645C]">
+            {{ unsummonedInstances().length === 2 ? 'Only the superbike is on the track.' : 'One more bike can join the track.' }}
+          </span>
+          <button
+            type="button"
+            (click)="toggleSummon($event)"
+            class="border border-[#F2554A] text-[#F2554A] bg-white hover:bg-[#FDEBE8] text-xs font-semibold px-3 py-1.5 rounded-md transition-colors cursor-pointer shadow-2xs"
+          >
+            Summon a bike
+          </button>
+        </div>
+      }
     </div>
   `
 })
@@ -151,8 +200,34 @@ export class KinematicsCanvasComponent implements OnDestroy {
   readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   readonly store = inject(BenchmarkStore);
   readonly isTelemetryCollapsed = input<boolean>(false);
-  readonly heightMode = signal<ViewportHeight>('immersive');
-  readonly isIdleMode = signal<boolean>(false);
+  readonly isSummonOpen = signal<boolean>(false);
+
+  readonly unsummonedInstances = computed(() => {
+    return this.store.instances().filter(inst => !inst.enabled);
+  });
+
+  readonly isAtEnd = computed(() => {
+    return this.store.scrubTime() >= this.store.maxRunTime() - 0.05;
+  });
+
+  handlePlay(): void {
+    if (this.isAtEnd()) {
+      this.store.resetPlayback();
+      this.store.togglePlay();
+    } else {
+      this.store.togglePlay();
+    }
+  }
+
+  @HostListener('window:keydown.space', ['$event'])
+  onSpacebar(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return;
+    }
+    event.preventDefault();
+    this.handlePlay();
+  }
 
   private readonly trackRenderer = new TrackRenderer();
   private readonly vehicleRenderer = new VehicleRenderer();
@@ -167,12 +242,76 @@ export class KinematicsCanvasComponent implements OnDestroy {
     });
   }
 
+  toggleSummon(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.unsummonedInstances().length > 0) {
+      this.isSummonOpen.update(open => !open);
+    }
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.isSummonOpen()) {
+      this.isSummonOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.isSummonOpen()) {
+      this.isSummonOpen.set(false);
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
+    }
+  }
+
+  getCanvasContainerHeight(): number {
+    const count = Math.max(1, this.store.enabledInstances().length);
+    // Big default height: at least 380px, expanding if 3 bikes are on track
+    if (count === 1) return 380;
+    if (count === 2) return 400;
+    return 440;
+  }
+
+  getVehicleSpeedText(id: string): string {
+    const frame = this.store.scrubFrames()[id];
+    if (!frame) return '0.0 km/h · Idle';
+    const kmh = (frame.velocity * 3.6).toFixed(1);
+    const status = frame.velocity > 0.08 ? 'Braking' : 'Idle';
+    return `${kmh} km/h · ${status}`;
+  }
+
+  getSubtitleFor(name: string): string {
+    const lower = name.toLowerCase();
+    if (lower.includes('scooter')) return 'Blue sport scooter, light and short';
+    if (lower.includes('cruiser')) return 'Heavy touring twin, high inertia';
+    return 'Green supersport, high power';
+  }
+
+  summonBike(id: string, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.store.toggleInstanceEnabled(id);
+    this.store.setSelectedInstanceId(id);
+    this.isSummonOpen.set(false);
+  }
+
+  removeBike(id: string): void {
+    this.store.toggleInstanceEnabled(id);
+    // If the removed bike was selected, select an enabled one
+    if (this.store.selectedInstanceId() === id) {
+      const remaining = this.store.enabledInstances();
+      if (remaining.length > 0) {
+        this.store.setSelectedInstanceId(remaining[0].id);
+      }
     }
   }
 
@@ -229,7 +368,7 @@ export class KinematicsCanvasComponent implements OnDestroy {
     const enabledInsts = this.store.enabledInstances();
     const frames = this.store.scrubFrames();
 
-    // 1. Render Track
+    // 1. Render Track Grid & Hazard line
     this.trackRenderer.render({
       ctx,
       width,
@@ -242,23 +381,22 @@ export class KinematicsCanvasComponent implements OnDestroy {
     });
 
     // 2. Render Vehicles on Lanes
-    const laneHeight = height / Math.max(1, enabledInsts.length);
+    const topOffset = 24;
+    const laneHeight = (height - topOffset) / Math.max(1, enabledInsts.length);
     const isPaused = !this.store.isPlaying();
 
     enabledInsts.forEach((inst, idx) => {
       const frame = frames[inst.id];
       if (!frame) return;
 
-      const shouldIdle = this.isIdleMode() || isPaused || frame.velocity <= 0.08;
-      const renderFrame = this.isIdleMode()
-        ? { ...frame, distance: 0, velocity: 0, deceleration: 0 }
-        : isPaused
+      const shouldIdle = isPaused || frame.velocity <= 0.08;
+      const renderFrame = isPaused
         ? { ...frame, velocity: 0, deceleration: 0 }
         : frame;
 
       this.vehicleRenderer.render({
         ctx,
-        laneY: idx * laneHeight,
+        laneY: topOffset + idx * laneHeight,
         laneHeight,
         width,
         maxDistance: maxDist,
@@ -295,8 +433,8 @@ export class KinematicsCanvasComponent implements OnDestroy {
     const canvas = this.canvasRef().nativeElement;
     const rect = canvas.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
-    const paddingLeft = 90;
-    const paddingRight = 60;
+    const paddingLeft = 16;
+    const paddingRight = 40;
     const trackWidth = rect.width - paddingLeft - paddingRight;
 
     if (clickX >= paddingLeft && clickX <= rect.width - paddingRight) {
