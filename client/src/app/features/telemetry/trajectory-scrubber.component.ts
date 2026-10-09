@@ -8,13 +8,33 @@ import { BenchmarkStore } from '../../state/benchmark.store';
   imports: [CommonModule],
   template: `
     <div class="flex items-center gap-3 p-2 bg-slate-900 border border-slate-800 rounded-xs text-xs font-mono select-none">
-      <!-- Play/Pause Button -->
+      <!-- Play/Pause Button with Idle Stance Indicator -->
       <button
         type="button"
         (click)="store.togglePlay()"
-        class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xs border border-slate-700 flex items-center gap-1 transition-colors"
+        class="px-2.5 py-1 font-bold rounded-xs border flex items-center gap-1.5 transition-all cursor-pointer text-xs"
+        [style.borderColor]="store.isPlaying() ? '#fbbf24' : store.selectedInstance().colorAccent"
+        [style.backgroundColor]="store.isPlaying() ? 'rgba(245, 158, 11, 0.15)' : store.selectedInstance().colorAccent + '18'"
+        [style.color]="store.isPlaying() ? '#fbbf24' : store.selectedInstance().colorAccent"
+        [title]="store.isPlaying() ? 'Pause playback (enters idle mode)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
       >
-        <span>{{ store.isPlaying() ? 'PAUSE' : 'PLAY' }}</span>
+        <span class="w-1.5 h-1.5 rounded-full" [style.backgroundColor]="store.isPlaying() ? '#fbbf24' : store.selectedInstance().colorAccent"></span>
+        <span>{{ store.isPlaying() ? 'PAUSE' : (isAtEnd() ? '↺ REPLAY' : 'PLAY') }}</span>
+        @if (!store.isPlaying() && !isAtEnd()) {
+          <span class="text-[9px] px-1 py-0.2 rounded-xs bg-slate-950/80 border border-slate-700 font-mono font-normal text-slate-300">
+            IDLE
+          </span>
+        }
+      </button>
+
+      <!-- Repeat / Retry / Reset Button -->
+      <button
+        type="button"
+        (click)="store.resetPlayback()"
+        class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold rounded-xs border border-slate-700 flex items-center gap-1 transition-all cursor-pointer text-xs"
+        title="Reset playback to start line (t = 0.00s)"
+      >
+        <span>↺ RESET</span>
       </button>
 
       <!-- Scrub Time Readout -->
@@ -74,6 +94,10 @@ import { BenchmarkStore } from '../../state/benchmark.store';
 })
 export class TrajectoryScrubberComponent {
   readonly store = inject(BenchmarkStore);
+
+  isAtEnd(): boolean {
+    return this.store.scrubTime() >= this.store.maxRunTime() - 0.05;
+  }
 
   onScrubInput(event: Event): void {
     const target = event.target as HTMLInputElement;
