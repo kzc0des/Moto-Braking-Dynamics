@@ -12,8 +12,8 @@ import { ActuationType } from '../../core/models/benchmark.types';
   template: `
     <div class="flex flex-col gap-3 py-1">
       <!-- Actuation Profile Strategy -->
-      <div class="flex flex-col gap-1">
-        <label class="text-xs font-medium text-slate-300">Actuation Profile Strategy</label>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs sm:text-sm font-semibold text-[#22201E]">Actuation Profile Strategy</label>
         <app-segmented-toggle
           [options]="actuationOptions"
           [value]="actuation().type"

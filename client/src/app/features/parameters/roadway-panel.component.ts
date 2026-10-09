@@ -12,8 +12,8 @@ import { SurfaceSubstrate, SurfaceContaminant } from '../../core/models/benchmar
   template: `
     <div class="flex flex-col gap-3 py-1">
       <!-- Surface Substrate -->
-      <div class="flex flex-col gap-1">
-        <label class="text-xs font-medium text-slate-300">Surface Substrate</label>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs sm:text-sm font-semibold text-[#22201E]">Surface Substrate</label>
         <app-segmented-toggle
           [options]="substrateOptions"
           [value]="env().substrate"
@@ -22,8 +22,8 @@ import { SurfaceSubstrate, SurfaceContaminant } from '../../core/models/benchmar
       </div>
 
       <!-- Surface Contaminant -->
-      <div class="flex flex-col gap-1">
-        <label class="text-xs font-medium text-slate-300">Surface Contaminant</label>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs sm:text-sm font-semibold text-[#22201E]">Surface Contaminant</label>
         <app-segmented-toggle
           [options]="contaminantOptions"
           [value]="env().contaminant"
@@ -45,16 +45,16 @@ import { SurfaceSubstrate, SurfaceContaminant } from '../../core/models/benchmar
       />
 
       <!-- Pothole Void Defect Toggle -->
-      <div class="flex items-center justify-between p-2 bg-slate-900 border border-slate-800 rounded-xs text-xs">
+      <div class="flex items-center justify-between p-3 bg-[#FAF7F2] border border-[#E6DFD3] rounded-lg text-sm">
         <div>
-          <span class="font-medium text-slate-200">Pothole Disturbance</span>
-          <p class="text-[10px] text-slate-400">Simulates normal load reduction at x = 15m</p>
+          <span class="font-semibold text-[#22201E] text-xs sm:text-sm">Pothole Disturbance</span>
+          <p class="text-xs text-[#6B645C]">Simulates normal load reduction at x = 15m</p>
         </div>
         <button
           type="button"
           (click)="togglePothole()"
-          class="px-2.5 py-1 text-xs font-mono font-bold rounded-xs border transition-colors"
-          [ngClass]="env().potholeEnabled ? 'bg-amber-950/40 text-amber-400 border-amber-500/50' : 'bg-slate-950 text-slate-500 border-slate-800'"
+          class="px-3 py-1 text-xs font-semibold rounded-md border transition-colors cursor-pointer"
+          [ngClass]="env().potholeEnabled ? 'bg-[#FDEBE8] text-[#C93A30] border-[#F2554A]' : 'bg-white text-[#6B645C] border-[#E6DFD3]'"
         >
           {{ env().potholeEnabled ? 'ACTIVE' : 'OFF' }}
         </button>
