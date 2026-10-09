@@ -8,10 +8,13 @@ import { VehicleRenderer } from './renderers/vehicle.renderer';
   selector: 'app-kinematics-canvas',
   standalone: true,
   imports: [CommonModule],
+  host: {
+    class: 'block w-full h-full flex-1 min-h-0 flex flex-col'
+  },
   template: `
-    <div class="relative w-full h-full flex-1 min-h-0 bg-[#FFFFFF] border border-[#E6DFD3] rounded-xl shadow-xs p-4 flex flex-col gap-3 select-none">
+    <div class="relative w-full h-full flex-1 min-h-0 bg-[#FFFFFF] border border-[#E6DFD3] rounded-xl shadow-xs p-2.5 sm:p-4 flex flex-col gap-2.5 sm:gap-3 select-none">
       <!-- Top Track Viewport Header -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-1 border-b border-[#E6DFD3]/60 shrink-0">
+      <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-1 border-b border-[#E6DFD3]/60 shrink-0">
         <!-- Left: Title, Status Badge & Archetype Pills -->
         <div class="flex items-center gap-2.5">
           <span class="font-bold text-[#22201E] text-base">Track viewport</span>
@@ -39,23 +42,23 @@ import { VehicleRenderer } from './renderers/vehicle.renderer';
         </div>
 
         <!-- Right: Hazard distance, time readout, Play button, Reset button, and + Summon button -->
-        <div class="flex items-center gap-2.5 text-xs">
-          <div class="flex items-center gap-1 text-[#6B645C]">
+        <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs flex-wrap">
+          <div class="flex items-center gap-1 text-[#6B645C] whitespace-nowrap shrink-0">
             <span>Hazard</span>
-            <span class="font-bold text-[#22201E] tabular-nums">{{ store.selectedInstance().simulation.hazardDistance }} m</span>
+            <span class="font-bold text-[#22201E] tabular-nums">{{ store.selectedInstance().simulation.hazardDistance }}m</span>
           </div>
 
-          <div class="flex items-center gap-1 text-[#6B645C]">
+          <div class="flex items-center gap-1 text-[#6B645C] whitespace-nowrap shrink-0">
             <span>t</span>
-            <span class="font-bold text-[#22201E] tabular-nums">{{ store.scrubTime().toFixed(2) }} s</span>
-            <span class="text-[#A39B90]">/ {{ store.maxRunTime().toFixed(2) }} s</span>
+            <span class="font-bold text-[#22201E] tabular-nums">{{ store.scrubTime().toFixed(2) }}s</span>
+            <span class="text-[#A39B90]">/ {{ store.maxRunTime().toFixed(2) }}s</span>
           </div>
 
           <!-- Play / Pause / Replay Button -->
           <button
             type="button"
             (click)="handlePlay()"
-            class="px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+            class="px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0"
             [ngClass]="
               store.isPlaying()
                 ? 'bg-[#22201E] hover:bg-[#000000] text-white'
@@ -71,8 +74,8 @@ import { VehicleRenderer } from './renderers/vehicle.renderer';
           <!-- Reset Button -->
           <button
             type="button"
-            (click)="store.resetPlayback()"
-            class="px-2.5 py-1 bg-white hover:bg-[#FAF7F2] text-[#22201E] rounded-md border border-[#E6DFD3] text-xs font-medium transition-colors cursor-pointer"
+            (click)="handleReset()"
+            class="px-2.5 py-1 bg-white hover:bg-[#FAF7F2] text-[#22201E] rounded-md border border-[#E6DFD3] text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
             title="Reset to start line"
           >
             Reset
@@ -131,49 +134,66 @@ import { VehicleRenderer } from './renderers/vehicle.renderer';
         </div>
       </div>
 
-      <!-- Track Grid: Left Vehicle Column + Right Canvas Viewport (Fills available space) -->
+      <!-- Track Grid: Left Vehicle Column (sticky) + Right Canvas Viewport (Horizontally Scrollable) -->
       <div
-        class="w-full flex-1 min-h-[300px] flex border border-[#E6DFD3] rounded-lg overflow-hidden bg-white"
+        class="w-full flex-1 flex items-stretch border border-[#E6DFD3] rounded-lg overflow-hidden bg-white shadow-xs"
+        [style.minHeight.px]="getCanvasContainerHeight()"
       >
-        <!-- Vehicle Info Column -->
-        <div class="w-40 sm:w-48 border-r border-[#E6DFD3] bg-[#FAF7F2]/40 shrink-0 flex flex-col h-full">
-          <div class="h-6 px-3 flex items-center text-[11px] font-bold text-[#A39B90] uppercase tracking-wider border-b border-[#E6DFD3] shrink-0">
+        <!-- Vehicle Info Column (Pinned on Left, matching track height) -->
+        <div
+          class="w-32 sm:w-40 md:w-48 border-r border-[#E6DFD3] bg-[#FAF7F2] shrink-0 flex flex-col self-stretch z-10 shadow-xs"
+        >
+          <div class="h-[26px] px-2.5 sm:px-3 flex items-center text-[10px] sm:text-[11px] font-bold text-[#A39B90] uppercase tracking-wider border-b border-[#E6DFD3] shrink-0">
             Vehicle
           </div>
 
           <!-- Dynamic Lane Vehicle Rows distributing available height -->
-          @for (inst of store.enabledInstances(); track inst.id; let idx = $index) {
-            <div
-              class="px-3 py-3 flex flex-col justify-center border-b border-[#E6DFD3] last:border-b-0 flex-1 min-h-0"
-            >
-              <div class="text-xs sm:text-sm font-bold text-[#22201E] leading-snug">
-                {{ inst.name }}
+          <div
+            class="flex-1 min-h-0 grid grid-cols-1"
+            [style.gridTemplateRows]="'repeat(' + store.enabledInstances().length + ', 1fr)'"
+          >
+            @for (inst of store.enabledInstances(); track inst.id; let idx = $index) {
+              <div
+                class="px-2.5 sm:px-3 py-2 flex flex-col justify-center border-b border-[#E6DFD3] last:border-b-0 min-h-0 overflow-hidden"
+              >
+                <div class="flex items-center gap-1.5">
+                  <span
+                    class="w-2 h-2 rounded-full shrink-0"
+                    [style.backgroundColor]="inst.colorAccent"
+                  ></span>
+                  <div class="text-[11px] sm:text-xs md:text-sm font-bold text-[#22201E] leading-tight truncate" [title]="inst.name">
+                    {{ inst.name }}
+                  </div>
+                </div>
+                <div class="text-[10px] sm:text-xs text-[#6B645C] leading-tight truncate mt-1 pl-3.5">
+                  {{ getVehicleSpeedText(inst.id) }}
+                </div>
+                @if (store.enabledInstances().length > 1) {
+                  <button
+                    type="button"
+                    (click)="removeBike(inst.id)"
+                    class="text-[10px] sm:text-xs text-[#C93A30] hover:text-[#F2554A] hover:underline text-left mt-1.5 pl-3.5 cursor-pointer whitespace-nowrap"
+                  >
+                    Remove
+                  </button>
+                }
               </div>
-              <div class="text-xs text-[#6B645C]">
-                {{ getVehicleSpeedText(inst.id) }}
-              </div>
-              @if (store.enabledInstances().length > 1) {
-                <button
-                  type="button"
-                  (click)="removeBike(inst.id)"
-                  class="text-xs text-[#C93A30] hover:text-[#F2554A] hover:underline text-left mt-1 cursor-pointer"
-                >
-                  Remove
-                </button>
-              }
-            </div>
-          }
+            }
+          </div>
         </div>
 
-        <!-- Canvas Track Lanes Area -->
-        <div class="flex-1 relative bg-white overflow-hidden h-full">
+        <!-- Canvas Track Lanes Area (Horizontally Scrollable) -->
+        <div
+          #trackScrollContainer
+          class="flex-1 min-w-0 relative bg-white overflow-x-auto overflow-y-hidden self-stretch"
+        >
           <canvas
             #canvas
             (click)="onCanvasClick($event)"
             (mousemove)="onCanvasMouseMove($event)"
             (mousedown)="onCanvasMouseDown($event)"
             (mouseup)="onCanvasMouseUp()"
-            class="w-full h-full block cursor-crosshair select-none"
+            class="min-w-[840px] w-full h-full block cursor-crosshair select-none"
           ></canvas>
         </div>
       </div>
@@ -198,6 +218,7 @@ import { VehicleRenderer } from './renderers/vehicle.renderer';
 })
 export class KinematicsCanvasComponent implements OnDestroy {
   readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  readonly trackScrollContainerRef = viewChild<ElementRef<HTMLDivElement>>('trackScrollContainer');
   readonly store = inject(BenchmarkStore);
   readonly isTelemetryCollapsed = input<boolean>(false);
   readonly isSummonOpen = signal<boolean>(false);
@@ -212,10 +233,18 @@ export class KinematicsCanvasComponent implements OnDestroy {
 
   handlePlay(): void {
     if (this.isAtEnd()) {
-      this.store.resetPlayback();
+      this.handleReset();
       this.store.togglePlay();
     } else {
       this.store.togglePlay();
+    }
+  }
+
+  handleReset(): void {
+    this.store.resetPlayback();
+    const container = this.trackScrollContainerRef()?.nativeElement;
+    if (container) {
+      container.scrollLeft = 0;
     }
   }
 
@@ -274,10 +303,10 @@ export class KinematicsCanvasComponent implements OnDestroy {
 
   getCanvasContainerHeight(): number {
     const count = Math.max(1, this.store.enabledInstances().length);
-    // Big default height: at least 380px, expanding if 3 bikes are on track
-    if (count === 1) return 380;
-    if (count === 2) return 400;
-    return 440;
+    // Generous lane height (~160px per lane for 3 bikes) so prominent arcade bikes fit comfortably
+    if (count === 1) return 320;
+    if (count === 2) return 420;
+    return 510;
   }
 
   getVehicleSpeedText(id: string): string {
@@ -381,7 +410,7 @@ export class KinematicsCanvasComponent implements OnDestroy {
     });
 
     // 2. Render Vehicles on Lanes
-    const topOffset = 24;
+    const topOffset = 26;
     const laneHeight = (height - topOffset) / Math.max(1, enabledInsts.length);
     const isPaused = !this.store.isPlaying();
 
@@ -408,6 +437,52 @@ export class KinematicsCanvasComponent implements OnDestroy {
         frame: renderFrame
       });
     });
+
+    // 3. Auto-scroll container following motorcycle movement
+    this.updateScrollFollow();
+  }
+
+  private lastFollowedTime = -1;
+
+  private updateScrollFollow(): void {
+    const container = this.trackScrollContainerRef()?.nativeElement;
+    if (!container) return;
+
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    if (maxScroll <= 0) return;
+
+    const scrubTime = this.store.scrubTime();
+    const isPlaying = this.store.isPlaying();
+
+    // If user is paused and time hasn't changed, allow free manual inspection
+    if (!isPlaying && !this.isDragging && Math.abs(scrubTime - this.lastFollowedTime) < 0.001) {
+      return;
+    }
+    this.lastFollowedTime = scrubTime;
+
+    if (scrubTime <= 0.02) {
+      container.scrollLeft = 0;
+      return;
+    }
+
+    const frames = this.store.scrubFrames();
+    const selectedInst = this.store.selectedInstance();
+    // Track selected bike or the foremost moving bike
+    const frame = frames[selectedInst?.id] ?? Object.values(frames)[0];
+    if (!frame) return;
+
+    const canvas = this.canvasRef().nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    const cssWidth = rect.width > 0 ? rect.width : 840;
+    const paddingLeft = 70;
+    const paddingRight = 50;
+    const trackWidth = Math.max(120, cssWidth - paddingLeft - paddingRight);
+    const maxDist = this.store.maxStoppingDistance();
+    const posX = paddingLeft + (frame.distance / maxDist) * trackWidth;
+
+    // Keep active bike at ~30% from the left edge of the visible scroll window
+    const targetScroll = Math.max(0, Math.min(maxScroll, posX - container.clientWidth * 0.3));
+    container.scrollLeft = targetScroll;
   }
 
   onCanvasMouseDown(event: MouseEvent): void {
@@ -433,9 +508,9 @@ export class KinematicsCanvasComponent implements OnDestroy {
     const canvas = this.canvasRef().nativeElement;
     const rect = canvas.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
-    const paddingLeft = 16;
-    const paddingRight = 40;
-    const trackWidth = rect.width - paddingLeft - paddingRight;
+    const paddingLeft = 70;
+    const paddingRight = 50;
+    const trackWidth = Math.max(120, rect.width - paddingLeft - paddingRight);
 
     if (clickX >= paddingLeft && clickX <= rect.width - paddingRight) {
       const frac = Math.max(0, Math.min(1, (clickX - paddingLeft) / trackWidth));
