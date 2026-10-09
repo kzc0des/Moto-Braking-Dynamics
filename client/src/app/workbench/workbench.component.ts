@@ -20,9 +20,12 @@ import { DiagnosticsHudComponent } from '../features/diagnostics/diagnostics-hud
     DiagnosticsHudComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#0b0f17] text-slate-100 flex flex-col font-sans select-none overflow-x-hidden">
+    <div
+      class="bg-[#0b0f17] text-slate-100 flex flex-col font-sans select-none overflow-x-hidden"
+      [ngClass]="isTelemetryCollapsed() ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen'"
+    >
       <!-- Top Application Header -->
-      <header class="flex items-center justify-between px-4 py-2 bg-[#151c28] border-b border-[#232f42] text-xs font-mono">
+      <header class="flex items-center justify-between px-4 py-2 bg-[#151c28] border-b border-[#232f42] text-xs font-mono shrink-0">
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
             <span class="w-3 h-3 bg-amber-400 rounded-xs"></span>
@@ -81,22 +84,42 @@ import { DiagnosticsHudComponent } from '../features/diagnostics/diagnostics-hud
       </header>
 
       <!-- Main Workbench Layout -->
-      <main class="flex-1 p-3 flex flex-col gap-3 max-w-[1840px] w-full mx-auto">
+      <main
+        class="flex-1 p-2.5 sm:p-3 flex flex-col gap-3 max-w-[1840px] w-full mx-auto min-h-0"
+        [ngClass]="isTelemetryCollapsed() ? 'h-full overflow-hidden' : ''"
+      >
         <!-- Row 1: 2D Kinematics Track Viewport & Minimizable Anatomy Inspector -->
-        <div class="flex flex-col lg:flex-row gap-3 items-stretch w-full">
-          <!-- 2D Kinematics Track Viewport (expands smoothly when anatomy is minimized) -->
-          <div class="flex-1 min-w-0 transition-all duration-300">
-            <app-kinematics-canvas />
+        <div
+          class="flex flex-col lg:flex-row gap-3 items-stretch w-full"
+          [ngClass]="isTelemetryCollapsed() ? 'flex-1 min-h-0 h-full' : ''"
+        >
+          <!-- 2D Kinematics Track Viewport (expands to 100dvh total screen when telemetry is minimized) -->
+          <div
+            class="flex-1 min-w-0 transition-all duration-300"
+            [ngClass]="isTelemetryCollapsed() ? 'h-full flex flex-col min-h-0' : ''"
+          >
+            <app-kinematics-canvas
+              [isTelemetryCollapsed]="isTelemetryCollapsed()"
+              [class.h-full]="isTelemetryCollapsed()"
+              [class.flex-1]="isTelemetryCollapsed()"
+              [class.min-h-0]="isTelemetryCollapsed()"
+              [class.flex]="isTelemetryCollapsed()"
+              [class.flex-col]="isTelemetryCollapsed()"
+            />
           </div>
 
           <!-- Interactive Anatomy Inspector (beside it, minimizable) -->
           <div
             class="transition-all duration-300 shrink-0"
-            [ngClass]="isAnatomyMinimized() ? 'w-full lg:w-12' : 'w-full lg:w-[380px]'"
+            [ngClass]="[
+              isAnatomyMinimized() ? 'w-full lg:w-12' : 'w-full lg:w-[380px]',
+              isTelemetryCollapsed() ? 'h-full flex flex-col min-h-0' : ''
+            ]"
           >
             <app-anatomy-inspector
               [isMinimized]="isAnatomyMinimized()"
               (toggleMinimize)="isAnatomyMinimized.set(!isAnatomyMinimized())"
+              [class.h-full]="isTelemetryCollapsed()"
             />
           </div>
         </div>

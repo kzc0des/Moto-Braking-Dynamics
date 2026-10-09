@@ -55,7 +55,7 @@ import { OutcomeBadgeComponent } from '../../shared/ui/outcome-badge.component';
       </div>
     } @else {
       <!-- Expanded Anatomy Inspector State -->
-      <div class="flex flex-col gap-2.5 p-3 bg-slate-950 border border-slate-800 rounded-sm shadow-md h-full select-none">
+      <div class="flex flex-col gap-2.5 p-3 bg-slate-950 border border-slate-800 rounded-sm shadow-md h-full select-none overflow-y-auto">
         <div class="flex items-center justify-between text-xs font-mono">
           <div class="flex items-center gap-2">
             <span
