@@ -7,15 +7,15 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="flex flex-col gap-1">
-      <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
-        <span class="truncate">{{ label() }}</span>
-        <span class="text-slate-200 font-semibold tabular-nums">{{ (slipRatio() * 100).toFixed(1) }}%</span>
+      <div class="flex items-center justify-between text-xs font-mono text-[#6B645C]">
+        <span class="truncate font-semibold">{{ label() }}</span>
+        <span class="text-[#22201E] font-bold tabular-nums">{{ (slipRatio() * 100).toFixed(1) }}%</span>
       </div>
-      <div class="grid grid-cols-10 gap-0.5 p-1 bg-slate-950 border border-slate-800 rounded-xs">
+      <div class="grid grid-cols-10 gap-1 p-1 bg-[#F3EEE6] border border-[#E6DFD3] rounded-md">
         @for (seg of segments(); track $index) {
           <div
-            class="h-2 rounded-[1px] transition-colors duration-75"
-            [ngClass]="seg.active ? seg.color : 'bg-slate-900 opacity-40'"
+            class="h-2 rounded-[2px] transition-colors duration-75"
+            [ngClass]="seg.active ? seg.color : 'bg-[#E6DFD3]'"
           ></div>
         }
       </div>
@@ -32,13 +32,13 @@ export class LedSlipBarComponent {
 
     return Array.from({ length: 10 }, (_, i) => {
       const active = i < activeCount;
-      let color = 'bg-emerald-500';
+      let color = 'bg-[#2F9E6B]';
       if (i >= 2 && i < 6) {
         // around 15-20% critical slip
-        color = 'bg-amber-400';
+        color = 'bg-[#E0A030]';
       } else if (i >= 6) {
         // unstable / impending lockup
-        color = 'bg-rose-500';
+        color = 'bg-[#F2554A]';
       }
       return { active, color };
     });

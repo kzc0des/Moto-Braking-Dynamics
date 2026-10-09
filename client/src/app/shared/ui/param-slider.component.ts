@@ -8,14 +8,14 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="flex flex-col gap-1.5 py-1.5">
-      <div class="flex items-center justify-between text-xs">
-        <label class="font-medium text-slate-200 flex items-center gap-1.5">
+      <div class="flex items-center justify-between text-sm">
+        <label class="font-semibold text-[#22201E] flex items-center gap-1.5 text-xs sm:text-sm">
           <span>{{ label() }}</span>
           @if (symbol()) {
-            <span class="text-[10px] font-mono text-slate-400">({{ symbol() }})</span>
+            <span class="text-xs text-[#6B645C]">({{ symbol() }})</span>
           }
         </label>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1.5">
           <input
             type="number"
             [min]="min()"
@@ -23,10 +23,10 @@ import { FormsModule } from '@angular/forms';
             [step]="step()"
             [ngModel]="value()"
             (ngModelChange)="onInputChange($event)"
-            class="w-16 px-1.5 py-0.5 text-right font-mono text-xs bg-slate-900 border rounded-xs text-slate-100 tabular-nums focus:outline-none focus:border-amber-400"
-            [ngClass]="isOutOfBounds() ? 'border-rose-500 text-rose-300' : 'border-slate-800'"
+            class="w-20 px-2 py-1 text-right text-xs sm:text-sm bg-white border rounded-md text-[#22201E] tabular-nums focus:outline-none focus:border-[#F2554A]"
+            [ngClass]="isOutOfBounds() ? 'border-[#F2554A] text-[#C93A30]' : 'border-[#E6DFD3]'"
           />
-          <span class="text-[10px] font-mono text-slate-400 min-w-6">{{ unit() }}</span>
+          <span class="text-xs text-[#6B645C] min-w-7">{{ unit() }}</span>
         </div>
       </div>
 
@@ -37,11 +37,11 @@ import { FormsModule } from '@angular/forms';
         [step]="step()"
         [value]="value()"
         (input)="onSliderInput($event)"
-        class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400 hover:accent-amber-300 transition-colors"
+        class="w-full h-1.5 bg-[#E6DFD3] rounded-lg appearance-none cursor-pointer accent-[#F2554A] hover:accent-[#C93A30] transition-colors"
       />
 
       @if (description()) {
-        <p class="text-[10px] text-slate-400 leading-tight">{{ description() }}</p>
+        <p class="text-xs text-[#6B645C] leading-normal">{{ description() }}</p>
       }
     </div>
   `
@@ -72,9 +72,8 @@ export class ParamSliderComponent {
   }
 
   onInputChange(val: number): void {
-    if (typeof val === 'number' && !isNaN(val)) {
-      const clamped = Math.max(this.min(), Math.min(this.max(), val));
-      this.valueChange.emit(clamped);
+    if (val !== undefined && val !== null && !isNaN(val)) {
+      this.valueChange.emit(val);
     }
   }
 }

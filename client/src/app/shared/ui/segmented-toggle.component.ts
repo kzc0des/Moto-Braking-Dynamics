@@ -11,16 +11,16 @@ export interface ToggleOption<T> {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="flex p-0.5 bg-slate-950 border border-slate-800 rounded-xs">
+    <div class="flex p-0.5 bg-[#FAF7F2] border border-[#E6DFD3] rounded-lg">
       @for (opt of options(); track opt.value) {
         <button
           type="button"
           (click)="selectOption(opt.value)"
-          class="flex-1 px-3 py-1 text-xs font-mono font-medium rounded-xs transition-colors duration-100 text-center"
+          class="flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors text-center cursor-pointer"
           [ngClass]="
             value() === opt.value
-              ? 'bg-slate-800 text-amber-400 font-semibold shadow-xs'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-white text-[#22201E] font-bold shadow-2xs border border-[#E6DFD3]'
+              : 'text-[#6B645C] hover:text-[#22201E]'
           "
         >
           {{ opt.label }}

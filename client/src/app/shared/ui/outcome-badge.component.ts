@@ -8,7 +8,7 @@ import { TerminalOutcome } from '../../core/models/telemetry.types';
   imports: [CommonModule],
   template: `
     <span
-      class="inline-flex items-center px-2.5 py-0.5 text-xs font-mono font-bold tracking-wider uppercase border rounded-xs select-none transition-colors"
+      class="inline-flex items-center px-2.5 py-0.5 text-xs font-mono font-bold tracking-wider uppercase border rounded-md select-none transition-colors"
       [ngClass]="badgeClass()"
     >
       [{{ outcome() }}]
@@ -26,15 +26,15 @@ export class OutcomeBadgeComponent {
   badgeClass(): string {
     switch (this.outcome()) {
       case 'Safe Stop':
-        return 'bg-emerald-950/40 text-emerald-400 border-emerald-500/50';
+        return 'bg-[#EAF7EE] text-[#1E7E4E] border-[#2F9E6B]';
       case 'Barrier Collision':
-        return 'bg-rose-950/50 text-rose-400 border-rose-500/60 animate-pulse';
+        return 'bg-[#FDEBE8] text-[#C93A30] border-[#F2554A]';
       case 'Front-Wheel Washout':
-        return 'bg-amber-950/40 text-amber-400 border-amber-500/50';
+        return 'bg-[#FEF7EC] text-[#B87A14] border-[#E0A030]';
       case 'Rear-Wheel Lift-off':
-        return 'bg-cyan-950/40 text-cyan-400 border-cyan-500/50';
+        return 'bg-[#FEF7EC] text-[#B87A14] border-[#E0A030]';
       default:
-        return 'bg-slate-800 text-slate-300 border-slate-700';
+        return 'bg-[#F3EEE6] text-[#6B645C] border-[#E6DFD3]';
     }
   }
 }
