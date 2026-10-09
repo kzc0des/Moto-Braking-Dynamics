@@ -74,26 +74,26 @@ export class VehicleRenderer {
 
   render(params: VehicleRenderParams): void {
     const { ctx, laneY, laneHeight, width, maxDistance, colorAccent, name, spriteKey, frame } = params;
-    const paddingLeft = 90;
-    const paddingRight = 40;
-    const trackWidth = width - paddingLeft - paddingRight;
+    const paddingLeft = 70;
+    const paddingRight = 50;
+    const trackWidth = Math.max(120, width - paddingLeft - paddingRight);
 
     const meterToPx = (m: number) => paddingLeft + (m / maxDistance) * trackWidth;
     const posX = meterToPx(frame.distance);
-
-    const groundY = laneY + Math.min(laneHeight - 16, Math.max(50, laneHeight * 0.72));
 
     // Resolve sprite archetype
     const resolvedKey = this.resolveSpriteKey(spriteKey, name);
     const cfg = this.spriteConfigs[resolvedKey];
 
-    // Responsive scaling based on lane height
-    const baseScale = Math.min(1.7, Math.max(1.0, laneHeight / 110));
+    // Responsive scaling: guaranteed prominent arcade sprite size on both mobile and desktop
+    const baseScale = Math.min(2.4, Math.max(1.85, laneHeight / 90));
     const scale = baseScale * cfg.scaleMultiplier;
 
     const drawW = cfg.frameWidth * scale;
     const drawH = cfg.frameHeight * scale;
     const anchorX = cfg.frameWidth * cfg.anchorXRatio * scale;
+
+    const groundY = laneY + Math.min(laneHeight - 12, Math.max(drawH + 8, laneHeight * 0.72));
 
     // Deceleration pitch angle (fork dive)
     const pitchAngle = Math.min(0.12, Math.max(-0.04, (frame.deceleration / 9.81) * 0.08));
