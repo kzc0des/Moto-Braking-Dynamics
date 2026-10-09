@@ -1,3 +1,112 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import "tailwindcss";
+
+:root {
+  /* surfaces */
+  --bg:        #FAF7F2;  /* page (cream) */
+  --panel:     #FFFFFF;  /* cards, viewport, inspector */
+  --well:      #F3EEE6;  /* track lanes, chart backgrounds */
+  --border:    #E6DFD3;  /* borders, gridlines */
+
+  /* text */
+  --ink:       #22201E;  /* main text */
+  --ink-2:     #6B645C;  /* labels, secondary */
+  --ink-3:     #A39B90;  /* hints, disabled, axis ticks */
+
+  /* accent: coral */
+  --coral:      #F2554A; /* buttons, active states, key lines */
+  --coral-deep: #C93A30; /* coral text and links */
+  --coral-tint: #FDEBE8; /* hover and selected backgrounds */
+
+  /* data series */
+  --series-1:  #F2554A;  /* coral (the selected bike or main line) */
+  --series-2:  #2E2C33;  /* ink */
+  --series-3:  #6F8FAF;  /* slate blue */
+
+  /* status */
+  --ok:        #2F9E6B;
+  --caution:   #E0A030;
+}
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-well: var(--well);
+  --color-border: var(--border);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-2);
+  --color-ink-subtle: var(--ink-3);
+
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --color-coral-tint: var(--coral-tint);
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure dense tabular numbers for telemetry readouts */
+.tabular-nums, input[type="number"], .font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom range input styling matching the editorial coral / charcoal aesthetic */
+input[type="range"].coral-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 8px;
+  border-radius: 9999px;
+  outline: none;
+}
+input[type="range"].coral-slider::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--track-bg, var(--border));
+}
+input[type="range"].coral-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  margin-top: -5px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+input[type="range"].coral-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--track-bg, var(--border));
+}
+input[type="range"].coral-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide native scrollbars while preserving touch/trackpad scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

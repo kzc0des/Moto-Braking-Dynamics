@@ -6,14 +6,16 @@ export type AppTheme = 'dark' | 'light';
   providedIn: 'root'
 })
 export class ThemeService {
-  readonly currentTheme = signal<AppTheme>('dark');
+  readonly currentTheme = signal<AppTheme>('light');
 
   constructor() {
-    // Check localStorage or default to dark
+    // Check localStorage or default to light
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moto_theme') as AppTheme | null;
       if (saved === 'light' || saved === 'dark') {
         this.currentTheme.set(saved);
+      } else {
+        this.currentTheme.set('light');
       }
 
       effect(() => {
