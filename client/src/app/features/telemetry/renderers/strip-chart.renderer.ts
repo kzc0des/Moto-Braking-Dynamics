@@ -17,7 +17,7 @@ export interface StripChartRenderParams {
   ctx: CanvasRenderingContext2D;
   width: number;
   height: number;
-  title: string;
+  title?: string;
   curves: ChartCurve[];
   thresholds?: ThresholdLine[];
   maxTime: number;
@@ -30,23 +30,25 @@ export class StripChartRenderer {
   render(params: StripChartRenderParams): void {
     const { ctx, width, height, title, curves, thresholds, maxTime, scrubTime } = params;
 
-    const padLeft = 45;
-    const padRight = 85;
-    const padTop = 20;
-    const padBottom = 20;
+    const padLeft = 16;
+    const padRight = 16;
+    const padTop = 12;
+    const padBottom = 24;
     const plotW = width - padLeft - padRight;
     const plotH = height - padTop - padBottom;
 
-    // Background
-    ctx.fillStyle = '#0b0f17';
+    if (plotW <= 0 || plotH <= 0) return;
+
+    // 1. Chart Well Background (--well / #FAF7F2)
+    ctx.fillStyle = '#FAF7F2';
     ctx.fillRect(0, 0, width, height);
 
-    // Border
-    ctx.strokeStyle = '#1e293b';
+    // 2. Chart Plot Border (--border / #E6DFD3)
+    ctx.strokeStyle = '#E6DFD3';
     ctx.lineWidth = 1;
     ctx.strokeRect(padLeft, padTop, plotW, plotH);
 
-    // Compute dynamic Y min/max if not explicitly provided
+    // Dynamic Y min/max calculation
     let minY = params.yMin ?? Infinity;
     let maxY = params.yMax ?? -Infinity;
 
@@ -65,24 +67,40 @@ export class StripChartRenderer {
     const timeToX = (t: number) => padLeft + (t / maxTime) * plotW;
     const valToY = (v: number) => padTop + plotH - ((v - minY) / yRange) * plotH;
 
-    // Horizontal grid lines
-    ctx.strokeStyle = '#151c28';
+    // 3. Horizontal Gridlines (--border / #E6DFD3)
+    ctx.strokeStyle = '#E6DFD3';
     ctx.lineWidth = 1;
-    for (let i = 0; i <= 3; i++) {
-      const y = padTop + (i / 3) * plotH;
+    const gridDivs = 3;
+    for (let i = 1; i < gridDivs; i++) {
+      const y = padTop + (i / gridDivs) * plotH;
       ctx.beginPath();
       ctx.moveTo(padLeft, y);
       ctx.lineTo(padLeft + plotW, y);
       ctx.stroke();
-
-      const val = maxY - (i / 3) * yRange;
-      ctx.fillStyle = '#64748b';
-      ctx.font = '9px monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(val.toFixed(1), padLeft - 4, y + 3);
     }
 
-    // Threshold lines (e.g. Critical Slip or Lift-off 0 N)
+    // 4. Bottom Time Axis Ticks & Labels
+    ctx.fillStyle = '#A39B90';
+    ctx.font = '500 11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+
+    const stepT = maxTime > 3 ? 1.0 : 0.5;
+    for (let t = 0; t <= maxTime + 0.01; t += stepT) {
+      const x = timeToX(t);
+      if (x > padLeft + plotW) break;
+
+      // Vertical tick stub
+      ctx.strokeStyle = '#E6DFD3';
+      ctx.beginPath();
+      ctx.moveTo(x, padTop + plotH);
+      ctx.lineTo(x, padTop + plotH + 4);
+      ctx.stroke();
+
+      const label = t === 0 ? '0 s' : t >= maxTime - 0.2 ? `${t.toFixed(1)} s` : `${t.toFixed(1)}`;
+      ctx.fillText(label, x, padTop + plotH + 16);
+    }
+
+    // 5. Threshold Lines (if applicable)
     if (thresholds) {
       thresholds.forEach(th => {
         if (th.value >= minY && th.value <= maxY) {
@@ -95,31 +113,21 @@ export class StripChartRenderer {
           ctx.lineTo(padLeft + plotW, y);
           ctx.stroke();
           ctx.setLineDash([]);
-
-          ctx.fillStyle = th.color;
-          ctx.font = '9px monospace';
-          ctx.textAlign = 'left';
-          ctx.fillText(th.label, padLeft + plotW + 4, y + 3);
         }
       });
     }
 
-    // Title & Legend at top left
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 10px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(title, padLeft, 13);
-
-    // Plot Curves
+    // 6. Plot Curves
     curves.forEach(c => {
       if (c.times.length === 0) return;
       ctx.strokeStyle = c.color;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 2.2;
+      ctx.lineJoin = 'round';
       ctx.beginPath();
 
       for (let i = 0; i < c.times.length; i++) {
         const x = timeToX(c.times[i]);
-        const y = valToY(c.values[i]);
+        const y = Math.max(padTop, Math.min(padTop + plotH, valToY(c.values[i])));
         if (i === 0) {
           ctx.moveTo(x, y);
         } else {
@@ -127,21 +135,14 @@ export class StripChartRenderer {
         }
       }
       ctx.stroke();
-
-      // Find value at scrub needle
-      const scrubVal = this.interpolateValue(c.times, c.values, scrubTime);
-      ctx.fillStyle = c.color;
-      ctx.font = '10px monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(`${c.name}: ${scrubVal.toFixed(1)}${c.unit}`, padLeft + plotW + 4, padTop + 14 * (curves.indexOf(c) + 1));
     });
 
-    // Synchronized Scrub Needle
+    // 7. Synchronized Scrub Needle
     if (scrubTime >= 0 && scrubTime <= maxTime) {
       const scrubX = timeToX(scrubTime);
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([2, 2]);
+      ctx.strokeStyle = '#22201E';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 3]);
       ctx.beginPath();
       ctx.moveTo(scrubX, padTop);
       ctx.lineTo(scrubX, padTop + plotH);
@@ -150,7 +151,7 @@ export class StripChartRenderer {
     }
   }
 
-  private interpolateValue(times: number[], values: number[], t: number): number {
+  interpolateValue(times: number[], values: number[], t: number): number {
     if (times.length === 0) return 0;
     if (t <= times[0]) return values[0];
     const last = times.length - 1;
