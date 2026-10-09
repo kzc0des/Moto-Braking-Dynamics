@@ -60,7 +60,7 @@ export const DEFAULT_SUPERBIKE: BenchmarkInstanceConfig = {
 export const DEFAULT_CRUISER: BenchmarkInstanceConfig = {
   id: 'instance-2',
   name: 'Cruiser 650cc',
-  enabled: true,
+  enabled: false,
   colorAccent: '#06b6d4', // Laser Cyan
   vehicle: {
     mass: 260.0,
