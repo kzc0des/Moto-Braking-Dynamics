@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
 import { LedSlipBarComponent } from '../../shared/ui/led-slip-bar.component';
@@ -77,7 +77,59 @@ import { OutcomeBadgeComponent } from '../../shared/ui/outcome-badge.component';
               class="px-2 py-0.5 bg-slate-900 border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-400 rounded-xs transition-colors"
               title="Minimize to side strip"
             >
-              — MINIMIZE
+              - MINIMIZE
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Vehicle Sprite Asset Preview Card -->
+        <div class="flex items-center justify-between px-2.5 py-1.5 bg-[#0e1420] border border-slate-800 rounded-xs">
+          <div class="flex items-center gap-2.5">
+            <img
+              [src]="'sprites/' + getSpriteKey() + (activePreviewMode() === 'ride' ? '_ride_preview.gif' : '_idle_preview.gif')"
+              class="h-9 object-contain"
+              [alt]="inst().name"
+            />
+            <div>
+              <div class="text-[11px] font-bold font-mono" [style.color]="inst().colorAccent">{{ inst().name }}</div>
+              <div class="text-[9px] font-mono text-slate-400">
+                {{ activePreviewMode() === 'ride' ? 'DYNAMIC RIDING ANIMATION' : 'IDLE ENGINE & BREATHING' }}
+              </div>
+            </div>
+          </div>
+          <!-- Idle / Ride Mode Toggles -->
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              (click)="previewMode.set('idle')"
+              class="text-[9px] font-mono px-1.5 py-0.5 rounded-xs border font-bold transition-all cursor-pointer"
+              [style.borderColor]="activePreviewMode() === 'idle' ? inst().colorAccent : 'rgba(51, 65, 85, 0.6)'"
+              [style.color]="activePreviewMode() === 'idle' ? inst().colorAccent : '#64748b'"
+              [style.backgroundColor]="activePreviewMode() === 'idle' ? inst().colorAccent + '20' : 'transparent'"
+              title="View Idle Animation"
+            >
+              IDLE
+            </button>
+            <button
+              type="button"
+              (click)="previewMode.set('ride')"
+              class="text-[9px] font-mono px-1.5 py-0.5 rounded-xs border font-bold transition-all cursor-pointer"
+              [style.borderColor]="activePreviewMode() === 'ride' ? inst().colorAccent : 'rgba(51, 65, 85, 0.6)'"
+              [style.color]="activePreviewMode() === 'ride' ? inst().colorAccent : '#64748b'"
+              [style.backgroundColor]="activePreviewMode() === 'ride' ? inst().colorAccent + '20' : 'transparent'"
+              title="View Ride Animation"
+            >
+              RIDE
+            </button>
+            <button
+              type="button"
+              (click)="previewMode.set('auto')"
+              class="text-[9px] font-mono px-1 py-0.5 rounded-xs border transition-all cursor-pointer"
+              [style.borderColor]="previewMode() === 'auto' ? inst().colorAccent : 'rgba(51, 65, 85, 0.4)'"
+              [style.color]="previewMode() === 'auto' ? inst().colorAccent : '#475569'"
+              title="Auto: follow simulation velocity"
+            >
+              SYNC
             </button>
           </div>
         </div>
@@ -103,18 +155,18 @@ import { OutcomeBadgeComponent } from '../../shared/ui/outcome-badge.component';
             <!-- Chassis Main Triangle -->
             <!-- Swingarm -->
             <line x1="80" y1="110" x2="150" y2="95" stroke="#94a3b8" stroke-width="3" />
-            <!-- Main Frame Spars -->
-            <polygon points="150,95 215,65 160,50" fill="#1e293b" stroke="#cbd5e1" stroke-width="2" />
+            <!-- Main Frame Spars tinted with instance color -->
+            <polygon points="150,95 215,65 160,50" fill="#1e293b" [attr.stroke]="inst().colorAccent" stroke-width="2" />
             <!-- Front Fork -->
             <line x1="215" y1="65" x2="240" y2="110" stroke="#f59e0b" stroke-width="3" />
 
             <!-- Center of Gravity (CoG) Crosshair (approx x: 160, y: 75) -->
             <g transform="translate(160, 75)">
-              <circle cx="0" cy="0" r="7" fill="#fbbf24" opacity="0.2" />
-              <circle cx="0" cy="0" r="4" fill="#fbbf24" />
+              <circle cx="0" cy="0" r="7" [attr.fill]="inst().colorAccent" opacity="0.2" />
+              <circle cx="0" cy="0" r="4" [attr.fill]="inst().colorAccent" />
               <line x1="-8" y1="0" x2="8" y2="0" stroke="#ffffff" stroke-width="1.5" />
               <line x1="0" y1="-8" x2="0" y2="8" stroke="#ffffff" stroke-width="1.5" />
-              <text x="10" y="4" fill="#fbbf24" font-size="9" font-family="monospace">CoG (h: {{ inst().vehicle.cogHeight }}m)</text>
+              <text x="10" y="4" [attr.fill]="inst().colorAccent" font-size="9" font-family="monospace">CoG (h: {{ inst().vehicle.cogHeight }}m)</text>
             </g>
 
             <!-- Wheelbase Dimension line L -->
@@ -165,6 +217,7 @@ export class AnatomyInspectorComponent {
   readonly toggleMinimize = output<void>();
 
   readonly Math = Math;
+  readonly previewMode = signal<'auto' | 'idle' | 'ride'>('auto');
 
   inst = this.store.selectedInstance;
 
@@ -172,4 +225,21 @@ export class AnatomyInspectorComponent {
     const id = this.store.selectedInstanceId();
     return this.store.scrubFrames()[id];
   };
+
+  activePreviewMode(): 'idle' | 'ride' {
+    const mode = this.previewMode();
+    if (mode !== 'auto') return mode;
+    if (!this.store.isPlaying()) return 'idle';
+    const frame = this.currentFrame();
+    return frame && frame.velocity > 0.08 ? 'ride' : 'idle';
+  }
+
+  getSpriteKey(): string {
+    const key = this.inst().spriteKey;
+    if (key) return key;
+    const name = this.inst().name.toLowerCase();
+    if (name.includes('scooter')) return 'scooter';
+    if (name.includes('cruiser')) return 'cruiser';
+    return 'ninja';
+  }
 }
