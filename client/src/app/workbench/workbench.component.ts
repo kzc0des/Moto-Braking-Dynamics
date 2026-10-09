@@ -50,11 +50,9 @@ import { DiagnosticsHudComponent } from '../features/diagnostics/diagnostics-hud
             type="button"
             (click)="toggleConfigDrawer()"
             class="px-2.5 py-1 bg-slate-900 border rounded-xs transition-colors flex items-center gap-2"
-            [ngClass]="
-              isConfigDrawerOpen()
-                ? 'border-amber-400 bg-amber-950/40 text-amber-300 font-bold'
-                : 'border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
-            "
+            [style.borderColor]="isConfigDrawerOpen() ? store.selectedInstance().colorAccent : 'rgba(51, 65, 85, 0.8)'"
+            [style.backgroundColor]="isConfigDrawerOpen() ? store.selectedInstance().colorAccent + '20' : 'rgba(15, 23, 42, 0.9)'"
+            [style.color]="isConfigDrawerOpen() ? store.selectedInstance().colorAccent : '#cbd5e1'"
             title="Open Configuration Drawer (Esc to close)"
           >
             <span class="w-2 h-2 rounded-full" [style.backgroundColor]="store.selectedInstance().colorAccent"></span>
@@ -69,7 +67,7 @@ import { DiagnosticsHudComponent } from '../features/diagnostics/diagnostics-hud
             class="px-2 py-1 bg-slate-900 border border-slate-700 text-slate-300 hover:text-white rounded-xs transition-colors text-[11px]"
             title="Toggle Telemetry Panel"
           >
-            {{ isTelemetryCollapsed() ? '+ TELEMETRY' : '— TELEMETRY' }}
+            {{ isTelemetryCollapsed() ? '+ TELEMETRY' : '- TELEMETRY' }}
           </button>
 
           <!-- Theme Toggle -->
