@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
 
@@ -7,44 +7,47 @@ import { BenchmarkStore } from '../../state/benchmark.store';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="flex items-center gap-3 p-2 bg-slate-900 border border-slate-800 rounded-xs text-xs font-mono select-none">
-      <!-- Play/Pause Button with Idle Stance Indicator -->
+    <div class="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-[#FFFFFF] border border-[#E6DFD3] rounded-xl shadow-2xs select-none">
+      <!-- 1. Play / Pause / Replay Button with Idle Stance Indicator -->
       <button
         type="button"
-        (click)="store.togglePlay()"
-        class="px-2.5 py-1 font-bold rounded-xs border flex items-center gap-1.5 transition-all cursor-pointer text-xs"
-        [style.borderColor]="store.isPlaying() ? '#fbbf24' : store.selectedInstance().colorAccent"
-        [style.backgroundColor]="store.isPlaying() ? 'rgba(245, 158, 11, 0.15)' : store.selectedInstance().colorAccent + '18'"
-        [style.color]="store.isPlaying() ? '#fbbf24' : store.selectedInstance().colorAccent"
-        [title]="store.isPlaying() ? 'Pause playback (enters idle mode)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
+        (click)="handlePlay()"
+        class="px-3.5 py-1.5 font-bold rounded-lg transition-colors cursor-pointer text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs shrink-0"
+        [ngClass]="
+          store.isPlaying()
+            ? 'bg-[#F2554A] hover:bg-[#C93A30] text-white'
+            : isAtEnd()
+              ? 'bg-[#FDEBE8] text-[#C93A30] border border-[#F2554A] hover:bg-[#F2554A] hover:text-white'
+              : 'bg-[#F2554A] hover:bg-[#C93A30] text-white'
+        "
+        [title]="store.isPlaying() ? 'Pause playback (enters idle stance)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
       >
-        <span class="w-1.5 h-1.5 rounded-full" [style.backgroundColor]="store.isPlaying() ? '#fbbf24' : store.selectedInstance().colorAccent"></span>
-        <span>{{ store.isPlaying() ? 'PAUSE' : (isAtEnd() ? '↺ REPLAY' : 'PLAY') }}</span>
+        <span>{{ store.isPlaying() ? '❚❚ Pause' : (isAtEnd() ? '↺ Replay' : '► Play') }}</span>
         @if (!store.isPlaying() && !isAtEnd()) {
-          <span class="text-[9px] px-1 py-0.2 rounded-xs bg-slate-950/80 border border-slate-700 font-mono font-normal text-slate-300">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/15 text-white font-mono font-medium tracking-wide">
             IDLE
           </span>
         }
       </button>
 
-      <!-- Repeat / Retry / Reset Button -->
+      <!-- 2. Dedicated Reset Button -->
       <button
         type="button"
         (click)="store.resetPlayback()"
-        class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold rounded-xs border border-slate-700 flex items-center gap-1 transition-all cursor-pointer text-xs"
+        class="px-2.5 py-1.5 bg-white hover:bg-[#FAF7F2] text-[#22201E] hover:text-[#000000] font-semibold rounded-lg border border-[#E6DFD3] hover:border-[#6B645C] flex items-center gap-1 transition-colors cursor-pointer text-xs shrink-0 shadow-2xs"
         title="Reset playback to start line (t = 0.00s)"
       >
-        <span>↺ RESET</span>
+        <span>↺ Reset</span>
       </button>
 
-      <!-- Scrub Time Readout -->
-      <div class="flex items-center gap-1 min-w-28 text-slate-300">
-        <span class="text-amber-400 font-bold tabular-nums">{{ store.scrubTime().toFixed(2) }}s</span>
-        <span class="text-slate-500">/</span>
-        <span class="text-slate-400 tabular-nums">{{ store.maxRunTime().toFixed(2) }}s</span>
+      <!-- 3. Scrub Time Readout -->
+      <div class="flex items-center gap-1.5 min-w-32 text-xs sm:text-sm shrink-0 font-mono tabular-nums">
+        <span class="font-bold text-[#22201E]">{{ store.scrubTime().toFixed(2) }} s</span>
+        <span class="text-[#A39B90]">/</span>
+        <span class="text-[#6B645C]">{{ store.maxRunTime().toFixed(2) }} s</span>
       </div>
 
-      <!-- Scrubber Slider -->
+      <!-- 4. Scrubber Range Slider with dynamic progress track fill -->
       <input
         type="range"
         min="0"
@@ -52,42 +55,43 @@ import { BenchmarkStore } from '../../state/benchmark.store';
         step="0.01"
         [value]="store.scrubTime()"
         (input)="onScrubInput($event)"
-        class="flex-1 h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-amber-400 hover:accent-amber-300"
+        class="coral-slider flex-1 h-2 cursor-pointer min-w-32"
+        [style.--track-bg]="trackBackground()"
+        title="Scrub simulation trajectory"
       />
 
-      <!-- Speed Multiplier -->
-      <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xs p-0.5">
+      <!-- 5. Speed Multiplier Pills (0.5x, 1x, 2x) -->
+      <div class="flex items-center border border-[#E6DFD3] rounded-lg p-0.5 bg-[#F3EEE6] shrink-0">
         @for (speed of [0.5, 1.0, 2.0]; track speed) {
           <button
             type="button"
             (click)="store.setPlaybackSpeed(speed)"
-            class="px-1.5 py-0.5 text-[10px] rounded-xs"
-            [ngClass]="store.playbackSpeed() === speed ? 'bg-slate-800 text-amber-400 font-bold' : 'text-slate-500 hover:text-slate-300'"
+            class="px-2 py-1 text-xs rounded-md transition-colors cursor-pointer font-medium"
+            [ngClass]="
+              store.playbackSpeed() === speed
+                ? 'bg-white text-[#22201E] font-bold shadow-2xs border border-[#E6DFD3]'
+                : 'text-[#6B645C] hover:text-[#22201E]'
+            "
           >
-            {{ speed }}x
+            {{ speed === 1.0 ? '1x' : (speed === 2.0 ? '2x' : '0.5x') }}
           </button>
         }
       </div>
 
-      <!-- Live Auto-compute toggle -->
+      <!-- 6. Live Auto-compute Toggle -->
       <button
         type="button"
         (click)="store.toggleAutoCompute()"
-        class="px-2 py-0.5 text-[10px] border rounded-xs transition-colors"
-        [ngClass]="store.autoCompute() ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500/40' : 'bg-slate-950 text-slate-500 border-slate-800'"
-        title="Toggle automatic recomputation on slider adjust"
+        class="px-2.5 py-1.5 text-xs rounded-lg border font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+        [ngClass]="
+          store.autoCompute()
+            ? 'bg-[#EAF7EE] text-[#1E7E4E] border-[#2F9E6B] shadow-2xs'
+            : 'bg-white text-[#6B645C] border-[#E6DFD3] hover:text-[#22201E] hover:border-[#6B645C]'
+        "
+        title="Toggle automatic recomputation on parameter change"
       >
-        {{ store.autoCompute() ? 'LIVE' : 'MANUAL' }}
-      </button>
-
-      <!-- Manual Re-run button -->
-      <button
-        type="button"
-        (click)="store.triggerSimulation()"
-        class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xs transition-colors"
-        [disabled]="store.isLoading()"
-      >
-        {{ store.isLoading() ? 'SOLVING...' : 'RUN' }}
+        <span class="w-1.5 h-1.5 rounded-full" [ngClass]="store.autoCompute() ? 'bg-[#2F9E6B]' : 'bg-[#A39B90]'"></span>
+        <span>{{ store.autoCompute() ? 'LIVE' : 'MANUAL' }}</span>
       </button>
     </div>
   `
@@ -95,8 +99,29 @@ import { BenchmarkStore } from '../../state/benchmark.store';
 export class TrajectoryScrubberComponent {
   readonly store = inject(BenchmarkStore);
 
+  readonly progressPercent = computed(() => {
+    const max = this.store.maxRunTime();
+    if (max <= 0) return 0;
+    const pct = (this.store.scrubTime() / max) * 100;
+    return Math.max(0, Math.min(100, pct));
+  });
+
+  trackBackground(): string {
+    const pct = this.progressPercent().toFixed(1);
+    return `linear-gradient(to right, #F2554A 0%, #F2554A ${pct}%, #E6DFD3 ${pct}%, #E6DFD3 100%)`;
+  }
+
   isAtEnd(): boolean {
     return this.store.scrubTime() >= this.store.maxRunTime() - 0.05;
+  }
+
+  handlePlay(): void {
+    if (this.isAtEnd()) {
+      this.store.resetPlayback();
+      this.store.togglePlay();
+    } else {
+      this.store.togglePlay();
+    }
   }
 
   onScrubInput(event: Event): void {
