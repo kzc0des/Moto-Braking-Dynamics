@@ -14,9 +14,9 @@ export interface TrackRenderParams {
 export class TrackRenderer {
   render(params: TrackRenderParams): void {
     const { ctx, width, height, maxDistance, hazardDistance, numLanes, roadGradeAngle = 0, pothole } = params;
-    const paddingLeft = 90;
-    const paddingRight = 40;
-    const trackWidth = width - paddingLeft - paddingRight;
+    const paddingLeft = 70;
+    const paddingRight = 50;
+    const trackWidth = Math.max(120, width - paddingLeft - paddingRight);
 
     const meterToPx = (m: number) => paddingLeft + (m / maxDistance) * trackWidth;
 
@@ -24,12 +24,12 @@ export class TrackRenderer {
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, width, height);
 
-    const topOffset = 24;
+    const topOffset = 26;
     const laneHeight = (height - topOffset) / numLanes;
 
-    // 2. Vertical distance gridlines (every 10m)
+    // 2. Vertical distance gridlines (every 10m, big and readable)
     const tickStep = 10;
-    ctx.font = '500 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
     for (let m = 0; m <= maxDistance; m += tickStep) {
       const x = meterToPx(m);
@@ -48,11 +48,11 @@ export class TrackRenderer {
       ctx.lineTo(x, height);
       ctx.stroke();
 
-      // Top distance tick labels: "0 m", "10", "20", ...
-      ctx.fillStyle = '#6B645C';
+      // Top distance tick labels: "0 m", "10 m", "20 m", ...
+      ctx.fillStyle = m === 0 ? '#22201E' : '#6B645C';
       ctx.textAlign = 'center';
-      const label = m === 0 ? '0 m' : m === 50 ? '50 m' : `${m}`;
-      ctx.fillText(label, x, 16);
+      const label = m === 0 ? '0 m' : `${m} m`;
+      ctx.fillText(label, x, 18);
     }
 
     // 3. Hazard Barrier at hazardDistance (55 m) - Coral dashed line
