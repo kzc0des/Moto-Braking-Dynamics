@@ -1,212 +1,167 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
-import { LedSlipBarComponent } from '../../shared/ui/led-slip-bar.component';
-import { OutcomeBadgeComponent } from '../../shared/ui/outcome-badge.component';
 
 @Component({
   selector: 'app-anatomy-inspector',
   standalone: true,
-  imports: [CommonModule, LedSlipBarComponent, OutcomeBadgeComponent],
+  imports: [CommonModule],
   template: `
     @if (isMinimized()) {
-      <!-- Minimized Vertical Dock State -->
+      <!-- Minimized State -->
       <div
         (click)="toggleMinimize.emit()"
-        class="h-full min-h-[320px] w-full bg-slate-950 border border-slate-800 rounded-sm flex flex-col items-center justify-between py-3 px-1 cursor-pointer hover:border-amber-500/50 transition-colors shadow-md select-none group"
+        class="h-full min-h-[300px] w-full bg-white border border-[#E6DFD3] rounded-xl flex flex-col items-center justify-between py-3 px-1 cursor-pointer hover:border-[#F2554A] transition-colors shadow-xs select-none"
         title="Click to expand Anatomy Inspector"
       >
-        <!-- Expand Action Button -->
         <button
           type="button"
           (click)="$event.stopPropagation(); toggleMinimize.emit()"
-          class="w-8 h-8 rounded-xs bg-slate-900 border border-slate-700 text-slate-300 group-hover:text-amber-400 group-hover:border-amber-400 flex items-center justify-center text-xs font-mono transition-colors"
-          title="Expand Anatomy Inspector"
+          class="w-7 h-7 rounded-md bg-[#FAF7F2] border border-[#E6DFD3] text-[#6B645C] hover:text-[#22201E] flex items-center justify-center text-xs transition-colors"
         >
           ⤢
         </button>
-
-        <!-- Vertical Rotated Title & Vehicle Indicator -->
-        <div class="flex flex-col items-center gap-2 py-4">
-          <span
-            class="w-2.5 h-2.5 rounded-full"
-            [style.backgroundColor]="inst().colorAccent"
-          ></span>
-          <span class="text-[11px] font-mono font-bold tracking-widest text-slate-400 group-hover:text-slate-200 [writing-mode:vertical-lr] rotate-180 uppercase">
-            ANATOMY INSPECTOR
-          </span>
-        </div>
-
-        <!-- Mini Live Slip Dots & Status -->
-        @if (currentFrame(); as frame) {
-          <div class="flex flex-col items-center gap-1.5 font-mono text-[9px]">
-            <div
-              class="w-2.5 h-2.5 rounded-xs"
-              [ngClass]="Math.abs(frame.slipRatioFront) > 0.14 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'"
-              title="Front slip state"
-            ></div>
-            <div
-              class="w-2.5 h-2.5 rounded-xs"
-              [ngClass]="Math.abs(frame.slipRatioRear) > 0.14 ? 'bg-rose-500 animate-pulse' : 'bg-cyan-500'"
-              title="Rear slip state"
-            ></div>
-          </div>
-        }
+        <span class="text-xs font-bold text-[#6B645C] [writing-mode:vertical-lr] rotate-180 uppercase tracking-wider">
+          Anatomy Inspector
+        </span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#F2554A]"></span>
       </div>
     } @else {
-      <!-- Expanded Anatomy Inspector State -->
-      <div class="flex flex-col gap-2.5 p-3 bg-slate-950 border border-slate-800 rounded-sm shadow-md h-full select-none overflow-y-auto">
-        <div class="flex items-center justify-between text-xs font-mono">
-          <div class="flex items-center gap-2">
-            <span
-              class="w-2.5 h-2.5 rounded-full"
-              [style.backgroundColor]="inst().colorAccent"
-            ></span>
-            <span class="text-slate-200 font-bold tracking-wide">ANATOMY INSPECTOR</span>
-          </div>
+      <!-- Expanded State Matching Screenshot -->
+      <div class="bg-white border border-[#E6DFD3] rounded-xl shadow-xs p-4 flex flex-col gap-3.5 h-full select-none">
+        <!-- Header: "Anatomy inspector" + Coral Outline "Safe stop" Pill -->
+        <div class="flex items-center justify-between pb-1 border-b border-[#E6DFD3]/60">
+          <div class="font-bold text-[#22201E] text-base">Anatomy inspector</div>
 
           <div class="flex items-center gap-2">
-            @if (currentFrame(); as frame) {
-              <app-outcome-badge [outcome]="frame.terminalOutcome" />
-            }
+            <span class="border border-[#F2554A] text-[#F2554A] text-xs font-semibold px-2.5 py-0.5 rounded-md">
+              {{ getStatusLabel() }}
+            </span>
 
-            <!-- Minimize Button -->
             <button
               type="button"
               (click)="toggleMinimize.emit()"
-              class="px-2 py-0.5 bg-slate-900 border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-400 rounded-xs transition-colors"
-              title="Minimize to side strip"
+              class="text-xs text-[#A39B90] hover:text-[#6B645C] cursor-pointer"
+              title="Minimize panel"
             >
-              - MINIMIZE
+              –
             </button>
           </div>
         </div>
 
-        <!-- Live Vehicle Sprite Asset Preview Card -->
-        <div class="flex items-center justify-between px-2.5 py-1.5 bg-[#0e1420] border border-slate-800 rounded-xs">
-          <div class="flex items-center gap-2.5">
-            <img
-              [src]="'sprites/' + getSpriteKey() + (activePreviewMode() === 'ride' ? '_ride_preview.gif' : '_idle_preview.gif')"
-              class="h-9 object-contain"
-              [alt]="inst().name"
-            />
-            <div>
-              <div class="text-[11px] font-bold font-mono" [style.color]="inst().colorAccent">{{ inst().name }}</div>
-              <div class="text-[9px] font-mono text-slate-400">
-                {{ activePreviewMode() === 'ride' ? 'DYNAMIC RIDING ANIMATION' : 'IDLE ENGINE & BREATHING' }}
+        <!-- Selected Vehicle Sub-card -->
+        <div class="bg-[#FAF7F2] border border-[#E6DFD3] rounded-lg p-3.5 flex flex-col gap-3">
+          <!-- Sub-card Header -->
+          <div>
+            <div class="text-sm font-bold text-[#22201E]">{{ inst().name }}</div>
+            <div class="text-xs text-[#6B645C]">
+              Chassis & geometry architecture
+            </div>
+          </div>
+
+          <!-- 2D Motorcycle Skeleton Anatomy Schematic -->
+          <div class="relative w-full h-36 flex items-center justify-center overflow-hidden">
+            <svg viewBox="0 0 320 140" class="w-full h-full">
+              <!-- Rear Wheel (Ink #2E2C33) -->
+              <circle cx="70" cy="85" r="22" stroke="#2E2C33" stroke-width="2.5" fill="none" />
+              <circle cx="70" cy="85" r="4" fill="#2E2C33" />
+
+              <!-- Front Wheel (Coral #F2554A) -->
+              <circle cx="250" cy="85" r="22" stroke="#F2554A" stroke-width="2.5" fill="none" />
+              <circle cx="250" cy="85" r="4" fill="#F2554A" />
+
+              <!-- Chassis Frame Lines -->
+              <!-- Swingarm -->
+              <line x1="70" y1="85" x2="145" y2="70" stroke="#2E2C33" stroke-width="2.5" />
+              <!-- Steering neck -->
+              <line x1="145" y1="70" x2="225" y2="40" stroke="#2E2C33" stroke-width="2.5" />
+              <!-- Front fork -->
+              <line x1="225" y1="40" x2="250" y2="85" stroke="#6F8FAF" stroke-width="2.5" />
+              <!-- Upper frame truss -->
+              <line x1="145" y1="70" x2="185" y2="35" stroke="#6B645C" stroke-width="1.5" />
+              <line x1="185" y1="35" x2="225" y2="40" stroke="#6B645C" stroke-width="1.5" />
+              <line x1="70" y1="85" x2="225" y2="40" stroke="#E6DFD3" stroke-width="1" stroke-dasharray="2,2" />
+
+              <!-- Center of Gravity (CoG) Coral Crosshair Target -->
+              <g transform="translate(170, 52)">
+                <circle cx="0" cy="0" r="8" stroke="#F2554A" stroke-width="1.5" fill="none" />
+                <line x1="-10" y1="0" x2="10" y2="0" stroke="#F2554A" stroke-width="1.5" />
+                <line x1="0" y1="-10" x2="0" y2="10" stroke="#F2554A" stroke-width="1.5" />
+              </g>
+
+              <!-- Dimension Guidelines below -->
+              <line x1="70" y1="120" x2="250" y2="120" stroke="#E6DFD3" stroke-width="1" />
+              <line x1="70" y1="116" x2="70" y2="124" stroke="#A39B90" stroke-width="1" />
+              <line x1="250" y1="116" x2="250" y2="124" stroke="#A39B90" stroke-width="1" />
+
+              <text x="70" y="134" fill="#6B645C" font-size="11" font-family="system-ui, sans-serif">
+                Wheelbase {{ inst().vehicle.wheelbase }} m
+              </text>
+              <text x="250" y="134" fill="#6B645C" font-size="11" font-family="system-ui, sans-serif" text-anchor="end">
+                CoG h {{ inst().vehicle.cogHeight }} m
+              </text>
+            </svg>
+          </div>
+
+          <!-- Slip Metrics Horizontal Bars -->
+          @if (currentFrame(); as frame) {
+            <div class="grid grid-cols-2 gap-4 pt-1">
+              <!-- Front Slip (Coral) -->
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[#6B645C]">Front slip</span>
+                  <span class="font-bold text-[#22201E] tabular-nums">
+                    {{ (Math.abs(frame.slipRatioFront) * 100).toFixed(1) }}%
+                  </span>
+                </div>
+                <div class="w-full h-1.5 bg-[#E6DFD3] rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-[#F2554A] rounded-full transition-all duration-75"
+                    [style.width.%]="Math.min(100, Math.abs(frame.slipRatioFront) * 500)"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Rear Slip (Ink) -->
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[#6B645C]">Rear slip</span>
+                  <span class="font-bold text-[#22201E] tabular-nums">
+                    {{ (Math.abs(frame.slipRatioRear) * 100).toFixed(1) }}%
+                  </span>
+                </div>
+                <div class="w-full h-1.5 bg-[#E6DFD3] rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-[#2E2C33] rounded-full transition-all duration-75"
+                    [style.width.%]="Math.min(100, Math.abs(frame.slipRatioRear) * 500)"
+                  ></div>
+                </div>
               </div>
             </div>
-          </div>
-          <!-- Idle / Ride Mode Toggles -->
-          <div class="flex items-center gap-1">
-            <button
-              type="button"
-              (click)="previewMode.set('idle')"
-              class="text-[9px] font-mono px-1.5 py-0.5 rounded-xs border font-bold transition-all cursor-pointer"
-              [style.borderColor]="activePreviewMode() === 'idle' ? inst().colorAccent : 'rgba(51, 65, 85, 0.6)'"
-              [style.color]="activePreviewMode() === 'idle' ? inst().colorAccent : '#64748b'"
-              [style.backgroundColor]="activePreviewMode() === 'idle' ? inst().colorAccent + '20' : 'transparent'"
-              title="View Idle Animation"
-            >
-              IDLE
-            </button>
-            <button
-              type="button"
-              (click)="previewMode.set('ride')"
-              class="text-[9px] font-mono px-1.5 py-0.5 rounded-xs border font-bold transition-all cursor-pointer"
-              [style.borderColor]="activePreviewMode() === 'ride' ? inst().colorAccent : 'rgba(51, 65, 85, 0.6)'"
-              [style.color]="activePreviewMode() === 'ride' ? inst().colorAccent : '#64748b'"
-              [style.backgroundColor]="activePreviewMode() === 'ride' ? inst().colorAccent + '20' : 'transparent'"
-              title="View Ride Animation"
-            >
-              RIDE
-            </button>
-            <button
-              type="button"
-              (click)="previewMode.set('auto')"
-              class="text-[9px] font-mono px-1 py-0.5 rounded-xs border transition-all cursor-pointer"
-              [style.borderColor]="previewMode() === 'auto' ? inst().colorAccent : 'rgba(51, 65, 85, 0.4)'"
-              [style.color]="previewMode() === 'auto' ? inst().colorAccent : '#475569'"
-              title="Auto: follow simulation velocity"
-            >
-              SYNC
-            </button>
-          </div>
+
+            <!-- 3-Column Stats Row: Front Fz, Rear Fz, Rotor Temp -->
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#E6DFD3]/80">
+              <div>
+                <div class="text-[11px] text-[#6B645C]">Front Fz</div>
+                <div class="text-sm font-bold text-[#22201E] tabular-nums">
+                  {{ (frame.normalLoadFront / 1000).toFixed(2) }} kN
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] text-[#6B645C]">Rear Fz</div>
+                <div class="text-sm font-bold text-[#22201E] tabular-nums">
+                  {{ (frame.normalLoadRear / 1000).toFixed(2) }} kN
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] text-[#6B645C]">Rotor temp</div>
+                <div class="text-sm font-bold text-[#22201E] tabular-nums">
+                  {{ frame.rotorTemperature.toFixed(1) }} °C
+                </div>
+              </div>
+            </div>
+          }
         </div>
-
-        <!-- 2D SVG Schematic -->
-        <div class="relative w-full h-44 bg-slate-900 border border-slate-800 rounded-xs flex items-center justify-center p-2 overflow-hidden">
-          <svg viewBox="0 0 320 160" class="w-full h-full">
-            <!-- Ground line -->
-            <line x1="20" y1="135" x2="300" y2="135" stroke="#334155" stroke-width="2" />
-
-            <!-- Rear Wheel (x: 80, y: 110, r: 25) -->
-            <circle cx="80" cy="110" r="25" fill="#0b0f17" stroke="#06b6d4" stroke-width="2.5" />
-            <circle cx="80" cy="110" r="6" fill="#06b6d4" />
-            <!-- Rear Brake Caliper/Disc -->
-            <circle cx="80" cy="110" r="14" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3" />
-
-            <!-- Front Wheel (x: 240, y: 110, r: 25) -->
-            <circle cx="240" cy="110" r="25" fill="#0b0f17" stroke="#fbbf24" stroke-width="2.5" />
-            <circle cx="240" cy="110" r="6" fill="#fbbf24" />
-            <!-- Front Brake Caliper/Disc -->
-            <circle cx="240" cy="110" r="16" fill="none" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4,2" />
-
-            <!-- Chassis Main Triangle -->
-            <!-- Swingarm -->
-            <line x1="80" y1="110" x2="150" y2="95" stroke="#94a3b8" stroke-width="3" />
-            <!-- Main Frame Spars tinted with instance color -->
-            <polygon points="150,95 215,65 160,50" fill="#1e293b" [attr.stroke]="inst().colorAccent" stroke-width="2" />
-            <!-- Front Fork -->
-            <line x1="215" y1="65" x2="240" y2="110" stroke="#f59e0b" stroke-width="3" />
-
-            <!-- Center of Gravity (CoG) Crosshair (approx x: 160, y: 75) -->
-            <g transform="translate(160, 75)">
-              <circle cx="0" cy="0" r="7" [attr.fill]="inst().colorAccent" opacity="0.2" />
-              <circle cx="0" cy="0" r="4" [attr.fill]="inst().colorAccent" />
-              <line x1="-8" y1="0" x2="8" y2="0" stroke="#ffffff" stroke-width="1.5" />
-              <line x1="0" y1="-8" x2="0" y2="8" stroke="#ffffff" stroke-width="1.5" />
-              <text x="10" y="4" [attr.fill]="inst().colorAccent" font-size="9" font-family="monospace">CoG (h: {{ inst().vehicle.cogHeight }}m)</text>
-            </g>
-
-            <!-- Wheelbase Dimension line L -->
-            <line x1="80" y1="145" x2="240" y2="145" stroke="#64748b" stroke-width="1" />
-            <line x1="80" y1="141" x2="80" y2="149" stroke="#64748b" stroke-width="1" />
-            <line x1="240" y1="141" x2="240" y2="149" stroke="#64748b" stroke-width="1" />
-            <text x="160" y="155" fill="#94a3b8" font-size="9" font-family="monospace" text-anchor="middle">
-              Wheelbase L: {{ inst().vehicle.wheelbase }}m
-            </text>
-          </svg>
-        </div>
-
-        <!-- Real-Time Physical State Readouts -->
-        @if (currentFrame(); as frame) {
-          <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-            <app-led-slip-bar
-              label="FRONT SLIP (κ_f)"
-              [slipRatio]="frame.slipRatioFront"
-            />
-            <app-led-slip-bar
-              label="REAR SLIP (κ_r)"
-              [slipRatio]="frame.slipRatioRear"
-            />
-          </div>
-
-          <div class="grid grid-cols-3 gap-1.5 p-2 bg-slate-900 border border-slate-800 rounded-xs text-[11px] font-mono">
-            <div>
-              <div class="text-slate-400">Front F_z:</div>
-              <div class="text-amber-400 font-bold tabular-nums">{{ (frame.normalLoadFront / 1000).toFixed(2) }} kN</div>
-            </div>
-            <div>
-              <div class="text-slate-400">Rear F_z:</div>
-              <div class="text-cyan-400 font-bold tabular-nums">{{ (frame.normalLoadRear / 1000).toFixed(2) }} kN</div>
-            </div>
-            <div>
-              <div class="text-slate-400">Rotor Temp:</div>
-              <div class="text-rose-400 font-bold tabular-nums">{{ frame.rotorTemperature.toFixed(1) }} °C</div>
-            </div>
-          </div>
-        }
       </div>
     }
   `
@@ -234,12 +189,12 @@ export class AnatomyInspectorComponent {
     return frame && frame.velocity > 0.08 ? 'ride' : 'idle';
   }
 
-  getSpriteKey(): string {
-    const key = this.inst().spriteKey;
-    if (key) return key;
-    const name = this.inst().name.toLowerCase();
-    if (name.includes('scooter')) return 'scooter';
-    if (name.includes('cruiser')) return 'cruiser';
-    return 'ninja';
+  getStatusLabel(): string {
+    const frame = this.currentFrame();
+    if (!frame) return 'Safe stop';
+    if (frame.terminalOutcome === 'Front-Wheel Washout') return 'Washout';
+    if (frame.terminalOutcome === 'Barrier Collision') return 'Barrier hit';
+    if (frame.terminalOutcome === 'Rear-Wheel Lift-off') return 'Rear lift';
+    return 'Safe stop';
   }
 }
