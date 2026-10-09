@@ -14,34 +14,44 @@ type PillarTab = 'chassis' | 'roadway' | 'actuation';
   template: `
     <div class="flex flex-col gap-2 p-3 bg-slate-950 border border-slate-800 rounded-sm">
       <!-- Benchmark Instance Tabs -->
-      <div class="flex items-center gap-1.5 border-b border-slate-800 pb-2">
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
         @for (inst of store.instances(); track inst.id) {
           <div
-            class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-xs border cursor-pointer transition-colors"
-            [ngClass]="
-              store.selectedInstanceId() === inst.id
-                ? 'bg-slate-900 border-amber-500/50 text-slate-100 font-bold'
-                : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
-            "
+            class="flex items-center gap-2 px-3 py-1.5 text-xs font-mono rounded-xs border cursor-pointer transition-all select-none"
+            [style.borderColor]="store.selectedInstanceId() === inst.id ? inst.colorAccent : 'rgba(51, 65, 85, 0.7)'"
+            [style.backgroundColor]="store.selectedInstanceId() === inst.id ? inst.colorAccent + '15' : 'rgba(2, 6, 23, 0.8)'"
+            [style.boxShadow]="store.selectedInstanceId() === inst.id ? '0 0 10px ' + inst.colorAccent + '30' : 'none'"
             (click)="store.setSelectedInstanceId(inst.id)"
           >
+            <!-- Sprite Idle Animation Preview -->
+            <img
+              [src]="'sprites/' + (inst.spriteKey || (inst.name.toLowerCase().includes('scooter') ? 'scooter' : inst.name.toLowerCase().includes('cruiser') ? 'cruiser' : 'ninja')) + '_idle_preview.gif'"
+              class="w-7 h-4.5 object-contain shrink-0"
+              [alt]="inst.name"
+            />
+
             <!-- Color indicator dot -->
             <span
-              class="w-2 h-2 rounded-full"
+              class="w-2 h-2 rounded-full shrink-0"
               [style.backgroundColor]="inst.colorAccent"
             ></span>
-            <span class="truncate">{{ inst.name }}</span>
 
-            <!-- Enable/disable toggle -->
+            <!-- Instance Name with matching active color -->
+            <span
+              class="truncate font-bold"
+              [style.color]="store.selectedInstanceId() === inst.id ? inst.colorAccent : '#cbd5e1'"
+            >
+              {{ inst.name }}
+            </span>
+
+            <!-- Enable/disable toggle with matching color -->
             <button
               type="button"
               (click)="$event.stopPropagation(); store.toggleInstanceEnabled(inst.id)"
-              class="ml-1 text-[10px] px-1 rounded-xs border"
-              [ngClass]="
-                inst.enabled
-                  ? 'text-emerald-400 border-emerald-500/40 bg-emerald-950/20'
-                  : 'text-slate-600 border-slate-800 bg-slate-950'
-              "
+              class="ml-1 text-[10px] px-1.5 py-0.5 rounded-xs border font-bold transition-all"
+              [style.borderColor]="inst.enabled ? inst.colorAccent + '80' : 'rgba(51, 65, 85, 0.6)'"
+              [style.color]="inst.enabled ? inst.colorAccent : '#64748b'"
+              [style.backgroundColor]="inst.enabled ? inst.colorAccent + '20' : 'transparent'"
               title="Toggle inclusion in benchmark run"
             >
               {{ inst.enabled ? 'ON' : 'OFF' }}
@@ -50,29 +60,32 @@ type PillarTab = 'chassis' | 'roadway' | 'actuation';
         }
       </div>
 
-      <!-- Pillar Selector Tabs -->
+      <!-- Pillar Selector Tabs with Active Instance Color Accent -->
       <div class="flex items-center gap-2 border-b border-slate-900 pb-1 text-xs font-mono">
         <button
           type="button"
           (click)="activePillar.set('chassis')"
-          class="px-2 py-1 transition-colors"
-          [ngClass]="activePillar() === 'chassis' ? 'text-amber-400 font-bold border-b-2 border-amber-400' : 'text-slate-400 hover:text-slate-200'"
+          class="px-2 py-1 transition-colors border-b-2"
+          [style.borderColor]="activePillar() === 'chassis' ? store.selectedInstance().colorAccent : 'transparent'"
+          [style.color]="activePillar() === 'chassis' ? store.selectedInstance().colorAccent : '#94a3b8'"
         >
           1. Chassis & Geometry
         </button>
         <button
           type="button"
           (click)="activePillar.set('roadway')"
-          class="px-2 py-1 transition-colors"
-          [ngClass]="activePillar() === 'roadway' ? 'text-amber-400 font-bold border-b-2 border-amber-400' : 'text-slate-400 hover:text-slate-200'"
+          class="px-2 py-1 transition-colors border-b-2"
+          [style.borderColor]="activePillar() === 'roadway' ? store.selectedInstance().colorAccent : 'transparent'"
+          [style.color]="activePillar() === 'roadway' ? store.selectedInstance().colorAccent : '#94a3b8'"
         >
           2. Roadway & Environment
         </button>
         <button
           type="button"
           (click)="activePillar.set('actuation')"
-          class="px-2 py-1 transition-colors"
-          [ngClass]="activePillar() === 'actuation' ? 'text-amber-400 font-bold border-b-2 border-amber-400' : 'text-slate-400 hover:text-slate-200'"
+          class="px-2 py-1 transition-colors border-b-2"
+          [style.borderColor]="activePillar() === 'actuation' ? store.selectedInstance().colorAccent : 'transparent'"
+          [style.color]="activePillar() === 'actuation' ? store.selectedInstance().colorAccent : '#94a3b8'"
         >
           3. Actuation & Scenario
         </button>
