@@ -44,8 +44,8 @@ export class TrackRenderer {
 
     for (let l = 0; l < numLanes; l++) {
       const laneY = l * laneHeight;
-      const roadHeight = Math.min(46, laneHeight * 0.32);
-      const roadTop = laneY + laneHeight - roadHeight - 12;
+      const roadHeight = 44;
+      const roadTop = laneY + (laneHeight > 260 ? Math.floor(laneHeight * 0.65) : laneHeight - roadHeight - 12);
       const groundBottom = laneY + laneHeight - 2;
 
       // 1. Terrain Sub-stratum (Hill Climb Racing underground cross-section)

@@ -21,8 +21,8 @@ export class VehicleRenderer {
     const meterToPx = (m: number) => paddingLeft + (m / maxDistance) * trackWidth;
     const posX = meterToPx(frame.distance);
 
-    const roadHeight = Math.min(46, laneHeight * 0.32);
-    const roadTop = laneY + laneHeight - roadHeight - 12;
+    const roadHeight = 44;
+    const roadTop = laneY + (laneHeight > 260 ? Math.floor(laneHeight * 0.65) : laneHeight - roadHeight - 12);
     const groundY = roadTop;
 
     // Responsive scaling based on lane height (Hill Climb Racing prominent vehicle size)
