@@ -16,7 +16,7 @@
       <g fill="none" stroke="var(--kerb)">
         <circle r="152" stroke-width="1.2"></circle>
         <circle r="144" stroke-width="8" stroke-dasharray="1 8.36" stroke="var(--concrete)"></circle>
-        <circle r="150" stroke-width="3" pathLength="100" stroke-dasharray="21 79" transform="rotate(-90)" stroke="var(--danger)" opacity="0.65"></circle>
+        <circle r="150" stroke-width="3" pathLength="100" stroke-dasharray="21 79" transform="rotate(-90)" stroke="var(--line)" opacity="0.8"></circle>
         <g class="spin">
           <circle r="112" stroke-width="1.2"></circle>
           <circle r="100" stroke-width="7" stroke-linecap="round" stroke-dasharray="0.1 14.5"></circle>
@@ -40,7 +40,7 @@
       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
         <path d="M10 150 H390 M10 150 V10" stroke="var(--kerb)" stroke-width="1"></path>
         <path d="M10 40 H390 M10 80 H390 M10 120 H390" stroke="var(--well)" stroke-width="1"></path>
-        <path class="trace" pathLength="1" d="M10 28 H80 C170 28 240 60 320 150" stroke="var(--danger)" stroke-width="2" opacity="0.8"></path>
+        <path class="trace" pathLength="1" d="M10 28 H80 C170 28 240 60 320 150" stroke="var(--line)" stroke-width="2" opacity="0.9"></path>
         <path d="M80 150 V22" stroke="var(--kerb)" stroke-width="1" stroke-dasharray="3 5"></path>
       </g>
       <g font-family="'JetBrains Mono', monospace" font-size="10" fill="var(--ink-3)">
@@ -65,7 +65,7 @@
 
         <!-- Cylinder Top Crosshair & Spark Chamber -->
         <path d="M75 14 Q110 4 145 14" stroke="var(--kerb)" stroke-width="1.4" />
-        <circle cx="110" cy="14" r="3" fill="var(--danger)" stroke="none" />
+        <circle cx="110" cy="14" r="3" fill="var(--line)" stroke="none" />
 
         <!-- Reciprocating Piston Assembly -->
         <g class="piston-stroke">
@@ -96,7 +96,7 @@
           <circle cx="110" cy="195" r="14" stroke="var(--ink)" stroke-width="1.4" fill="var(--concrete)" />
           <circle cx="110" cy="195" r="4" fill="var(--ink)" />
           <!-- Crank Pin (Eccentric Journal at radius 24) -->
-          <circle cx="110" cy="171" r="7" stroke="var(--danger)" stroke-width="1.6" fill="#FFFFFF" />
+          <circle cx="110" cy="171" r="7" stroke="var(--line-deep)" stroke-width="1.6" fill="#FFFFFF" />
           <line x1="110" y1="135" x2="110" y2="255" stroke="var(--kerb)" stroke-width="0.8" stroke-dasharray="2 4" />
           <line x1="50" y1="195" x2="170" y2="195" stroke="var(--kerb)" stroke-width="0.8" stroke-dasharray="2 4" />
           <!-- Degree Notch Ticks around rim -->
@@ -208,7 +208,7 @@
         <path d="M102 192 L76 238 L60 234" stroke-width="1.2"></path>
 
         <!-- CoG Indicator -->
-        <g stroke="var(--danger)" stroke-width="1.4">
+        <g stroke="var(--line-deep)" stroke-width="1.4">
           <circle cx="440" cy="205" r="9"></circle>
           <path d="M440 190 V220 M425 205 H455"></path>
           <path d="M440 220 V385" stroke-dasharray="3 5" stroke-width="1"></path>
@@ -226,8 +226,8 @@
       <!-- Engineering Dimension Labels -->
       <g font-family="'JetBrains Mono', monospace" font-size="12" fill="var(--ink-3)">
         <text x="450" y="414" text-anchor="middle">L = 1.42 m</text>
-        <text x="452" y="340" fill="var(--warn)">h = 0.58 m</text>
-        <text x="458" y="196" fill="var(--warn)">CoG</text>
+        <text x="452" y="340" fill="var(--line-deep)">h = 0.58 m</text>
+        <text x="458" y="196" fill="var(--line-deep)">CoG</text>
       </g>
     </svg>
   </div>
@@ -283,11 +283,9 @@
             Manually configure your motorcycle's category, engine displacement, total mass, and braking architecture before starting the simulation.
           </p>
 
-          <div class="my-4 border-t border-[var(--kerb)]"></div>
-
           <!-- Features checklist -->
           <div class="space-y-2.5">
-            <div class="chk">Define category: Underbone, Scooter, Standard, or Superbike</div>
+            <div class="chk">4 Geometry Families &amp; 7 Standard Production Presets</div>
             <div class="chk">Specify displacement (<span class="font-mono text-xs">50cc – 1000cc</span>) &amp; curb weight</div>
             <div class="chk">Configure front/rear hardware (Disc, Dual Disc, or Drum)</div>
             <div class="chk">Select actuation: Conventional Levers, Linked CBS, or ABS</div>
@@ -322,16 +320,16 @@
             Load Calibrated Baseline (125cc Scooter)
           </h2>
           <p class="text-[12.5px] text-[var(--ink-2)] leading-relaxed">
-            Immediately launch the workbench using the pre-calibrated 125cc commuter motorcycle baseline verified against published Cossalter (2006) road test data.
+            Immediately launch the workbench using the pre-calibrated 125cc commuter motorcycle baseline verified against empirical road test standards.
           </p>
 
           <div class="my-4 border-t border-[var(--kerb)]"></div>
 
           <!-- Features checklist -->
           <div class="space-y-2.5">
-            <div class="chk">Vehicle: 125cc Commuter Step-Through (<span class="font-mono text-xs">165 kg</span> Total Mass)</div>
+            <div class="chk">Vehicle: 125cc Commuter Step-Through (<span class="font-mono text-xs">130 kg</span> Total Mass)</div>
             <div class="chk">Braking: <span class="font-mono text-xs">220mm</span> Front Hydraulic Disc + <span class="font-mono text-xs">130mm</span> Rear Drum</div>
-            <div class="chk">Benchmark: Calibrated against Cossalter (2006) empirical data</div>
+            <div class="chk">Benchmark: Calibrated against empirical road test data</div>
             <div class="chk">Instant Access: Populates the Predictive Horizon with zero setup delay</div>
           </div>
         </div>
