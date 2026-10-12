@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed, effect, PLATFORM_ID } from '@angu
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, of } from 'rxjs';
 import { debounceTime, switchMap, catchError, tap } from 'rxjs/operators';
-import { BenchmarkInstanceConfig } from '../core/models/benchmark.types';
+import { BenchmarkInstanceConfig, VehicleSpriteKey } from '../core/models/benchmark.types';
 import { DEFAULT_SUPERBIKE, DEFAULT_CRUISER, DEFAULT_SCOOTER } from '../core/models/archetype-defaults';
 import { InstanceSimulationResult, InterpolatedScrubFrame, BenchmarkResponse } from '../core/models/telemetry.types';
 import { SimulationApiService } from '../core/api/simulation-api.service';
@@ -292,6 +292,7 @@ export class BenchmarkStore {
   configureCustomVehicle(custom: {
     category: string;
     title: string;
+    spriteKey?: VehicleSpriteKey;
     displacementCc: number;
     massKg: number;
     frontBrake: string;
@@ -317,6 +318,16 @@ export class BenchmarkStore {
           else if (cat === 'adventure') biasRatio = 0.51;
           else if (cat === 'extended') biasRatio = custom.wheelbase > 1.50 ? 0.45 : 0.51;
 
+          let spriteKey: VehicleSpriteKey = custom.spriteKey || 'naked';
+          if (!custom.spriteKey) {
+            if (cat === 'step_through' || cat === 'scooter') spriteKey = 'scooter';
+            else if (cat === 'underbone') spriteKey = 'underbone';
+            else if (cat === 'supersport' || cat === 'sport') spriteKey = 'supersport';
+            else if (cat === 'cruiser') spriteKey = 'cruiser';
+            else if (cat === 'adventure') spriteKey = 'adventure';
+            else if (cat === 'extended') spriteKey = custom.wheelbase > 1.50 ? 'cruiser' : 'adventure';
+          }
+
           const cogFront = Number((custom.wheelbase * biasRatio).toFixed(2));
           const cogRear = Number((custom.wheelbase * (1.0 - biasRatio)).toFixed(2));
 
@@ -324,6 +335,7 @@ export class BenchmarkStore {
             ...inst,
             name: custom.title || `${custom.displacementCc}cc Custom ${custom.category}`,
             enabled: true,
+            spriteKey: spriteKey,
             vehicle: {
               ...inst.vehicle,
               mass: custom.massKg,
