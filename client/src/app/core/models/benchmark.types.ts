@@ -53,6 +53,8 @@ export interface ActuationParams {
   type: ActuationType;
   targetPressure: number;      // Pa
   riseTime: number;            // s (only for progressive squeeze)
+  frontLeverPct?: number;      // % [0, 100], Right Hand Lever (fine-motor)
+  rearControlPct?: number;     // % [0, 100], Left Hand Lever or Right Foot Pedal
 }
 
 export interface SimulationConfig {

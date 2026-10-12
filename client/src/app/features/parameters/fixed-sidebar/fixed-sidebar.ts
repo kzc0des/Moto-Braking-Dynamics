@@ -119,6 +119,31 @@ export class FixedSidebar {
     this.store.updateEnvironmentParam('contaminant', con);
   }
 
+  readonly frontLeverPct = computed(() => this.selectedInst().actuation.frontLeverPct ?? 85);
+  readonly rearControlPct = computed(() => this.selectedInst().actuation.rearControlPct ?? 65);
+  readonly frontPressureMpa = computed(() => ((this.frontLeverPct() / 100) * 6.5).toFixed(1));
+  readonly rearPressureMpa = computed(() => ((this.rearControlPct() / 100) * 5.0).toFixed(1));
+
+  readonly rearControlLabel = computed(() => {
+    const key = this.selectedInst().spriteKey;
+    return (key === 'scooter' || key === 'maxi') ? 'Left Hand Lever' : 'Right Foot Pedal';
+  });
+
+  readonly rearControlSubtext = computed(() => {
+    const key = this.selectedInst().spriteKey;
+    return (key === 'scooter' || key === 'maxi') ? 'Hand Lever (Scooter)' : 'Foot Pedal (Manual)';
+  });
+
+  onFrontLeverChange(val: number | string): void {
+    const num = Math.min(100, Math.max(0, Number(val)));
+    this.store.updateActuationParam('frontLeverPct', num);
+  }
+
+  onRearControlChange(val: number | string): void {
+    const num = Math.min(100, Math.max(0, Number(val)));
+    this.store.updateActuationParam('rearControlPct', num);
+  }
+
   onGradeChange(deg: number | string): void {
     const num = Number(deg);
     const rad = Number((num * Math.PI / 180).toFixed(4));

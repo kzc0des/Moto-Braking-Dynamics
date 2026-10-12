@@ -4,7 +4,7 @@ import { Subject, of } from 'rxjs';
 import { debounceTime, switchMap, catchError, tap } from 'rxjs/operators';
 import { BenchmarkInstanceConfig, VehicleSpriteKey } from '../core/models/benchmark.types';
 import { DEFAULT_SUPERBIKE, DEFAULT_CRUISER, DEFAULT_SCOOTER } from '../core/models/archetype-defaults';
-import { InstanceSimulationResult, InterpolatedScrubFrame, BenchmarkResponse } from '../core/models/telemetry.types';
+import { InstanceSimulationResult, InterpolatedScrubFrame, BenchmarkResponse, TerminalOutcome } from '../core/models/telemetry.types';
 import { SimulationApiService } from '../core/api/simulation-api.service';
 import { DiagnosticsService } from '../features/diagnostics/diagnostics.service';
 
@@ -438,11 +438,12 @@ export class BenchmarkStore {
       normalLoadFront: lerp(telem.normalLoadFront),
       normalLoadRear: lerp(telem.normalLoadRear),
       rotorTemperature: lerp(telem.rotorTemperature),
-      terminalOutcome
+      terminalOutcome,
+      isBrakingActive: t >= 1.0
     };
   }
 
-  // --- Local Fallback Generator (Ensures UI works even if backend is offline) ---
+  // --- Local Fallback Generator (Two-Phase Green 2000 & Biomechanical Dual-Brake Solver) ---
   private generateLocalFallbackResults(): void {
     const results: InstanceSimulationResult[] = this.enabledInstances().map(inst => {
       const N = 150;
@@ -450,10 +451,55 @@ export class BenchmarkStore {
       const m = inst.vehicle.mass;
       const L = inst.vehicle.wheelbase;
       const h = inst.vehicle.cogHeight;
-      const mu = inst.environment.substrate === 'gravel' ? 0.45 : inst.environment.contaminant === 'wet' ? 0.60 : 0.88;
-      const avgDecel = Math.min(mu * 9.81 * (inst.actuation.type === 'sudden_lockup' ? 0.75 : 0.95), 11.5);
-      const stopTime = Math.max(1.0, v0 / avgDecel);
-      const stopDist = 0.5 * avgDecel * stopTime * stopTime;
+      const x_hazard = inst.simulation.hazardDistance;
+
+      // Phase 1: Human perception-reaction delay (Green 2000)
+      const t_rxn = 1.0; // s
+      const d_rxn = Number((v0 * t_rxn).toFixed(2));
+
+      // Friction & Grade
+      const baseMu = inst.environment.substrate === 'asphalt' ? 0.85 : inst.environment.substrate === 'concrete' ? 0.80 : 0.54;
+      const conFactor = inst.environment.contaminant === 'dry' ? 1.0 : inst.environment.contaminant === 'wet' ? 0.65 : 0.50;
+      const mu = Number((baseMu * conFactor).toFixed(2));
+      const th = inst.environment.roadGradeAngle;
+
+      // Biomechanical Dual-Brake Actuation
+      const frontLeverPct = inst.actuation.frontLeverPct ?? 85;
+      const rearControlPct = inst.actuation.rearControlPct ?? 65;
+      const frontWeight = 1 - inst.vehicle.brakeBiasRatio;
+      const rearWeight = inst.vehicle.brakeBiasRatio;
+      const modulationEff = Math.min(1.0, Math.max(0.2, ((frontLeverPct / 100) * frontWeight + (rearControlPct / 100) * rearWeight)));
+
+      // Deceleration efficiency
+      const eff = 0.85 * modulationEff;
+      const avgDecel = Number(Math.max(0.5, 9.81 * (mu * eff * Math.cos(th) + Math.sin(th))).toFixed(2));
+
+      // Mechanical Braking Phase
+      const t_brake = Number((v0 / avgDecel).toFixed(2));
+      const d_brake = Number(((v0 * v0) / (2 * avgDecel)).toFixed(2));
+
+      const d_total = Number((d_rxn + d_brake).toFixed(2));
+      const t_total = Number((t_rxn + t_brake).toFixed(2));
+
+      // Barrier collision calculation
+      const isCollision = d_total > x_hazard;
+      let finalVelocity = 0;
+      let stopDist = d_total;
+      let stopTime = t_total;
+
+      if (isCollision) {
+        stopDist = x_hazard;
+        if (d_rxn >= x_hazard) {
+          finalVelocity = v0;
+          stopTime = Number((x_hazard / v0).toFixed(2));
+        } else {
+          const deltaX = x_hazard - d_rxn;
+          const v_imp_sq = Math.max(0, v0 * v0 - 2 * avgDecel * deltaX);
+          finalVelocity = Number(Math.sqrt(v_imp_sq).toFixed(2));
+          const t_brk_imp = (v0 - finalVelocity) / avgDecel;
+          stopTime = Number((t_rxn + t_brk_imp).toFixed(2));
+        }
+      }
 
       const time: number[] = [];
       const distance: number[] = [];
@@ -473,17 +519,32 @@ export class BenchmarkStore {
         const curT = (i / (N - 1)) * stopTime;
         time.push(curT);
 
-        const frac = curT / stopTime;
-        const curV = Math.max(0, v0 * (1 - frac));
-        const curA = frac >= 1 ? 0 : avgDecel;
-        const curX = v0 * curT - 0.5 * avgDecel * curT * curT;
+        let curX = 0;
+        let curV = v0;
+        let curA = 0;
+        let isBraking = false;
+
+        if (curT <= t_rxn) {
+          // Phase 1: Free-rolling Reaction
+          curX = Math.min(x_hazard, v0 * curT);
+          curV = v0;
+          curA = 0;
+          isBraking = false;
+        } else {
+          // Phase 2: Active Mechanical Braking
+          isBraking = true;
+          const t_b = curT - t_rxn;
+          curV = Math.max(finalVelocity, v0 - avgDecel * t_b);
+          curA = avgDecel;
+          curX = Math.min(stopDist, d_rxn + v0 * t_b - 0.5 * avgDecel * t_b * t_b);
+        }
 
         const deltaFz = (m * curA * h) / L;
         const fzFront = Fz_static_front + deltaFz;
         const fzRear = Math.max(0, Fz_static_rear - deltaFz);
 
-        const slipF = inst.actuation.type === 'sudden_lockup' ? Math.min(0.85, 0.15 + frac * 0.7) : 0.12 + Math.sin(frac * Math.PI) * 0.03;
-        const slipR = inst.actuation.type === 'sudden_lockup' ? 0.95 : 0.08 + frac * 0.04;
+        const slipF = !isBraking ? 0.01 : Math.min(0.20, 0.08 + (curA / 10) * 0.08);
+        const slipR = !isBraking ? 0.01 : (rearControlPct > 80 && inst.vehicle.brakeBiasRatio > 0.35 ? 0.95 : Math.min(0.25, 0.06 + (rearControlPct / 100) * 0.12));
 
         distance.push(curX);
         velocity.push(curV);
@@ -493,20 +554,22 @@ export class BenchmarkStore {
         slipRatioRear.push(slipR);
         normalLoadFront.push(fzFront);
         normalLoadRear.push(fzRear);
-        rotorTemperature.push(inst.simulation.initialRotorTemp + frac * 85.0);
+        rotorTemperature.push(inst.simulation.initialRotorTemp + (isBraking ? ((curT - t_rxn) / t_brake) * 85.0 : 0));
       }
 
       const rearLift = normalLoadRear.some(v => v <= 0.01);
-      const collision = stopDist > inst.simulation.hazardDistance;
-      const washout = inst.actuation.type === 'sudden_lockup' && inst.environment.contaminant === 'wet';
+      const washout = inst.environment.contaminant === 'wet' && slipRatioFront.some(s => s > 0.18);
 
-      const terminalOutcome = washout
-        ? 'Front-Wheel Washout'
-        : collision
+      const terminalOutcome: TerminalOutcome = isCollision
         ? 'Barrier Collision'
         : rearLift
         ? 'Rear-Wheel Lift-off'
+        : washout
+        ? 'Front-Wheel Washout'
         : 'Safe Stop';
+
+      const peakFrontPress = Number(((frontLeverPct / 100) * 6.5).toFixed(1)); // MPa
+      const peakRearPress = Number(((rearControlPct / 100) * 5.0).toFixed(1));  // MPa
 
       return {
         instanceId: inst.id,
@@ -514,8 +577,14 @@ export class BenchmarkStore {
         stoppingDistance: stopDist,
         stoppingTime: stopTime,
         peakDeceleration: avgDecel,
-        finalVelocity: collision ? v0 * 0.3 : 0,
-        maxRotorTemp: inst.simulation.initialRotorTemp + 85.0,
+        finalVelocity,
+        maxRotorTemp: inst.simulation.initialRotorTemp + (isCollision ? (stopTime / t_total) * 85.0 : 85.0),
+        reactionDistance: d_rxn,
+        mechanicalBrakingDistance: d_brake,
+        peakFrontLeverPct: frontLeverPct,
+        peakRearControlPct: rearControlPct,
+        peakFrontPressureMpa: peakFrontPress,
+        peakRearPressureMpa: peakRearPress,
         rearLiftOffOccurred: rearLift,
         frontWashoutOccurred: washout,
         fluidBoilOccurred: false,
@@ -535,5 +604,6 @@ export class BenchmarkStore {
     });
 
     this.activeResults.set(results);
+    this.isLoading.set(false);
   }
 }
