@@ -151,9 +151,10 @@ export class BenchmarkStore {
     value: BenchmarkInstanceConfig[K]
   ): void {
     const activeId = this.selectedInstanceId();
-    this.instances.update(list =>
-      list.map(inst => (inst.id === activeId ? { ...inst, [section]: value } : inst))
-    );
+    this.instances.update(list => {
+      const targetId = list.some(i => i.id === activeId) ? activeId : (list[0]?.id ?? 'instance-1');
+      return list.map(inst => (inst.id === targetId ? { ...inst, [section]: value } : inst));
+    });
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -164,15 +165,16 @@ export class BenchmarkStore {
     val: BenchmarkInstanceConfig['vehicle'][K]
   ): void {
     const activeId = this.selectedInstanceId();
-    this.instances.update(list =>
-      list.map(inst => {
-        if (inst.id !== activeId) return inst;
+    this.instances.update(list => {
+      const targetId = list.some(i => i.id === activeId) ? activeId : (list[0]?.id ?? 'instance-1');
+      return list.map(inst => {
+        if (inst.id !== targetId) return inst;
         return {
           ...inst,
           vehicle: { ...inst.vehicle, [key]: val }
         };
-      })
-    );
+      });
+    });
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -183,15 +185,16 @@ export class BenchmarkStore {
     val: BenchmarkInstanceConfig['actuation'][K]
   ): void {
     const activeId = this.selectedInstanceId();
-    this.instances.update(list =>
-      list.map(inst => {
-        if (inst.id !== activeId) return inst;
+    this.instances.update(list => {
+      const targetId = list.some(i => i.id === activeId) ? activeId : (list[0]?.id ?? 'instance-1');
+      return list.map(inst => {
+        if (inst.id !== targetId) return inst;
         return {
           ...inst,
           actuation: { ...inst.actuation, [key]: val }
         };
-      })
-    );
+      });
+    });
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -202,15 +205,16 @@ export class BenchmarkStore {
     val: BenchmarkInstanceConfig['environment'][K]
   ): void {
     const activeId = this.selectedInstanceId();
-    this.instances.update(list =>
-      list.map(inst => {
-        if (inst.id !== activeId) return inst;
+    this.instances.update(list => {
+      const targetId = list.some(i => i.id === activeId) ? activeId : (list[0]?.id ?? 'instance-1');
+      return list.map(inst => {
+        if (inst.id !== targetId) return inst;
         return {
           ...inst,
           environment: { ...inst.environment, [key]: val }
         };
-      })
-    );
+      });
+    });
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -300,8 +304,22 @@ export class BenchmarkStore {
     fluidBoilTemp: number;
   }): void {
     this.instances.update(list => {
+      const targetId = list.some(i => i.id === 'instance-1') ? 'instance-1' : (list[0]?.id ?? 'instance-1');
       return list.map(inst => {
-        if (inst.id === 'instance-1') {
+        if (inst.id === targetId) {
+          // Calculate empirical CoG distribution ratio (b/L) grounded in Cossalter (2006)
+          let biasRatio = 0.50; // neutral default (Standard / Roadster)
+          const cat = custom.category.toLowerCase();
+          if (cat === 'step_through' || cat === 'scooter') biasRatio = 0.42;
+          else if (cat === 'underbone') biasRatio = 0.48;
+          else if (cat === 'supersport' || cat === 'sport') biasRatio = 0.52;
+          else if (cat === 'cruiser') biasRatio = 0.45;
+          else if (cat === 'adventure') biasRatio = 0.51;
+          else if (cat === 'extended') biasRatio = custom.wheelbase > 1.50 ? 0.45 : 0.51;
+
+          const cogFront = Number((custom.wheelbase * biasRatio).toFixed(2));
+          const cogRear = Number((custom.wheelbase * (1.0 - biasRatio)).toFixed(2));
+
           return {
             ...inst,
             name: custom.title || `${custom.displacementCc}cc Custom ${custom.category}`,
@@ -311,9 +329,9 @@ export class BenchmarkStore {
               mass: custom.massKg,
               wheelbase: custom.wheelbase,
               cogHeight: custom.cogHeight,
-              cogDistanceFront: Number((custom.wheelbase * 0.5).toFixed(2)),
-              cogDistanceRear: Number((custom.wheelbase * 0.5).toFixed(2)),
-              brakeBiasRatio: custom.rearBrake === 'drum' ? 0.30 : 0.35
+              cogDistanceFront: cogFront,
+              cogDistanceRear: cogRear,
+              brakeBiasRatio: custom.rearBrake === 'drum' ? 0.35 : 0.30
             },
             brake: {
               ...inst.brake,
