@@ -36,10 +36,10 @@ export class TrackRenderer {
 
       // Vertical line across all lanes
       if (m === 0) {
-        ctx.strokeStyle = '#22201E';
+        ctx.strokeStyle = '#1F2328';
         ctx.lineWidth = 1.5;
       } else {
-        ctx.strokeStyle = '#E6DFD3';
+        ctx.strokeStyle = '#DDE0E4';
         ctx.lineWidth = 1;
       }
 
@@ -49,16 +49,16 @@ export class TrackRenderer {
       ctx.stroke();
 
       // Top distance tick labels: "0 m", "10 m", "20 m", ...
-      ctx.fillStyle = m === 0 ? '#22201E' : '#6B645C';
+      ctx.fillStyle = m === 0 ? '#1F2328' : '#656C76';
       ctx.textAlign = 'center';
       const label = m === 0 ? '0 m' : `${m} m`;
       ctx.fillText(label, x, 18);
     }
 
-    // 3. Hazard Barrier at hazardDistance (55 m) - Coral dashed line
+    // 3. Hazard Barrier at hazardDistance (55 m) - Red signal dashed line
     const barrierX = meterToPx(hazardDistance);
     if (barrierX <= width) {
-      ctx.strokeStyle = '#F2554A';
+      ctx.strokeStyle = '#D93A32';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -68,23 +68,25 @@ export class TrackRenderer {
       ctx.setLineDash([]);
 
       // "Barrier 55 m" label
-      ctx.fillStyle = '#F2554A';
+      ctx.fillStyle = '#D93A32';
       ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(`Barrier ${hazardDistance} m`, barrierX - 6, 32);
     }
 
-    // 4. Horizontal lane dividing lines between multiple vehicles
+    // 4. Horizontal lane dividing lines between multiple vehicles - Yellow pavement marking lines
     for (let l = 0; l < numLanes; l++) {
       const laneY = topOffset + l * laneHeight;
 
       if (l > 0) {
-        ctx.strokeStyle = '#E6DFD3';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#FFC800';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([12, 10]);
         ctx.beginPath();
         ctx.moveTo(0, laneY);
         ctx.lineTo(width, laneY);
         ctx.stroke();
+        ctx.setLineDash([]);
       }
 
       // Pothole defect indicator (if configured)
@@ -94,13 +96,13 @@ export class TrackRenderer {
         const holeW = Math.max(12, holeX2 - holeX1);
         const groundY = laneY + laneHeight - 20;
 
-        ctx.fillStyle = '#FDEBE8';
-        ctx.strokeStyle = '#F2554A';
+        ctx.fillStyle = '#FDF0EF';
+        ctx.strokeStyle = '#D93A32';
         ctx.lineWidth = 1.5;
         ctx.fillRect(holeX1, groundY, holeW, 8);
         ctx.strokeRect(holeX1, groundY, holeW, 8);
 
-        ctx.fillStyle = '#C93A30';
+        ctx.fillStyle = '#D93A32';
         ctx.font = '600 10px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('POTHOLE', holeX1 + holeW / 2, groundY - 4);
