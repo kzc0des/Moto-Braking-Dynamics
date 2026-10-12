@@ -1,11 +1,13 @@
 import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
+import { VehicleSpriteKey } from '../models/benchmark.types';
 
 export interface CustomVehicleRecord {
   id: string;
   category: string;
   title: string;
+  spriteKey?: VehicleSpriteKey;
   displacementCc: number;
   massKg: number;
   frontBrake: string;
@@ -34,6 +36,7 @@ export const BASELINE_SCOOTER_RECORD: CustomVehicleRecord = {
   id: 'baseline-scooter-125',
   category: 'step_through',
   title: '125cc Commuter Scooter',
+  spriteKey: 'scooter',
   displacementCc: 125,
   massKg: 130,
   frontBrake: 'single_disc',
@@ -211,6 +214,7 @@ export class GarageService {
     this.benchmarkStore.configureCustomVehicle({
       category: record.category,
       title: record.title,
+      spriteKey: record.spriteKey,
       displacementCc: record.displacementCc,
       massKg: record.massKg,
       frontBrake: record.frontBrake,

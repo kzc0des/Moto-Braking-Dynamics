@@ -65,12 +65,14 @@ export interface SimulationConfig {
   lowSpeedEpsilon: number;     // m/s
 }
 
+export type VehicleSpriteKey = 'scooter' | 'maxi' | 'underbone' | 'naked' | 'supersport' | 'adventure' | 'cruiser' | 'ninja';
+
 export interface BenchmarkInstanceConfig {
   id: string;                  // 'instance-1' | 'instance-2' | 'instance-3'
   name: string;                // e.g. "Superbike 1000cc"
   enabled: boolean;
   colorAccent: string;         // Hex code, e.g. #4ade80, #cbd5e1, #38bdf8
-  spriteKey?: 'ninja' | 'cruiser' | 'scooter';
+  spriteKey?: VehicleSpriteKey;
   vehicle: VehicleParams;
   brake: BrakeAssembly;
   actuation: ActuationParams;

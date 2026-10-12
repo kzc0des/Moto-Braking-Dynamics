@@ -1,4 +1,4 @@
-import { BenchmarkInstanceConfig } from './benchmark.types';
+import { BenchmarkInstanceConfig, VehicleSpriteKey } from './benchmark.types';
 
 /**
  * 4 CORE GEOMETRY FAMILIES & 7 EMPIRICAL SUB-PRESETS
@@ -73,7 +73,7 @@ export const ARCHETYPE_MAXI_SCOOTER_160: BenchmarkInstanceConfig = {
   name: 'Maxi-Scooter 160cc ABS',
   enabled: false,
   colorAccent: '#2B6CB0',
-  spriteKey: 'scooter',
+  spriteKey: 'maxi',
   vehicle: {
     mass: 150.0,
     wheelbase: 1.35,
@@ -131,7 +131,7 @@ export const ARCHETYPE_UNDERBONE_125: BenchmarkInstanceConfig = {
   name: 'Underbone Commuter 125cc',
   enabled: false,
   colorAccent: '#1F9D55',
-  spriteKey: 'ninja',
+  spriteKey: 'underbone',
   vehicle: {
     mass: 115.0,
     wheelbase: 1.24,
@@ -193,7 +193,7 @@ export const ARCHETYPE_STANDARD_NAKED_250: BenchmarkInstanceConfig = {
   name: 'Standard / Naked 250cc',
   enabled: false,
   colorAccent: '#1F2328',
-  spriteKey: 'ninja',
+  spriteKey: 'naked',
   vehicle: {
     mass: 175.0,
     wheelbase: 1.40,
@@ -255,7 +255,7 @@ export const ARCHETYPE_SUPERSPORT_600: BenchmarkInstanceConfig = {
   name: 'Supersport 600cc',
   enabled: false,
   colorAccent: '#D93A32',
-  spriteKey: 'ninja',
+  spriteKey: 'supersport',
   vehicle: {
     mass: 195.0,
     wheelbase: 1.40,
@@ -317,7 +317,7 @@ export const ARCHETYPE_ADVENTURE_300: BenchmarkInstanceConfig = {
   name: 'Adventure / Trail 300cc',
   enabled: false,
   colorAccent: '#E8750F',
-  spriteKey: 'ninja',
+  spriteKey: 'adventure',
   vehicle: {
     mass: 175.0,
     wheelbase: 1.45,
@@ -437,7 +437,8 @@ export const DEFAULT_SUPERBIKE: BenchmarkInstanceConfig = {
   id: 'instance-1',
   name: 'Superbike 1000cc',
   enabled: true,
-  colorAccent: '#FFC800'
+  colorAccent: '#FFC800',
+  spriteKey: 'supersport'
 };
 
 export const DEFAULT_CRUISER: BenchmarkInstanceConfig = {
@@ -460,6 +461,7 @@ export interface EmpiricalPresetDescriptor {
   key: string;
   familyKey: 'step_through' | 'standard' | 'supersport' | 'extended';
   name: string;
+  spriteKey: VehicleSpriteKey;
   displacementCc: number;
   massKg: number;
   wheelbase: number;
@@ -479,6 +481,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'scooter_125',
     familyKey: 'step_through',
     name: 'Small-Wheel Scooter 125cc',
+    spriteKey: 'scooter',
     displacementCc: 125,
     massKg: 130,
     wheelbase: 1.28,
@@ -496,6 +499,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'maxi_160',
     familyKey: 'step_through',
     name: 'Maxi-Scooter 160cc ABS',
+    spriteKey: 'maxi',
     displacementCc: 160,
     massKg: 150,
     wheelbase: 1.35,
@@ -513,6 +517,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'underbone_125',
     familyKey: 'step_through',
     name: 'Underbone Commuter 125cc',
+    spriteKey: 'underbone',
     displacementCc: 125,
     massKg: 115,
     wheelbase: 1.24,
@@ -530,6 +535,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'naked_250',
     familyKey: 'standard',
     name: 'Standard / Naked 250cc',
+    spriteKey: 'naked',
     displacementCc: 250,
     massKg: 175,
     wheelbase: 1.40,
@@ -547,6 +553,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'supersport_600',
     familyKey: 'supersport',
     name: 'Supersport 600cc',
+    spriteKey: 'supersport',
     displacementCc: 600,
     massKg: 195,
     wheelbase: 1.40,
@@ -564,6 +571,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'adventure_300',
     familyKey: 'extended',
     name: 'Adventure / Trail 300cc',
+    spriteKey: 'adventure',
     displacementCc: 300,
     massKg: 175,
     wheelbase: 1.45,
@@ -581,6 +589,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'cruiser_650',
     familyKey: 'extended',
     name: 'Cruiser / Touring 650cc',
+    spriteKey: 'cruiser',
     displacementCc: 650,
     massKg: 250,
     wheelbase: 1.58,
