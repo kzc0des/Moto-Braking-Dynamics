@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-3 py-1">
   <!-- Surface Substrate -->
   <div class="flex flex-col gap-1.5">
-    <label class="text-xs sm:text-sm font-semibold text-[#22201E]">Surface Substrate</label>
+    <label class="text-xs sm:text-sm font-semibold text-[var(--ink)]">Surface Substrate</label>
     <app-segmented-toggle
       [options]="substrateOptions"
       [value]="env().substrate"
@@ -11,7 +11,7 @@
 
   <!-- Surface Contaminant -->
   <div class="flex flex-col gap-1.5">
-    <label class="text-xs sm:text-sm font-semibold text-[#22201E]">Surface Contaminant</label>
+    <label class="text-xs sm:text-sm font-semibold text-[var(--ink)]">Surface Contaminant</label>
     <app-segmented-toggle
       [options]="contaminantOptions"
       [value]="env().contaminant"
@@ -33,16 +33,16 @@
   />
 
   <!-- Pothole Void Defect Toggle -->
-  <div class="flex items-center justify-between p-3 bg-[#FAF7F2] border border-[#E6DFD3] rounded-lg text-sm">
+  <div class="flex items-center justify-between p-3 bg-[var(--concrete)] border border-[var(--kerb)] rounded-lg text-sm">
     <div>
-      <span class="font-semibold text-[#22201E] text-xs sm:text-sm">Pothole Disturbance</span>
-      <p class="text-xs text-[#6B645C]">Simulates normal load reduction at x = 15m</p>
+      <span class="font-semibold text-[var(--ink)] text-xs sm:text-sm">Pothole Disturbance</span>
+      <p class="text-xs text-[var(--ink-2)]">Simulates normal load reduction at x = 15m</p>
     </div>
     <button
       type="button"
       (click)="togglePothole()"
       class="px-3 py-1 text-xs font-semibold rounded-md border transition-colors cursor-pointer"
-      [ngClass]="env().potholeEnabled ? 'bg-[#FDEBE8] text-[#C93A30] border-[#F2554A]' : 'bg-white text-[#6B645C] border-[#E6DFD3]'"
+      [ngClass]="env().potholeEnabled ? 'bg-[#FDF0EF] text-[#9E241E] border-[#D93A32]/40 font-bold' : 'bg-white text-[var(--ink-2)] border-[var(--kerb)]'"
     >
       {{ env().potholeEnabled ? 'ACTIVE' : 'OFF' }}
     </button>
