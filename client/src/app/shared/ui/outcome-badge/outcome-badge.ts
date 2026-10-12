@@ -1,26 +1,14 @@
 import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TerminalOutcome } from '../../core/models/telemetry.types';
+import { TerminalOutcome } from '../../../core/models/telemetry.types';
 
 @Component({
   selector: 'app-outcome-badge',
-  standalone: true,
   imports: [CommonModule],
-  template: `
-    <span
-      class="inline-flex items-center px-2.5 py-0.5 text-xs font-mono font-bold tracking-wider uppercase border rounded-md select-none transition-colors"
-      [ngClass]="badgeClass()"
-    >
-      [{{ outcome() }}]
-    </span>
-  `,
-  styles: [`
-    :host {
-      display: inline-block;
-    }
-  `]
+  templateUrl: './outcome-badge.html',
+  styleUrl: './outcome-badge.css'
 })
-export class OutcomeBadgeComponent {
+export class OutcomeBadge {
   readonly outcome = input.required<TerminalOutcome>();
 
   badgeClass(): string {

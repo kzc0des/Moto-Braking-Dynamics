@@ -1,94 +1,15 @@
 import { Component, ElementRef, viewChild, inject, afterNextRender, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BenchmarkStore } from '../../state/benchmark.store';
-import { StripChartRenderer } from './renderers/strip-chart.renderer';
+import { BenchmarkStore } from '../../../state/benchmark.store';
+import { StripChartRenderer } from '../renderers/strip-chart.renderer';
 
 @Component({
   selector: 'app-telemetry-panel',
-  standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="bg-white border border-[#E6DFD3] rounded-xl shadow-xs p-4 flex flex-col gap-3.5 select-none">
-      <!-- Top Header: Title & Channel Toggles -->
-      <div class="flex items-center justify-between pb-1 border-b border-[#E6DFD3]/60">
-        <div class="font-bold text-[#22201E] text-base">Synchronized telemetry</div>
-
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            (click)="showLoads.set(!showLoads())"
-            class="px-3 py-1 text-xs font-medium border rounded-md transition-colors cursor-pointer"
-            [ngClass]="showLoads() ? 'bg-[#FDEBE8] text-[#C93A30] border-[#F2554A]' : 'bg-white text-[#6B645C] border-[#E6DFD3] hover:text-[#22201E]'"
-          >
-            Normal loads
-          </button>
-          <button
-            type="button"
-            (click)="showThermals.set(!showThermals())"
-            class="px-3 py-1 text-xs font-medium border rounded-md transition-colors cursor-pointer"
-            [ngClass]="showThermals() ? 'bg-[#FDEBE8] text-[#C93A30] border-[#F2554A]' : 'bg-white text-[#6B645C] border-[#E6DFD3] hover:text-[#22201E]'"
-          >
-            Brake temp
-          </button>
-        </div>
-      </div>
-
-      <!-- Primary Charts: Velocity (Left) & Deceleration (Right) Side-by-Side -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Chart 1: Velocity -->
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-center justify-between text-xs px-1">
-            <span class="text-[#6B645C]">Velocity (m/s)</span>
-            <span class="font-bold text-[#22201E] text-sm tabular-nums">{{ currentVelocity().toFixed(1) }}</span>
-          </div>
-          <div class="w-full h-32 rounded-lg overflow-hidden border border-[#E6DFD3]">
-            <canvas #canvasVelocity class="w-full h-full block"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart 2: Deceleration -->
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-center justify-between text-xs px-1">
-            <span class="text-[#6B645C]">Deceleration (m/s²)</span>
-            <span class="font-bold text-[#22201E] text-sm tabular-nums">{{ currentDeceleration().toFixed(1) }}</span>
-          </div>
-          <div class="w-full h-32 rounded-lg overflow-hidden border border-[#E6DFD3]">
-            <canvas #canvasDecel class="w-full h-full block"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Optional Strip 3: Normal Loads (Front & Rear Fz) -->
-      @if (showLoads()) {
-        <div class="flex flex-col gap-1.5 pt-2 border-t border-[#E6DFD3]/60">
-          <div class="flex items-center justify-between text-xs px-1">
-            <span class="text-[#6B645C]">Normal load distribution (Front: Coral, Rear: Ink) (N)</span>
-            <span class="font-bold text-[#22201E] text-sm tabular-nums">
-              F: {{ (currentFrontLoad() / 1000).toFixed(2) }} kN · R: {{ (currentRearLoad() / 1000).toFixed(2) }} kN
-            </span>
-          </div>
-          <div class="w-full h-28 rounded-lg overflow-hidden border border-[#E6DFD3]">
-            <canvas #canvasLoads class="w-full h-full block"></canvas>
-          </div>
-        </div>
-      }
-
-      <!-- Optional Strip 4: Brake Rotor Temperature -->
-      @if (showThermals()) {
-        <div class="flex flex-col gap-1.5 pt-2 border-t border-[#E6DFD3]/60">
-          <div class="flex items-center justify-between text-xs px-1">
-            <span class="text-[#6B645C]">Rotor temperature (°C)</span>
-            <span class="font-bold text-[#22201E] text-sm tabular-nums">{{ currentRotorTemp().toFixed(1) }} °C</span>
-          </div>
-          <div class="w-full h-28 rounded-lg overflow-hidden border border-[#E6DFD3]">
-            <canvas #canvasThermals class="w-full h-full block"></canvas>
-          </div>
-        </div>
-      }
-    </div>
-  `
+  templateUrl: './telemetry-panel.html',
+  styleUrl: './telemetry-panel.css'
 })
-export class TelemetryPanelComponent implements OnDestroy {
+export class TelemetryPanel implements OnDestroy {
   readonly store = inject(BenchmarkStore);
   readonly showLoads = signal<boolean>(false);
   readonly showThermals = signal<boolean>(false);

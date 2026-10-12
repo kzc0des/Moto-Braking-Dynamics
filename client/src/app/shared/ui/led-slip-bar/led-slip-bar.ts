@@ -3,26 +3,11 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-led-slip-bar',
-  standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="flex flex-col gap-1">
-      <div class="flex items-center justify-between text-xs font-mono text-[#6B645C]">
-        <span class="truncate font-semibold">{{ label() }}</span>
-        <span class="text-[#22201E] font-bold tabular-nums">{{ (slipRatio() * 100).toFixed(1) }}%</span>
-      </div>
-      <div class="grid grid-cols-10 gap-1 p-1 bg-[#F3EEE6] border border-[#E6DFD3] rounded-md">
-        @for (seg of segments(); track $index) {
-          <div
-            class="h-2 rounded-[2px] transition-colors duration-75"
-            [ngClass]="seg.active ? seg.color : 'bg-[#E6DFD3]'"
-          ></div>
-        }
-      </div>
-    </div>
-  `
+  templateUrl: './led-slip-bar.html',
+  styleUrl: './led-slip-bar.css'
 })
-export class LedSlipBarComponent {
+export class LedSlipBar {
   readonly label = input<string>('Slip Ratio (κ)');
   readonly slipRatio = input.required<number>(); // 0.0 to 1.0+
 

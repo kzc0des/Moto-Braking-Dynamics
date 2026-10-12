@@ -1,0 +1,112 @@
+<div class="relative w-full h-full flex-1 min-h-0 bg-[#FFFFFF] border border-[#E6DFD3] rounded-xl shadow-xs p-3 sm:p-4 flex flex-col gap-3 select-none">
+  <!-- Top Track Viewport Header -->
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-2 border-b border-[#E6DFD3]/60 shrink-0">
+    <!-- Left: Title & Active Configured Vehicle Badge -->
+    <div class="flex items-center gap-3">
+      <span class="font-bold text-[#22201E] text-base">2D Kinematics Track</span>
+      <span class="px-2.5 py-0.5 text-xs bg-[#FAF7F2] text-[#22201E] border border-[#E6DFD3] rounded-full font-semibold">
+        {{ activeInst().name }}
+      </span>
+      <span class="text-xs font-mono text-[#6B645C] hidden md:inline">
+        Single-Track Evaluation
+      </span>
+    </div>
+
+    <!-- Right: Hazard distance, time readout, Play button, Reset button -->
+    <div class="flex items-center gap-2 sm:gap-3 text-xs flex-wrap">
+      <div class="flex items-center gap-1 text-[#6B645C] whitespace-nowrap shrink-0">
+        <span>Hazard</span>
+        <span class="font-bold text-[#22201E] tabular-nums">{{ activeInst().simulation.hazardDistance }}m</span>
+      </div>
+
+      <div class="flex items-center gap-1 text-[#6B645C] whitespace-nowrap shrink-0">
+        <span>t</span>
+        <span class="font-bold text-[#22201E] tabular-nums">{{ store.scrubTime().toFixed(2) }}s</span>
+        <span class="text-[#A39B90]">/ {{ store.maxRunTime().toFixed(2) }}s</span>
+      </div>
+
+      <!-- Play / Pause / Replay Button -->
+      <button
+        type="button"
+        (click)="handlePlay()"
+        class="px-3 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0"
+        [ngClass]="
+          store.isPlaying()
+            ? 'bg-[#22201E] hover:bg-[#000000] text-white'
+            : isAtEnd()
+              ? 'bg-[#FDEBE8] text-[#C93A30] border border-[#F2554A] hover:bg-[#F2554A] hover:text-white'
+              : 'bg-[#F2554A] hover:bg-[#C93A30] text-white'
+        "
+        [title]="store.isPlaying() ? 'Pause playback (Space)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory (Space)')"
+      >
+        <span>{{ store.isPlaying() ? '❚❚ Pause' : (isAtEnd() ? '↺ Replay' : '► Play') }}</span>
+      </button>
+
+      <!-- Reset Button -->
+      <button
+        type="button"
+        (click)="handleReset()"
+        class="px-2.5 py-1 bg-white hover:bg-[#FAF7F2] text-[#22201E] rounded-md border border-[#E6DFD3] text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+        title="Reset to start line"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Track Grid: Left Vehicle Telemetry Pin + Right Canvas Viewport -->
+  <div
+    class="w-full flex-1 flex items-stretch border border-[#E6DFD3] rounded-lg overflow-hidden bg-white shadow-xs min-h-[320px]"
+  >
+    <!-- Vehicle Info Column (Pinned on Left) -->
+    <div class="w-36 sm:w-44 border-r border-[#E6DFD3] bg-[#FAF7F2] shrink-0 flex flex-col justify-between p-3 z-10 shadow-xs">
+      <div>
+        <div class="text-[10px] font-bold text-[#A39B90] uppercase tracking-wider mb-2">
+          Live Vehicle Telemetry
+        </div>
+
+        <div class="text-xs sm:text-sm font-bold text-[#22201E] truncate mb-1">
+          {{ activeInst().name }}
+        </div>
+
+        <div class="font-mono text-xs font-bold text-[#F2554A] mb-2">
+          {{ liveSpeedKmh() }} km/h
+        </div>
+
+        <div class="space-y-1 font-mono text-[11px] text-[#6B645C] border-t border-[#E6DFD3] pt-2">
+          <div class="flex justify-between">
+            <span>Distance x:</span>
+            <b class="text-[#22201E]">{{ liveDistanceM() }}m</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Deceleration:</span>
+            <b class="text-[#22201E]">{{ liveDecelG() }}g</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Rotor Temp:</span>
+            <b class="text-[#22201E]">{{ liveTempC() }}°C</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-[10.5px] font-mono text-[#A39B90] border-t border-[#E6DFD3] pt-2">
+        Status: <span class="font-bold text-[#22201E]">{{ liveStatusText() }}</span>
+      </div>
+    </div>
+
+    <!-- Canvas Track Area -->
+    <div
+      #trackScrollContainer
+      class="flex-1 min-w-0 relative bg-white overflow-x-auto overflow-y-hidden self-stretch"
+    >
+      <canvas
+        #canvas
+        (click)="onCanvasClick($event)"
+        (mousemove)="onCanvasMouseMove($event)"
+        (mousedown)="onCanvasMouseDown($event)"
+        (mouseup)="onCanvasMouseUp()"
+        class="min-w-[840px] w-full h-full block cursor-crosshair select-none"
+      ></canvas>
+    </div>
+  </div>
+</div>

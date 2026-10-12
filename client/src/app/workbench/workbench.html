@@ -1,0 +1,213 @@
+<div class="bg-[#FAF7F2] text-[#22201E] flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
+  <!-- Top Application Header -->
+  <header class="flex items-center justify-between px-4 sm:px-6 py-2.5 bg-white border-b border-[#E6DFD3] shrink-0 h-14">
+    <!-- Left: Brand / Topic Title -->
+    <div class="flex items-center gap-3">
+      <span class="w-4 h-4 bg-[#F2554A] rounded-xs shrink-0"></span>
+      <div class="leading-tight">
+        <div class="text-sm sm:text-base font-bold tracking-tight text-[#22201E]">Moto-Braking Dynamics</div>
+        <div class="text-[10px] sm:text-[11px] text-[#6B645C] font-medium hidden sm:block">Computational Benchmark Workbench</div>
+      </div>
+    </div>
+
+    <!-- Center: Operational Mode Segmented Navigation -->
+    <div class="inline-flex p-1 gap-1 rounded-xl bg-[#F4EFE6] border border-[#E6DFD3]">
+      <button
+        type="button"
+        (click)="setMode('analytics')"
+        class="h-8 px-4 rounded-lg text-xs font-bold transition-all cursor-pointer"
+        [ngClass]="currentMode() === 'analytics'
+          ? 'bg-white border border-[#E6DFD3] text-[#22201E] shadow-2xs'
+          : 'text-[#6B645C] hover:text-[#22201E]'"
+      >
+        📊 Predictive Horizon (Analytics)
+      </button>
+      <button
+        type="button"
+        (click)="setMode('simulation')"
+        class="h-8 px-4 rounded-lg text-xs font-bold transition-all cursor-pointer"
+        [ngClass]="currentMode() === 'simulation'
+          ? 'bg-white border border-[#E6DFD3] text-[#22201E] shadow-2xs'
+          : 'text-[#6B645C] hover:text-[#22201E]'"
+      >
+        🏍️ Dynamic Track (Simulation)
+      </button>
+    </div>
+
+    <!-- Right: Action CTA & Team Members Trigger -->
+    <div class="flex items-center gap-2.5">
+      @if (currentMode() === 'analytics') {
+        <button
+          type="button"
+          (click)="switchToSimulation()"
+          class="h-8 px-3.5 bg-[#F2554A] hover:bg-[#C93A30] text-white rounded-lg text-xs font-bold transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>Simulate Run on Track</span>
+          <span class="text-sm">→</span>
+        </button>
+      }
+
+      <button
+        type="button"
+        (click)="toggleMembersDrawer()"
+        class="h-8 px-3 bg-white border border-[#E6DFD3] hover:border-[#F2554A] hover:bg-[#FDEBE8] text-[#22201E] rounded-lg transition-colors text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer"
+        title="View Project Team Members (Esc to close)"
+      >
+        <svg class="w-3.5 h-3.5 text-[#F2554A] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 16v-1a5 5 0 00-2.316-4.175A3.992 3.992 0 0115 11a4 4 0 014 4v1h-3zM4.316 10.825A5 5 0 002 15v1h3v-1a4 4 0 011-2.9 3.992 3.992 0 01-1.684-1.275z" />
+        </svg>
+        <span class="hidden sm:inline">Team</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workbench Layout: Fixed Sidebar + Viewport Stage -->
+  <div class="flex-1 min-h-0 flex overflow-hidden">
+    <!-- 1. FIXED NON-HIDEABLE LEFT SIDEBAR (Width: 300px) -->
+    <app-fixed-sidebar />
+
+    <!-- 2. MAIN STAGE CONTENT AREA -->
+    <main class="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden relative">
+      @if (currentMode() === 'analytics') {
+        <!-- Mode 1: Predictive Horizon (Analytics Mode - Zero Scroll Single Screen) -->
+        <app-predictive-horizon (simulateTrigger)="switchToSimulation()" />
+      } @else {
+        <!-- Mode 2: Dynamic Track Viewport (Simulation Mode) -->
+        <div class="flex-1 min-h-0 flex flex-col p-3 gap-2.5 overflow-hidden">
+          <!-- Kinematics Track Canvas Container -->
+          <div class="flex-1 min-h-0 flex flex-col rounded-xl overflow-hidden border border-[#E6DFD3] shadow-2xs bg-white">
+            <app-kinematics-canvas class="flex-1 min-h-0 flex flex-col h-full" />
+          </div>
+
+          <!-- Trajectory Scrubber Playback Controls -->
+          <div class="shrink-0 bg-white border border-[#E6DFD3] rounded-xl p-3 shadow-2xs">
+            <app-trajectory-scrubber />
+          </div>
+
+          <!-- Collapsible Multi-Channel Telemetry Toggle -->
+          <div class="shrink-0 flex items-center justify-between px-3 py-1.5 bg-white border border-[#E6DFD3] rounded-xl text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-[#22201E]">Multi-channel Strip Telemetry</span>
+              <span class="text-[#6B645C] text-[11px]">(Velocity, Decel, Slip, Normal Load, Temperature)</span>
+            </div>
+            <button
+              type="button"
+              (click)="isTelemetryOpen.set(!isTelemetryOpen())"
+              class="font-bold text-[#F2554A] hover:underline cursor-pointer"
+            >
+              {{ isTelemetryOpen() ? '▲ Hide Telemetry Charts' : '▼ Show Telemetry Charts' }}
+            </button>
+          </div>
+
+          @if (isTelemetryOpen()) {
+            <div class="h-44 shrink-0 overflow-y-auto bg-white border border-[#E6DFD3] rounded-xl p-3 shadow-2xs">
+              <app-telemetry-panel />
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+
+  <!-- Team Members Slide-over Drawer (From Left) -->
+  @if (isMembersDrawerOpen()) {
+    <!-- Backdrop Overlay -->
+    <div
+      (click)="isMembersDrawerOpen.set(false)"
+      class="fixed inset-0 bg-black/30 z-50 backdrop-blur-2xs transition-opacity"
+    ></div>
+  }
+
+  <div
+    class="fixed inset-y-0 left-0 z-55 w-full sm:w-[460px] bg-[#FAF7F2] border-r border-[#E6DFD3] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out select-none"
+    [class.translate-x-0]="isMembersDrawerOpen()"
+    [class.-translate-x-full]="!isMembersDrawerOpen()"
+  >
+    <!-- Drawer Header -->
+    <div class="flex items-center justify-between px-5 py-3.5 bg-[#FFFFFF] border-b border-[#E6DFD3]">
+      <div class="flex items-center gap-2.5">
+        <span class="w-6 h-6 rounded-md bg-[#FDEBE8] border border-[#F2554A]/30 flex items-center justify-center text-[#F2554A] shrink-0">
+          <svg class="w-3.5 h-3.5 text-[#F2554A]" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 16v-1a5 5 0 00-2.316-4.175A3.992 3.992 0 0115 11a4 4 0 014 4v1h-3zM4.316 10.825A5 5 0 002 15v1h3v-1a4 4 0 011-2.9 3.992 3.992 0 01-1.684-1.275z" />
+          </svg>
+        </span>
+        <div>
+          <div class="text-base font-bold text-[#22201E]">Project Team & Members</div>
+          <div class="text-xs text-[#6B645C]">Computational Science Benchmark Group</div>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="isMembersDrawerOpen.set(false)"
+        class="px-3 py-1 bg-[#FFFFFF] border border-[#E6DFD3] hover:border-[#F2554A] hover:bg-[#FDEBE8] text-[#22201E] rounded-lg text-xs font-bold transition-colors cursor-pointer"
+      >
+        ✕ ESC
+      </button>
+    </div>
+
+    <!-- Research Topic Callout -->
+    <div class="p-4 bg-[#FFFFFF] border-b border-[#E6DFD3] flex flex-col gap-1.5">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-[#F2554A]">Research Investigation</div>
+      <div class="text-xs text-[#22201E] font-semibold leading-snug">
+        Multi-Physics Emergency Braking Dynamics, Thermal Fade, and Environmental Surface Modeling in Two-Wheeled Vehicles
+      </div>
+      <div class="text-[11px] text-[#6B645C] mt-1">
+        Department of Computer Science & Engineering · Software Engineering 3
+      </div>
+    </div>
+
+    <!-- Members Scrollable List -->
+    <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
+      <div class="text-[11px] font-bold uppercase tracking-wider text-[#6B645C] px-1 flex items-center justify-between">
+        <span>Contributors</span>
+        <span class="font-mono text-xs text-[#A39B90]">{{ members.length }} Members</span>
+      </div>
+
+      @for (member of members; track member.name; let idx = $index) {
+        <div
+          class="p-3 bg-[#FFFFFF] border rounded-xl flex items-center gap-3 transition-colors shadow-2xs"
+          [ngClass]="member.isLead ? 'border-[#F2554A] bg-[#FEF9F8]' : 'border-[#E6DFD3] hover:border-[#C93A30]/50'"
+        >
+          <div
+            class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 tracking-wide"
+            [ngClass]="member.isLead ? 'bg-[#F2554A] text-white shadow-xs' : 'bg-[#F3EEE6] text-[#22201E]'"
+          >
+            {{ member.initials }}
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs sm:text-sm font-bold text-[#22201E] truncate">
+                {{ member.name }}
+              </span>
+              @if (member.isLead) {
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FDEBE8] text-[#C93A30] border border-[#F2554A]/40 shrink-0">
+                  Author / Lead
+                </span>
+              }
+            </div>
+            <div class="text-xs text-[#6B645C] truncate">
+              {{ member.role }}
+            </div>
+          </div>
+
+          <span class="text-xs font-mono text-[#A39B90] tabular-nums shrink-0">
+            #{{ idx + 1 }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="px-5 py-3 bg-[#FFFFFF] border-t border-[#E6DFD3] flex items-center justify-between text-xs">
+      <div class="text-[#6B645C] text-[11px] font-medium">Academic Year 2026</div>
+      <button
+        type="button"
+        (click)="isMembersDrawerOpen.set(false)"
+        class="px-5 py-1.5 bg-[#F2554A] hover:bg-[#C93A30] text-white rounded-lg font-bold transition-colors text-xs shadow-2xs cursor-pointer"
+      >
+        Done
+      </button>
+    </div>
+  </div>
+</div>

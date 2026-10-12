@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.coral-slider {
+  background: var(--track-bg, #E6DFD3);
+  border-radius: 9999px;
+  appearance: none;
+}
+
+.coral-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #F2554A;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+}
+
+.coral-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
