@@ -1,13 +1,30 @@
 import { Routes } from '@angular/router';
-import { WorkbenchComponent } from './workbench/workbench.component';
+import { Workbench } from './workbench/workbench';
+import { SetupHub } from './features/setup/setup-hub/setup-hub';
+import { ConfigureStudio } from './features/setup/configure-studio/configure-studio';
+import { vehicleSetupGuard } from './core/guards/vehicle-setup.guard';
 
 export const routes: Routes = [
   {
+    path: 'setup',
+    component: SetupHub
+  },
+  {
+    path: 'configure',
+    component: ConfigureStudio
+  },
+  {
+    path: 'workbench',
+    component: Workbench,
+    canActivate: [vehicleSetupGuard]
+  },
+  {
     path: '',
-    component: WorkbenchComponent
+    pathMatch: 'full',
+    redirectTo: 'workbench'
   },
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'workbench'
   }
 ];
