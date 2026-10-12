@@ -1,0 +1,332 @@
+<div class="min-h-screen bg-[#FAF7F2] text-[#22201E] flex flex-col font-sans select-none pb-12">
+  <!-- Top Application Header -->
+  <header class="flex items-center justify-between px-6 py-3.5 bg-white border-b border-[#E6DFD3] shrink-0 sticky top-0 z-30 shadow-2xs">
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="px-2.5 py-1 text-xs font-bold text-[#6B645C] hover:text-[#22201E] bg-[#F4EFE6] hover:bg-[#E6DFD3] border border-[#E6DFD3] rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
+      >
+        <span>←</span>
+        <span>{{ garageService.hasVehicles() ? 'Return to Workbench' : 'Back to Setup' }}</span>
+      </button>
+      <div>
+        <div class="text-base font-bold tracking-tight text-[#22201E]">
+          {{ isEditMode() ? 'Edit Motorcycle Configuration' : 'Motorcycle Engineering Studio' }}
+        </div>
+        <div class="text-xs text-[#6B645C] font-medium">
+          {{ isEditMode() ? 'Update geometry, displacement, and braking specs' : 'Custom Vehicle Calibration & Actuation Specifier' }}
+        </div>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="saveAndLaunch()"
+      class="py-2 px-5 bg-[#F2554A] hover:bg-[#C93A30] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+    >
+      <span>{{ isEditMode() ? 'Save Changes & Open Workbench' : 'Save Configuration & Open Workbench' }}</span>
+      <span class="text-sm">→</span>
+    </button>
+  </header>
+
+  <!-- Main Form Container -->
+  <main class="max-w-4xl mx-auto w-full p-6 flex flex-col gap-6">
+    <!-- 1. Interactive Schematic Card -->
+    <div class="bg-white border border-[#E6DFD3] rounded-2xl p-5 shadow-2xs flex flex-col md:flex-row items-center gap-6">
+      <div class="flex-1 w-full border border-[#E6DFD3] rounded-xl bg-[#FAF7F2] p-3 flex items-center justify-center">
+        <svg width="100%" height="110" viewBox="0 0 280 100" role="img" class="block">
+          <!-- Ground Line -->
+          <line x1="10" y1="88" x2="270" y2="88" stroke="#DDD6C9" stroke-width="1" />
+          <!-- Rear Wheel -->
+          <circle [attr.cx]="svgCoords().rx" cy="66" r="22" fill="none" stroke="#22201E" stroke-width="2.5" />
+          <circle [attr.cx]="svgCoords().rx" cy="66" r="3.5" fill="#22201E" />
+          <!-- Front Wheel -->
+          <circle [attr.cx]="svgCoords().fx" cy="66" r="22" fill="none" stroke="#22201E" stroke-width="2.5" />
+          <circle [attr.cx]="svgCoords().fx" cy="66" r="3.5" fill="#22201E" />
+          <!-- Chassis Frame -->
+          <polyline [attr.points]="svgCoords().frame" fill="none" stroke="#6B645C" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+          <!-- Seat Bar -->
+          <line [attr.x1]="svgCoords().seatA" y1="42" [attr.x2]="svgCoords().seatB" y2="42" stroke="#22201E" stroke-width="4.5" stroke-linecap="round" />
+          <!-- CoG Indicator -->
+          <circle [attr.cx]="svgCoords().cx" [attr.cy]="svgCoords().cy" r="6" fill="#FFFFFF" stroke="#F2554A" stroke-width="2.5" />
+          <line [attr.x1]="svgCoords().cx" [attr.y1]="svgCoords().cyTop" [attr.x2]="svgCoords().cx" [attr.y2]="svgCoords().cyBot" stroke="#F2554A" stroke-width="1.5" />
+          <!-- Wheelbase Dimension -->
+          <line [attr.x1]="svgCoords().rx" y1="96" [attr.x2]="svgCoords().fx" y2="96" stroke="#A39B90" stroke-width="1" />
+          <line [attr.x1]="svgCoords().rx" y1="93" [attr.x2]="svgCoords().rx" y2="99" stroke="#A39B90" stroke-width="1" />
+          <line [attr.x1]="svgCoords().fx" y1="93" [attr.x2]="svgCoords().fx" y2="99" stroke="#A39B90" stroke-width="1" />
+        </svg>
+      </div>
+
+      <div class="w-full md:w-64 flex flex-col gap-2 shrink-0">
+        <span class="text-[10.5px] font-bold uppercase tracking-wider text-[#F2554A]">Calibrated Geometry</span>
+        <div class="text-base font-bold text-[#22201E]">{{ title() || 'Custom Build' }}</div>
+        <div class="space-y-1 font-mono text-xs text-[#6B645C]">
+          <div>Wheelbase: <b class="text-[#22201E]">{{ wheelbase().toFixed(2) }} m</b></div>
+          <div>CoG Height: <b class="text-[#22201E]">{{ cogHeight().toFixed(2) }} m</b></div>
+          <div>Displacement: <b class="text-[#22201E]">{{ displacementCc() }} cc</b></div>
+          <div>Total Mass: <b class="text-[#22201E]">{{ massKg() }} kg</b></div>
+          <div class="text-[#F2554A] font-semibold">Speed Cap: <b>{{ maxSpeedKmh() }} km/h</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Form Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Section A: Category & Title -->
+      <div class="bg-white border border-[#E6DFD3] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
+        <div class="text-xs font-bold uppercase tracking-wider text-[#6B645C]">1. Chassis Category & Title</div>
+
+        <div class="grid grid-cols-2 gap-2">
+          @for (cat of categories; track cat.key) {
+            <button
+              type="button"
+              (click)="selectCategory(cat.key)"
+              class="p-2.5 rounded-xl border text-xs font-bold transition-all text-left flex flex-col gap-1 cursor-pointer"
+              [ngClass]="category() === cat.key ? 'border-[#F2554A] bg-[#FDEBE8] text-[#C93A30]' : 'border-[#E6DFD3] bg-[#FAF7F2] text-[#22201E] hover:border-[#F2554A]/50'"
+            >
+              <span>{{ cat.label }}</span>
+              <span class="text-[10px] font-normal text-[#6B645C]">{{ cat.desc }}</span>
+            </button>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-medium text-[#22201E]">Custom Vehicle Name</label>
+          <input
+            type="text"
+            [(ngModel)]="title"
+            placeholder="e.g. Daily Commuter 125cc"
+            class="w-full h-9 px-3 border border-[#E6DFD3] rounded-lg bg-[#FAF7F2] text-xs text-[#22201E] focus:border-[#F2554A] focus:outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Section B: Powertrain & Weight -->
+      <div class="bg-white border border-[#E6DFD3] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
+        <div class="text-xs font-bold uppercase tracking-wider text-[#6B645C]">2. Engine Displacement & Mass</div>
+
+        <!-- Displacement (cc) -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between items-baseline text-xs">
+            <span class="font-medium text-[#22201E]">Engine Displacement (cc)</span>
+            <span class="font-mono text-sm font-bold text-[#22201E]">{{ displacementCc() }} cc</span>
+          </div>
+          <input
+            type="range"
+            min="50"
+            max="1000"
+            step="10"
+            [(ngModel)]="displacementCc"
+            (ngModelChange)="onDisplacementChange($event)"
+            class="w-full accent-[#F2554A] cursor-pointer"
+          />
+          <div class="flex justify-between font-mono text-[10px] text-[#A39B90]">
+            <span>50 cc (Moped)</span>
+            <span>400 cc</span>
+            <span>1000 cc (Superbike)</span>
+          </div>
+
+          <!-- Speed Cap Badge -->
+          <div class="mt-2 p-2 rounded-lg bg-[#FAF7F2] border border-[#E6DFD3] flex items-center justify-between text-xs">
+            <span class="text-[#6B645C] font-medium">Displacement Speed Ceiling (<i class="italic font-serif">v</i><sub>max</sub>):</span>
+            <span class="font-mono font-bold text-[#F2554A]">{{ maxSpeedKmh() }} km/h</span>
+          </div>
+        </div>
+
+        <!-- Total Mass (kg) -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between items-baseline text-xs">
+            <span class="font-medium text-[#22201E]">Total Mass (Curb + Rider)</span>
+            <span class="font-mono text-sm font-bold text-[#22201E]">{{ massKg() }} kg</span>
+          </div>
+          <input
+            type="range"
+            min="110"
+            max="320"
+            step="5"
+            [(ngModel)]="massKg"
+            class="w-full accent-[#F2554A] cursor-pointer"
+          />
+          <div class="flex justify-between font-mono text-[10px] text-[#A39B90]">
+            <span>110 kg</span>
+            <span>200 kg</span>
+            <span>320 kg (Heavy Touring)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section C: Brake Hardware Architecture -->
+      <div class="bg-white border border-[#E6DFD3] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
+        <div class="text-xs font-bold uppercase tracking-wider text-[#6B645C]">3. Caliper & Assembly Hardware</div>
+
+        <!-- Front Hardware -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium text-[#22201E]">Front Caliper Assembly</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              (click)="frontBrake.set('single_disc')"
+              class="p-2 rounded-xl border text-xs font-bold text-center cursor-pointer transition-all"
+              [ngClass]="frontBrake() === 'single_disc' ? 'border-[#F2554A] bg-[#FDEBE8] text-[#C93A30]' : 'border-[#E6DFD3] bg-[#FAF7F2] text-[#22201E]'"
+            >
+              Single Hydraulic Disc
+            </button>
+            <button
+              type="button"
+              (click)="frontBrake.set('dual_disc')"
+              class="p-2 rounded-xl border text-xs font-bold text-center cursor-pointer transition-all"
+              [ngClass]="frontBrake() === 'dual_disc' ? 'border-[#F2554A] bg-[#FDEBE8] text-[#C93A30]' : 'border-[#E6DFD3] bg-[#FAF7F2] text-[#22201E]'"
+            >
+              Dual Hydraulic Disc
+            </button>
+          </div>
+        </div>
+
+        <!-- Rear Hardware -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium text-[#22201E]">Rear Mechanism Assembly</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              (click)="rearBrake.set('drum')"
+              class="p-2 rounded-xl border text-xs font-bold text-center cursor-pointer transition-all"
+              [ngClass]="rearBrake() === 'drum' ? 'border-[#F2554A] bg-[#FDEBE8] text-[#C93A30]' : 'border-[#E6DFD3] bg-[#FAF7F2] text-[#22201E]'"
+            >
+              Mechanical Drum
+            </button>
+            <button
+              type="button"
+              (click)="rearBrake.set('disc')"
+              class="p-2 rounded-xl border text-xs font-bold text-center cursor-pointer transition-all"
+              [ngClass]="rearBrake() === 'disc' ? 'border-[#F2554A] bg-[#FDEBE8] text-[#C93A30]' : 'border-[#E6DFD3] bg-[#FAF7F2] text-[#22201E]'"
+            >
+              Hydraulic Disc
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section D: Electronic Actuation Control -->
+      <div class="bg-white border border-[#E6DFD3] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
+        <div class="text-xs font-bold uppercase tracking-wider text-[#6B645C]">4. Actuation Technology</div>
+
+        <div class="flex flex-col gap-2">
+          @for (act of actuations; track act.key) {
+            <button
+              type="button"
+              (click)="actuation.set(act.key)"
+              class="p-2.5 rounded-xl border text-xs font-bold text-left flex items-center justify-between cursor-pointer transition-all"
+              [ngClass]="actuation() === act.key ? 'border-[#F2554A] bg-[#FDEBE8] text-[#C93A30]' : 'border-[#E6DFD3] bg-[#FAF7F2] text-[#22201E] hover:border-[#F2554A]/50'"
+            >
+              <div>
+                <div>{{ act.label }}</div>
+                <div class="text-[10px] font-normal text-[#6B645C]">{{ act.desc }}</div>
+              </div>
+              <span class="text-sm font-bold">{{ actuation() === act.key ? '✓' : '' }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Section E: Tier 2 Advanced Tuning Accordion -->
+    <div class="bg-white border border-[#E6DFD3] rounded-2xl p-5 shadow-2xs">
+      <button
+        type="button"
+        (click)="isTier2Open.set(!isTier2Open())"
+        class="w-full flex items-center justify-between text-xs font-bold text-[#22201E] hover:text-[#F2554A] transition-colors cursor-pointer"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-[#F2554A]">{{ isTier2Open() ? '▼' : '▶' }}</span>
+          <span>Tier 2: Advanced Mechanical & Thermodynamic Parameters (Optional)</span>
+        </div>
+        <span class="text-[11px] text-[#6B645C] font-normal">Auto-calibrated based on category</span>
+      </button>
+
+      @if (isTier2Open()) {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-[#E6DFD3] text-xs">
+          <div class="flex flex-col gap-1">
+            <span class="text-[#6B645C]">Wheelbase L (m)</span>
+            <input
+              type="number"
+              step="0.02"
+              min="1.15"
+              max="1.65"
+              [(ngModel)]="wheelbase"
+              class="h-8 px-2 border border-[#E6DFD3] rounded-lg font-mono text-xs bg-[#FAF7F2]"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-[#6B645C]">CoG Height h (m)</span>
+            <input
+              type="number"
+              step="0.02"
+              min="0.45"
+              max="0.75"
+              [(ngModel)]="cogHeight"
+              class="h-8 px-2 border border-[#E6DFD3] rounded-lg font-mono text-xs bg-[#FAF7F2]"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-[#6B645C]">Rotor Diameter (mm)</span>
+            <input
+              type="number"
+              step="10"
+              min="180"
+              max="330"
+              [(ngModel)]="rotorDiameterMm"
+              class="h-8 px-2 border border-[#E6DFD3] rounded-lg font-mono text-xs bg-[#FAF7F2]"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-[#6B645C]">Pad Nominal Friction μ</span>
+            <input
+              type="number"
+              step="0.02"
+              min="0.25"
+              max="0.55"
+              [(ngModel)]="padFriction"
+              class="h-8 px-2 border border-[#E6DFD3] rounded-lg font-mono text-xs bg-[#FAF7F2]"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-[#6B645C]">Fluid Boil Temp (°C)</span>
+            <input
+              type="number"
+              step="5"
+              min="180"
+              max="260"
+              [(ngModel)]="fluidBoilTemp"
+              class="h-8 px-2 border border-[#E6DFD3] rounded-lg font-mono text-xs bg-[#FAF7F2]"
+            />
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Submit Bar -->
+    <div class="flex items-center justify-between pt-2">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="text-xs font-bold text-[#6B645C] hover:text-[#22201E]"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        (click)="saveAndLaunch()"
+        class="py-3 px-8 bg-[#F2554A] hover:bg-[#C93A30] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer shadow-md"
+      >
+        <span>{{ isEditMode() ? 'Confirm Changes & Open Workbench' : 'Confirm & Open Simulation Workbench' }}</span>
+        <span class="text-sm">→</span>
+      </button>
+    </div>
+  </main>
+</div>

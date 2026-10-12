@@ -1,0 +1,100 @@
+:host {
+  display: block;
+}
+
+.grid-bg {
+  background-image: linear-gradient(#ECE5D8 1px, transparent 1px), linear-gradient(90deg, #ECE5D8 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, transparent 0%, #000 100%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, transparent 0%, #000 100%);
+}
+.spin {
+  transform-origin: 50% 50%;
+  animation: spin 90s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: trace-loop 7s ease-in-out infinite;
+}
+@keyframes trace-loop {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  8% { opacity: 0.85; }
+  65% { stroke-dashoffset: 0; opacity: 0.85; }
+  88% { stroke-dashoffset: 0; opacity: 0.85; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.crank-spin {
+  transform-origin: 110px 195px;
+  animation: spin-cw 10s linear infinite;
+}
+@keyframes spin-cw {
+  to { transform: rotate(360deg); }
+}
+.cam-spin {
+  transform-origin: 218px 120px;
+  animation: spin-ccw 5s linear infinite;
+}
+@keyframes spin-ccw {
+  to { transform: rotate(-360deg); }
+}
+.piston-stroke {
+  animation: piston-reciprocate 3.2s ease-in-out infinite;
+}
+@keyframes piston-reciprocate {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(22px); }
+}
+.timing-chain {
+  stroke-dasharray: 4 6;
+  animation: chain-crawl 2.5s linear infinite;
+}
+@keyframes chain-crawl {
+  to { stroke-dashoffset: -40px; }
+}
+.path-card {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.path-card:hover {
+  border-color: #CFC5B2;
+  transform: translateY(-2px);
+  box-shadow: 0 1px 2px rgba(34, 32, 30, 0.04), 0 12px 28px rgba(34, 32, 30, 0.08);
+}
+.chk {
+  position: relative;
+  padding-left: 22px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #22201E;
+}
+.chk::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #2F9E6B;
+  font-weight: 700;
+}
+.btn-a:hover {
+  background: #E4483D;
+}
+.btn-b:hover {
+  background: #3A3633;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin, .trace, .crank-spin, .cam-spin, .piston-stroke, .timing-chain {
+    animation: none;
+  }
+  .trace {
+    stroke-dashoffset: 0;
+  }
+  .path-card {
+    transition: none;
+  }
+}
