@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.service';
 import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
+import { VehicleSpriteKey } from '../../../core/models/benchmark.types';
 
 export interface FamilyDescriptor {
   key: 'step_through' | 'standard' | 'supersport' | 'extended';
@@ -83,6 +84,20 @@ export class ConfigureStudio implements OnInit {
   readonly activePresets = computed(() => {
     const famKey = this.family();
     return EMPIRICAL_PRESETS.filter(p => p.familyKey === famKey);
+  });
+
+  readonly activeSpriteKey = computed<Exclude<VehicleSpriteKey, 'ninja'>>(() => {
+    const presetKey = this.selectedPresetKey();
+    const foundPreset = EMPIRICAL_PRESETS.find(p => p.key === presetKey);
+    if (foundPreset) {
+      return foundPreset.spriteKey === 'ninja' ? 'supersport' : foundPreset.spriteKey;
+    }
+    const fam = this.family();
+    if (fam === 'step_through') return 'scooter';
+    if (fam === 'standard') return 'naked';
+    if (fam === 'supersport') return 'supersport';
+    if (fam === 'extended') return this.wheelbase() > 1.50 ? 'cruiser' : 'adventure';
+    return 'naked';
   });
 
   readonly maxSpeedKmh = computed(() => getMaxSpeedForCc(this.displacementCc()));
@@ -217,6 +232,7 @@ export class ConfigureStudio implements OnInit {
     const payload = {
       category: this.family(),
       title: this.title(),
+      spriteKey: this.activeSpriteKey(),
       displacementCc: this.displacementCc(),
       massKg: this.massKg(),
       frontBrake: this.frontBrake(),

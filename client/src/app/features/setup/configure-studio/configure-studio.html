@@ -47,6 +47,27 @@
             <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
           </div>
 
+          <!-- Live Animated Sprite Machine Viewport -->
+          <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--concrete)] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden">
+            <div class="w-full flex items-center justify-between z-10">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)] animate-pulse"></span>
+                {{ activeSpriteKey() }} archetype
+              </span>
+              <span class="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
+                112×56 6-FPS Idle
+              </span>
+            </div>
+
+            <div class="bike-idle-stage my-1">
+              <div
+                class="bike-idle-sprite"
+                [style.background-image]="'url(sprites/' + activeSpriteKey() + '_sheet.png)'"
+              ></div>
+            </div>
+            <div class="bike-shadow-oval"></div>
+          </div>
+
           <!-- Dynamic SVG Schematic Viewport -->
           <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--well)] p-4 flex items-center justify-center">
             <svg width="100%" height="130" viewBox="0 0 280 110" role="img" class="block">
@@ -65,8 +86,8 @@
               <!-- Rider Seat Bar -->
               <line [attr.x1]="svgCoords().seatA" y1="46" [attr.x2]="svgCoords().seatB" y2="46" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round" />
               <!-- Dynamic Center of Gravity Indicator -->
-              <circle [attr.cx]="svgCoords().cx" [attr.cy]="svgCoords().cy" r="6.5" fill="#FFFFFF" stroke="var(--danger)" stroke-width="2.5" />
-              <line [attr.x1]="svgCoords().cx" [attr.y1]="svgCoords().cyTop" [attr.x2]="svgCoords().cx" [attr.y2]="svgCoords().cyBot" stroke="var(--danger)" stroke-width="1.5" />
+              <circle [attr.cx]="svgCoords().cx" [attr.cy]="svgCoords().cy" r="6.5" fill="#FFFFFF" stroke="var(--line-deep)" stroke-width="2.5" />
+              <line [attr.x1]="svgCoords().cx" [attr.y1]="svgCoords().cyTop" [attr.x2]="svgCoords().cx" [attr.y2]="svgCoords().cyBot" stroke="var(--line-deep)" stroke-width="1.5" />
               <!-- Wheelbase Dimension Leader Line -->
               <line [attr.x1]="svgCoords().rx" y1="102" [attr.x2]="svgCoords().fx" y2="102" stroke="var(--ink-3)" stroke-width="1" />
               <line [attr.x1]="svgCoords().rx" y1="98" [attr.x2]="svgCoords().rx" y2="106" stroke="var(--ink-3)" stroke-width="1" />
@@ -185,16 +206,25 @@
               <button
                 type="button"
                 (click)="applyPreset(preset)"
-                class="p-3 rounded-xl border text-left flex flex-col justify-between gap-2 cursor-pointer transition-all min-h-[92px]"
+                class="p-3 rounded-xl border text-left flex flex-col justify-between gap-2.5 cursor-pointer transition-all min-h-[120px]"
                 [ngClass]="selectedPresetKey() === preset.key ? 'border-[var(--line)] bg-[var(--line-tint)] shadow-2xs' : 'border-[var(--kerb)] bg-[var(--well)] hover:bg-[var(--concrete)] hover:border-[var(--kerb)]'"
               >
                 <div>
-                  <div class="flex items-center justify-between gap-1 mb-1">
+                  <div class="flex items-center justify-between gap-1 mb-1.5">
                     <span class="text-xs font-bold text-[var(--ink)]">{{ preset.name }}</span>
                     <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-[var(--kerb)] text-[var(--ink-2)] shrink-0 font-medium">
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
+
+                  <!-- Sprite Silhouette Thumbnail -->
+                  <div class="w-full h-10 bg-[var(--concrete)] rounded-lg border border-[var(--kerb)]/50 flex items-center justify-center overflow-hidden mb-1.5">
+                    <div
+                      class="preset-thumb-sprite"
+                      [style.background-image]="'url(sprites/' + preset.spriteKey + '_sheet.png)'"
+                    ></div>
+                  </div>
+
                   <p class="text-[10.5px] text-[var(--ink-2)] leading-relaxed m-0">
                     {{ preset.description }}
                   </p>
