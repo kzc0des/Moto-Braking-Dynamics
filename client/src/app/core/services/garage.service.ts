@@ -82,9 +82,33 @@ export class GarageService {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed.vehicles) && parsed.vehicles.length > 0) {
-          this.vehicles.set(parsed.vehicles);
-          const activeId = parsed.activeVehicleId || parsed.vehicles[0].id;
+          // Deduplicate any baseline duplicates from previous runs
+          const seen = new Set<string>();
+          let seenBaseline = false;
+          const cleaned: CustomVehicleRecord[] = [];
+
+          for (const v of parsed.vehicles) {
+            const isBaseline = v.id === BASELINE_SCOOTER_RECORD.id || v.id.startsWith('baseline-');
+            if (isBaseline) {
+              if (seenBaseline) continue;
+              seenBaseline = true;
+              cleaned.push({ ...v, id: BASELINE_SCOOTER_RECORD.id });
+              seen.add(BASELINE_SCOOTER_RECORD.id);
+              continue;
+            }
+
+            if (!seen.has(v.id)) {
+              seen.add(v.id);
+              cleaned.push(v);
+            }
+          }
+
+          this.vehicles.set(cleaned);
+          const activeId = cleaned.some(v => v.id === parsed.activeVehicleId)
+            ? parsed.activeVehicleId
+            : cleaned[0].id;
           this.activeVehicleId.set(activeId);
+          this.persist();
           this.syncToBenchmarkStore(this.activeVehicle());
           return;
         }
@@ -109,8 +133,17 @@ export class GarageService {
   }
 
   loadBaselineScooter(): CustomVehicleRecord {
-    const record = { ...BASELINE_SCOOTER_RECORD, id: 'baseline-' + Date.now() };
-    this.vehicles.update(list => [record, ...list.filter(v => v.id !== record.id)]);
+    const existing = this.vehicles().find(
+      v => v.id === BASELINE_SCOOTER_RECORD.id || v.id.startsWith('baseline-')
+    );
+
+    if (existing) {
+      this.setActiveVehicle(existing.id);
+      return existing;
+    }
+
+    const record = { ...BASELINE_SCOOTER_RECORD };
+    this.vehicles.update(list => [record, ...list]);
     this.activeVehicleId.set(record.id);
     this.persist();
     this.syncToBenchmarkStore(record);
