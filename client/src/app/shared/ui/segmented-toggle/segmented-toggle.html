@@ -1,4 +1,4 @@
-<div class="flex p-0.5 bg-[#FAF7F2] border border-[#E6DFD3] rounded-lg">
+<div class="flex p-0.5 bg-[var(--well)] border border-[var(--kerb)] rounded-lg">
   @for (opt of options(); track opt.value) {
     <button
       type="button"
@@ -6,8 +6,8 @@
       class="flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors text-center cursor-pointer"
       [ngClass]="
         value() === opt.value
-          ? 'bg-white text-[#22201E] font-bold shadow-2xs border border-[#E6DFD3]'
-          : 'text-[#6B645C] hover:text-[#22201E]'
+          ? 'bg-white text-[var(--ink)] font-bold shadow-2xs border border-[var(--kerb)]'
+          : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
       "
     >
       {{ opt.label }}

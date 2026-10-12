@@ -1,9 +1,9 @@
 <div class="flex flex-col gap-1.5 py-1.5">
   <div class="flex items-center justify-between text-sm">
-    <label class="font-semibold text-[#22201E] flex items-center gap-1.5 text-xs sm:text-sm">
+    <label class="font-semibold text-[var(--ink)] flex items-center gap-1.5 text-xs sm:text-sm">
       <span>{{ label() }}</span>
       @if (symbol()) {
-        <span class="text-xs text-[#6B645C]">({{ symbol() }})</span>
+        <span class="text-xs text-[var(--ink-2)]">({{ symbol() }})</span>
       }
     </label>
     <div class="flex items-center gap-1.5">
@@ -14,10 +14,10 @@
         [step]="step()"
         [ngModel]="value()"
         (ngModelChange)="onInputChange($event)"
-        class="w-20 px-2 py-1 text-right text-xs sm:text-sm bg-white border rounded-md text-[#22201E] tabular-nums focus:outline-none focus:border-[#F2554A]"
-        [ngClass]="isOutOfBounds() ? 'border-[#F2554A] text-[#C93A30]' : 'border-[#E6DFD3]'"
+        class="w-20 px-2 py-1 text-right text-xs sm:text-sm bg-white border rounded-md text-[var(--ink)] tabular-nums focus:outline-none focus:border-[var(--line)]"
+        [ngClass]="isOutOfBounds() ? 'border-[var(--danger)] text-[var(--danger)]' : 'border-[var(--kerb)]'"
       />
-      <span class="text-xs text-[#6B645C] min-w-7">{{ unit() }}</span>
+      <span class="text-xs text-[var(--ink-2)] min-w-7">{{ unit() }}</span>
     </div>
   </div>
 
@@ -28,10 +28,10 @@
     [step]="step()"
     [value]="value()"
     (input)="onSliderInput($event)"
-    class="w-full h-1.5 bg-[#E6DFD3] rounded-lg appearance-none cursor-pointer accent-[#F2554A] hover:accent-[#C93A30] transition-colors"
+    class="road-slider w-full h-1.5 bg-[var(--well)] rounded-lg appearance-none cursor-pointer accent-[var(--line)] transition-colors"
   />
 
   @if (description()) {
-    <p class="text-xs text-[#6B645C] leading-normal">{{ description() }}</p>
+    <p class="text-xs text-[var(--ink-2)] leading-normal">{{ description() }}</p>
   }
 </div>
