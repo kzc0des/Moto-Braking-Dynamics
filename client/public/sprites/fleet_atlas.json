@@ -1,0 +1,154 @@
+{
+  "frameWidth": 112,
+  "frameHeight": 56,
+  "columns": 8,
+  "bikes": {
+    "scooter": {
+      "label": "Scooter",
+      "idle": {
+        "row": 0,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 1,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        16,
+        45
+      ],
+      "wheelFront": [
+        66,
+        45
+      ]
+    },
+    "maxi": {
+      "label": "Maxi Scooter",
+      "idle": {
+        "row": 2,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 3,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        18,
+        43
+      ],
+      "wheelFront": [
+        76,
+        43
+      ]
+    },
+    "underbone": {
+      "label": "Commuter Underbone",
+      "idle": {
+        "row": 4,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 5,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        17,
+        44
+      ],
+      "wheelFront": [
+        68,
+        44
+      ]
+    },
+    "naked": {
+      "label": "Naked",
+      "idle": {
+        "row": 6,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 7,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        16,
+        43
+      ],
+      "wheelFront": [
+        72,
+        43
+      ]
+    },
+    "supersport": {
+      "label": "Supersport",
+      "idle": {
+        "row": 8,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 9,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        15,
+        43
+      ],
+      "wheelFront": [
+        74,
+        43
+      ]
+    },
+    "adventure": {
+      "label": "Adventure / Trail",
+      "idle": {
+        "row": 10,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 11,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        15,
+        43
+      ],
+      "wheelFront": [
+        74,
+        42
+      ]
+    },
+    "cruiser": {
+      "label": "Cruiser / Touring",
+      "idle": {
+        "row": 12,
+        "frames": 6,
+        "fps": 6
+      },
+      "ride": {
+        "row": 13,
+        "frames": 8,
+        "fps": 14
+      },
+      "wheelRear": [
+        14,
+        43
+      ],
+      "wheelFront": [
+        84,
+        43
+      ]
+    }
+  }
+}
