@@ -3,6 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.service';
+import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
+
+export interface FamilyDescriptor {
+  key: 'step_through' | 'standard' | 'supersport' | 'extended';
+  label: string;
+  desc: string;
+  badge: string;
+}
 
 @Component({
   selector: 'app-configure-studio',
@@ -18,34 +26,64 @@ export class ConfigureStudio implements OnInit {
   readonly editingVehicleId = signal<string | null>(null);
   readonly isEditMode = computed(() => this.editingVehicleId() !== null);
 
-  readonly categories = [
-    { key: 'scooter', label: 'Scooter / Step-Through', desc: 'Enclosed engine, automatic, relaxed pitch' },
-    { key: 'underbone', label: 'Underbone / Moped', desc: 'Lightweight backbone, commuter efficiency' },
-    { key: 'naked', label: 'Standard / Naked', desc: 'Upright geometry, medium displacement' },
-    { key: 'sport', label: 'Sport / Superbike', desc: 'Aggressive pitch, high deceleration bite' }
+  /**
+   * 4 Core Inertial Geometry Families grounded in Cossalter (2006) Chapter 1 & 7.
+   */
+  readonly families: FamilyDescriptor[] = [
+    {
+      key: 'step_through',
+      label: 'Step-Through / Commuter',
+      desc: 'Rear-biased CoG (b/L ≈ 0.42), low pitch-over, high commuter prevalence',
+      badge: 'Rear-Biased CoG'
+    },
+    {
+      key: 'standard',
+      label: 'Standard / Roadster',
+      desc: 'Neutral upright ergonomics (b/L ≈ 0.50), control dynamics benchmark',
+      badge: 'Neutral Baseline'
+    },
+    {
+      key: 'supersport',
+      label: 'Supersport / Performance',
+      desc: 'High h/L, short wheelbase, rear lift-off (stoppie) threshold critical',
+      badge: 'Stoppie-Prone'
+    },
+    {
+      key: 'extended',
+      label: 'Extended Geometry',
+      desc: 'Polar dynamics: long-wheelbase cruiser or tall long-travel adventure fork',
+      badge: 'Polar Geometry'
+    }
   ];
 
   readonly actuations = [
-    { key: 'independent', label: 'Independent Levers', desc: 'Standard manual modulation without electronic coupling' },
-    { key: 'cbs', label: 'Combi-Brake System (CBS)', desc: 'Rear lever proportionally actuates front caliper' },
+    { key: 'independent', label: 'Independent Controls', desc: 'Separate hand lever (front) and foot/hand control without linkage' },
+    { key: 'cbs', label: 'Combi-Brake System (CBS)', desc: 'Rear actuation proportionally applies front caliper pressure' },
     { key: 'abs', label: 'Anti-lock Braking System (ABS)', desc: 'Hydraulic pressure modulation prevents critical wheel lock' }
   ];
 
-  readonly category = signal<string>('scooter');
+  readonly family = signal<'step_through' | 'standard' | 'supersport' | 'extended'>('step_through');
+  readonly selectedPresetKey = signal<string>('scooter_125');
+
   readonly title = signal<string>('Custom 125cc Scooter');
   readonly displacementCc = signal<number>(125);
-  readonly massKg = signal<number>(165);
+  readonly massKg = signal<number>(130);
   readonly frontBrake = signal<string>('single_disc');
   readonly rearBrake = signal<string>('drum');
-  readonly actuation = signal<string>('independent');
+  readonly actuation = signal<string>('cbs');
 
   // Tier 2 parameters
   readonly isTier2Open = signal<boolean>(false);
   readonly wheelbase = signal<number>(1.28);
-  readonly cogHeight = signal<number>(0.62);
+  readonly cogHeight = signal<number>(0.48);
   readonly rotorDiameterMm = signal<number>(220);
   readonly padFriction = signal<number>(0.35);
-  readonly fluidBoilTemp = signal<number>(230);
+  readonly fluidBoilTemp = signal<number>(210);
+
+  readonly activePresets = computed(() => {
+    const famKey = this.family();
+    return EMPIRICAL_PRESETS.filter(p => p.familyKey === famKey);
+  });
 
   readonly maxSpeedKmh = computed(() => getMaxSpeedForCc(this.displacementCc()));
 
@@ -76,7 +114,6 @@ export class ConfigureStudio implements OnInit {
       const target = id ? this.garageService.getVehicleById(id) : this.garageService.activeVehicle();
       if (target) {
         this.editingVehicleId.set(target.id);
-        this.category.set(target.category);
         this.title.set(target.title);
         this.displacementCc.set(target.displacementCc);
         this.massKg.set(target.massKg);
@@ -88,6 +125,18 @@ export class ConfigureStudio implements OnInit {
         this.rotorDiameterMm.set(target.rotorDiameterMm);
         this.padFriction.set(target.padFriction);
         this.fluidBoilTemp.set(target.fluidBoilTemp);
+
+        // Map legacy or current category to family
+        const cat = target.category;
+        if (cat === 'scooter' || cat === 'underbone' || cat === 'step_through') {
+          this.family.set('step_through');
+        } else if (cat === 'naked' || cat === 'standard') {
+          this.family.set('standard');
+        } else if (cat === 'sport' || cat === 'supersport') {
+          this.family.set('supersport');
+        } else if (cat === 'extended' || cat === 'cruiser' || cat === 'adventure') {
+          this.family.set('extended');
+        }
       }
     } else if (mode === 'new') {
       this.editingVehicleId.set(null);
@@ -95,51 +144,65 @@ export class ConfigureStudio implements OnInit {
     }
   }
 
-  selectCategory(key: string): void {
-    this.category.set(key);
-    if (key === 'scooter') {
-      this.title.set('Custom 125cc Scooter');
-      this.displacementCc.set(125);
-      this.massKg.set(165);
-      this.wheelbase.set(1.28);
-      this.cogHeight.set(0.62);
-      this.rearBrake.set('drum');
-      this.rotorDiameterMm.set(220);
-    } else if (key === 'underbone') {
-      this.title.set('Custom 125cc Underbone');
-      this.displacementCc.set(125);
-      this.massKg.set(125);
-      this.wheelbase.set(1.22);
-      this.cogHeight.set(0.60);
-      this.rearBrake.set('drum');
-      this.rotorDiameterMm.set(220);
-    } else if (key === 'naked') {
-      this.title.set('Custom 400cc Naked');
-      this.displacementCc.set(400);
-      this.massKg.set(195);
-      this.wheelbase.set(1.38);
-      this.cogHeight.set(0.62);
-      this.rearBrake.set('disc');
-      this.rotorDiameterMm.set(290);
-    } else if (key === 'sport') {
-      this.title.set('Custom 600cc Superbike');
-      this.displacementCc.set(600);
-      this.massKg.set(200);
-      this.wheelbase.set(1.42);
-      this.cogHeight.set(0.58);
-      this.frontBrake.set('dual_disc');
-      this.rearBrake.set('disc');
-      this.rotorDiameterMm.set(320);
+  selectFamily(famKey: 'step_through' | 'standard' | 'supersport' | 'extended'): void {
+    this.family.set(famKey);
+    const presets = EMPIRICAL_PRESETS.filter(p => p.familyKey === famKey);
+    if (presets.length > 0) {
+      this.applyPreset(presets[0]);
     }
   }
 
-  onDisplacementChange(cc: number): void {
-    // Dynamic weight recommendation
+  applyPreset(preset: EmpiricalPresetDescriptor): void {
+    this.selectedPresetKey.set(preset.key);
+    this.title.set(preset.name);
+    this.displacementCc.set(preset.displacementCc);
+    this.massKg.set(preset.massKg);
+    this.wheelbase.set(preset.wheelbase);
+    this.cogHeight.set(preset.cogHeight);
+    this.frontBrake.set(preset.frontBrake);
+    this.rearBrake.set(preset.rearBrake);
+    this.actuation.set(preset.actuation);
+    this.rotorDiameterMm.set(preset.rotorDiameterMm);
+    this.padFriction.set(preset.padFriction);
+    this.fluidBoilTemp.set(preset.fluidBoilTemp);
+  }
+
+  updateTitle(val: string): void {
+    this.title.set(val);
+  }
+
+  updateDisplacement(val: number | string): void {
+    const cc = Number(val);
+    this.displacementCc.set(cc);
     if (cc <= 150 && this.massKg() > 200) {
-      this.massKg.set(150);
+      this.massKg.set(130);
     } else if (cc > 500 && this.massKg() < 180) {
-      this.massKg.set(210);
+      this.massKg.set(200);
     }
+  }
+
+  updateMass(val: number | string): void {
+    this.massKg.set(Number(val));
+  }
+
+  updateWheelbase(val: number | string): void {
+    this.wheelbase.set(Number(val));
+  }
+
+  updateCogHeight(val: number | string): void {
+    this.cogHeight.set(Number(val));
+  }
+
+  updateRotorDiameter(val: number | string): void {
+    this.rotorDiameterMm.set(Number(val));
+  }
+
+  updatePadFriction(val: number | string): void {
+    this.padFriction.set(Number(val));
+  }
+
+  updateFluidBoilTemp(val: number | string): void {
+    this.fluidBoilTemp.set(Number(val));
   }
 
   goBack(): void {
@@ -152,7 +215,7 @@ export class ConfigureStudio implements OnInit {
 
   saveAndLaunch(): void {
     const payload = {
-      category: this.category(),
+      category: this.family(),
       title: this.title(),
       displacementCc: this.displacementCc(),
       massKg: this.massKg(),
