@@ -110,7 +110,7 @@ export class TelemetryPanel implements OnDestroy {
 
     const telem = activeRes.telemetry;
 
-    // 1. Velocity Canvas (Coral curve --series-1 / #F2554A)
+    // 1. Velocity Canvas (--info / #2B6CB0)
     const cVel = this.canvasVelocityRef()?.nativeElement;
     if (cVel) {
       const ctx = cVel.getContext('2d');
@@ -120,7 +120,7 @@ export class TelemetryPanel implements OnDestroy {
           width: cVel.width,
           height: cVel.height,
           curves: [
-            { name: 'Velocity', color: '#F2554A', times: telem.time, values: telem.velocity, unit: ' m/s' }
+            { name: 'Velocity', color: '#2B6CB0', times: telem.time, values: telem.velocity, unit: ' m/s' }
           ],
           maxTime: maxT,
           scrubTime: scrubT,
@@ -129,7 +129,7 @@ export class TelemetryPanel implements OnDestroy {
       }
     }
 
-    // 2. Deceleration Canvas (Ink curve --series-2 / #2E2C33)
+    // 2. Deceleration Canvas (Asphalt ink #1F2328)
     const cDec = this.canvasDecelRef()?.nativeElement;
     if (cDec) {
       const ctx = cDec.getContext('2d');
@@ -139,7 +139,7 @@ export class TelemetryPanel implements OnDestroy {
           width: cDec.width,
           height: cDec.height,
           curves: [
-            { name: 'Decel', color: '#2E2C33', times: telem.time, values: telem.deceleration, unit: ' m/s²' }
+            { name: 'Decel', color: '#1F2328', times: telem.time, values: telem.deceleration, unit: ' m/s²' }
           ],
           maxTime: maxT,
           scrubTime: scrubT,
@@ -158,8 +158,8 @@ export class TelemetryPanel implements OnDestroy {
           width: cLoads.width,
           height: cLoads.height,
           curves: [
-            { name: 'Front Fz', color: '#F2554A', times: telem.time, values: telem.normalLoadFront, unit: ' N' },
-            { name: 'Rear Fz', color: '#2E2C33', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
+            { name: 'Front Fz', color: '#E8750F', times: telem.time, values: telem.normalLoadFront, unit: ' N' },
+            { name: 'Rear Fz', color: '#2B6CB0', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
           ],
           maxTime: maxT,
           scrubTime: scrubT,
@@ -168,7 +168,7 @@ export class TelemetryPanel implements OnDestroy {
       }
     }
 
-    // 4. Rotor Temperature Canvas (if shown)
+    // 4. Rotor Temperature Canvas (if shown: physical danger heat #D93A32)
     const cThermals = this.canvasThermalsRef()?.nativeElement;
     if (cThermals && this.showThermals()) {
       const ctx = cThermals.getContext('2d');
@@ -178,7 +178,7 @@ export class TelemetryPanel implements OnDestroy {
           width: cThermals.width,
           height: cThermals.height,
           curves: [
-            { name: 'Rotor Temp', color: '#F2554A', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
+            { name: 'Rotor Temp', color: '#D93A32', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
           ],
           maxTime: maxT,
           scrubTime: scrubT,

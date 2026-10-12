@@ -2,23 +2,24 @@
   display: block;
 }
 
-.coral-slider {
-  background: var(--track-bg, #E6DFD3);
+.road-slider {
+  background: var(--track-bg, #DDE0E4);
   border-radius: 9999px;
   appearance: none;
 }
 
-.coral-slider::-webkit-slider-thumb {
+.road-slider::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #F2554A;
+  background: #1F2328;
+  border: 2px solid #FFC800;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   transition: transform 0.1s ease;
 }
 
-.coral-slider::-webkit-slider-thumb:hover {
+.road-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
 }

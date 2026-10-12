@@ -39,12 +39,12 @@ export class StripChartRenderer {
 
     if (plotW <= 0 || plotH <= 0) return;
 
-    // 1. Chart Well Background (--well / #FAF7F2)
-    ctx.fillStyle = '#FAF7F2';
+    // 1. Chart Well Background (--well / #ECEEF0)
+    ctx.fillStyle = '#ECEEF0';
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Chart Plot Border (--border / #E6DFD3)
-    ctx.strokeStyle = '#E6DFD3';
+    // 2. Chart Plot Border (--kerb / #DDE0E4)
+    ctx.strokeStyle = '#DDE0E4';
     ctx.lineWidth = 1;
     ctx.strokeRect(padLeft, padTop, plotW, plotH);
 
@@ -67,8 +67,8 @@ export class StripChartRenderer {
     const timeToX = (t: number) => padLeft + (t / maxTime) * plotW;
     const valToY = (v: number) => padTop + plotH - ((v - minY) / yRange) * plotH;
 
-    // 3. Horizontal Gridlines (--border / #E6DFD3)
-    ctx.strokeStyle = '#E6DFD3';
+    // 3. Horizontal Gridlines (--kerb / #DDE0E4)
+    ctx.strokeStyle = '#DDE0E4';
     ctx.lineWidth = 1;
     const gridDivs = 3;
     for (let i = 1; i < gridDivs; i++) {
@@ -80,7 +80,7 @@ export class StripChartRenderer {
     }
 
     // 4. Bottom Time Axis Ticks & Labels
-    ctx.fillStyle = '#A39B90';
+    ctx.fillStyle = '#A3A9B1';
     ctx.font = '500 11px system-ui, sans-serif';
     ctx.textAlign = 'center';
 
@@ -90,7 +90,7 @@ export class StripChartRenderer {
       if (x > padLeft + plotW) break;
 
       // Vertical tick stub
-      ctx.strokeStyle = '#E6DFD3';
+      ctx.strokeStyle = '#DDE0E4';
       ctx.beginPath();
       ctx.moveTo(x, padTop + plotH);
       ctx.lineTo(x, padTop + plotH + 4);
@@ -140,7 +140,7 @@ export class StripChartRenderer {
     // 7. Synchronized Scrub Needle
     if (scrubTime >= 0 && scrubTime <= maxTime) {
       const scrubX = timeToX(scrubTime);
-      ctx.strokeStyle = '#22201E';
+      ctx.strokeStyle = '#1F2328';
       ctx.lineWidth = 1.2;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
