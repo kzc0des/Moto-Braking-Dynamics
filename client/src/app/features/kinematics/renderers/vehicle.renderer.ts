@@ -1,4 +1,5 @@
 import { InterpolatedScrubFrame } from '../../../core/models/telemetry.types';
+import { VehicleSpriteKey } from '../../../core/models/benchmark.types';
 
 export interface VehicleRenderParams {
   ctx: CanvasRenderingContext2D;
@@ -8,7 +9,7 @@ export interface VehicleRenderParams {
   maxDistance: number;
   colorAccent: string;
   name: string;
-  spriteKey?: 'ninja' | 'cruiser' | 'scooter';
+  spriteKey?: VehicleSpriteKey;
   forceIdle?: boolean;
   animTime?: number;
   frame: InterpolatedScrubFrame;
@@ -20,38 +21,106 @@ interface SpriteConfig {
   frameHeight: number;
   idleFrames: number;
   rideFrames: number;
-  anchorXRatio: number;
+  idleFps: number;
+  rideFps: number;
+  wheelRear: [number, number];
+  wheelFront: [number, number];
+  groundYOffset: number;
   scaleMultiplier: number;
 }
 
 export class VehicleRenderer {
-  private readonly spriteConfigs: Record<'ninja' | 'cruiser' | 'scooter', SpriteConfig> = {
-    ninja: {
-      sheetPath: 'sprites/ninja_sheet.png',
-      frameWidth: 96,
-      frameHeight: 48,
+  private readonly spriteConfigs: Record<Exclude<VehicleSpriteKey, 'ninja'>, SpriteConfig> = {
+    scooter: {
+      sheetPath: 'sprites/scooter_sheet.png',
+      frameWidth: 112,
+      frameHeight: 56,
       idleFrames: 6,
       rideFrames: 8,
-      anchorXRatio: 44 / 96,
-      scaleMultiplier: 1.05
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [16, 45],
+      wheelFront: [66, 45],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
+    },
+    maxi: {
+      sheetPath: 'sprites/maxi_sheet.png',
+      frameWidth: 112,
+      frameHeight: 56,
+      idleFrames: 6,
+      rideFrames: 8,
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [18, 43],
+      wheelFront: [76, 43],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
+    },
+    underbone: {
+      sheetPath: 'sprites/underbone_sheet.png',
+      frameWidth: 112,
+      frameHeight: 56,
+      idleFrames: 6,
+      rideFrames: 8,
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [17, 44],
+      wheelFront: [68, 44],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
+    },
+    naked: {
+      sheetPath: 'sprites/naked_sheet.png',
+      frameWidth: 112,
+      frameHeight: 56,
+      idleFrames: 6,
+      rideFrames: 8,
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [16, 43],
+      wheelFront: [72, 43],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
+    },
+    supersport: {
+      sheetPath: 'sprites/supersport_sheet.png',
+      frameWidth: 112,
+      frameHeight: 56,
+      idleFrames: 6,
+      rideFrames: 8,
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [15, 43],
+      wheelFront: [74, 43],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
+    },
+    adventure: {
+      sheetPath: 'sprites/adventure_sheet.png',
+      frameWidth: 112,
+      frameHeight: 56,
+      idleFrames: 6,
+      rideFrames: 8,
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [15, 43],
+      wheelFront: [74, 42],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
     },
     cruiser: {
       sheetPath: 'sprites/cruiser_sheet.png',
-      frameWidth: 96,
-      frameHeight: 48,
+      frameWidth: 112,
+      frameHeight: 56,
       idleFrames: 6,
       rideFrames: 8,
-      anchorXRatio: 44 / 96,
-      scaleMultiplier: 1.05
-    },
-    scooter: {
-      sheetPath: 'sprites/scooter_sheet.png',
-      frameWidth: 80,
-      frameHeight: 40,
-      idleFrames: 6,
-      rideFrames: 8,
-      anchorXRatio: 36 / 80,
-      scaleMultiplier: 1.2
+      idleFps: 6,
+      rideFps: 14,
+      wheelRear: [14, 43],
+      wheelFront: [84, 43],
+      groundYOffset: 52,
+      scaleMultiplier: 1.15
     }
   };
 
@@ -64,7 +133,8 @@ export class VehicleRenderer {
   private preloadSpriteSheets(): void {
     if (typeof window === 'undefined') return;
 
-    for (const key of ['ninja', 'cruiser', 'scooter'] as const) {
+    const keys = Object.keys(this.spriteConfigs) as Array<keyof typeof this.spriteConfigs>;
+    for (const key of keys) {
       const cfg = this.spriteConfigs[key];
       const img = new Image();
       img.src = cfg.sheetPath;
@@ -85,29 +155,32 @@ export class VehicleRenderer {
     const resolvedKey = this.resolveSpriteKey(spriteKey, name);
     const cfg = this.spriteConfigs[resolvedKey];
 
-    // Responsive scaling: guaranteed prominent arcade sprite size on both mobile and desktop
-    const baseScale = Math.min(2.4, Math.max(1.85, laneHeight / 90));
+    // Responsive scaling based on lane height
+    const baseScale = Math.min(1.45, Math.max(1.05, laneHeight / 64));
     const scale = baseScale * cfg.scaleMultiplier;
 
     const drawW = cfg.frameWidth * scale;
     const drawH = cfg.frameHeight * scale;
-    const anchorX = cfg.frameWidth * cfg.anchorXRatio * scale;
+    const anchorX = cfg.wheelRear[0] * scale;
+    const anchorY = cfg.groundYOffset * scale;
 
-    const groundY = laneY + Math.min(laneHeight - 12, Math.max(drawH + 8, laneHeight * 0.72));
+    const groundY = laneY + Math.min(laneHeight - 10, Math.max(drawH * 0.9, laneHeight * 0.78));
 
-    // Deceleration pitch angle (fork dive)
+    // Deceleration pitch angle (fork dive transient)
     const pitchAngle = Math.min(0.12, Math.max(-0.04, (frame.deceleration / 9.81) * 0.08));
 
-    // Wheel positions relative to posX
-    const rearWheelX = posX - anchorX + 16 * scale;
-    const frontWheelX = posX - anchorX + (cfg.frameWidth - 14) * scale;
+    // Wheel positions
+    const rearWheelX = posX;
+    const frontWheelX = posX + (cfg.wheelFront[0] - cfg.wheelRear[0]) * scale;
 
-    // Ground tire contact shadow (soft oval ground shadow)
-    const shadowW = drawW * 0.72;
-    const shadowH = 5 * scale;
-    ctx.fillStyle = 'rgba(34, 32, 30, 0.14)';
+    // Soft ground tire contact shadows under both wheels
+    ctx.fillStyle = 'rgba(34, 32, 30, 0.16)';
     ctx.beginPath();
-    ctx.ellipse(posX - anchorX + drawW * 0.48, groundY + 1, shadowW * 0.48, shadowH * 0.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(rearWheelX, groundY + 1, 14 * scale, 3 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(frontWheelX, groundY + 1, 14 * scale, 3 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Tire Skid Marks (if severe slip or lockup)
@@ -115,13 +188,13 @@ export class VehicleRenderer {
     const isSlippingRear = Math.abs(frame.slipRatioRear) > 0.14;
 
     if (isSlippingRear) {
-      ctx.fillStyle = 'rgba(46, 44, 51, 0.4)';
-      ctx.fillRect(rearWheelX - 20 * scale, groundY - 1, 24 * scale, 2);
+      ctx.fillStyle = 'rgba(46, 44, 51, 0.45)';
+      ctx.fillRect(rearWheelX - 18 * scale, groundY - 1, 22 * scale, 2.5);
     }
 
     if (isSlippingFront) {
-      ctx.fillStyle = 'rgba(46, 44, 51, 0.4)';
-      ctx.fillRect(frontWheelX - 16 * scale, groundY - 1, 20 * scale, 2);
+      ctx.fillStyle = 'rgba(46, 44, 51, 0.45)';
+      ctx.fillRect(frontWheelX - 16 * scale, groundY - 1, 20 * scale, 2.5);
     }
 
     // Animated Sprite Sheet Rendering
@@ -129,7 +202,7 @@ export class VehicleRenderer {
     const isImgReady = img && img.complete && img.naturalWidth > 0;
 
     const isMoving = !params.forceIdle && frame.velocity > 0.08;
-    const fps = isMoving ? 13.0 : 6.25;
+    const fps = isMoving ? cfg.rideFps : cfg.idleFps;
     const frameCount = isMoving ? cfg.rideFrames : cfg.idleFrames;
     const animClock = isMoving ? frame.time : (params.animTime ?? (typeof performance !== 'undefined' ? performance.now() / 1000 : frame.time));
     const frameIdx = Math.floor(animClock * fps) % frameCount;
@@ -138,8 +211,10 @@ export class VehicleRenderer {
     const sy = isMoving ? cfg.frameHeight : 0; // Row 1 = Ride, Row 0 = Idle
 
     ctx.save();
-    ctx.translate(posX, groundY);
+    // Pivot around front wheel contact patch on hard deceleration fork dive
+    ctx.translate(frontWheelX, groundY);
     ctx.rotate(-pitchAngle);
+    ctx.translate(-frontWheelX, -groundY);
 
     if (isImgReady) {
       ctx.imageSmoothingEnabled = false;
@@ -153,25 +228,33 @@ export class VehicleRenderer {
         sy,
         cfg.frameWidth,
         cfg.frameHeight,
-        -anchorX,
-        -drawH,
+        posX - anchorX,
+        groundY - anchorY,
         drawW,
         drawH
       );
     } else {
       ctx.fillStyle = colorAccent;
-      ctx.fillRect(-anchorX, -drawH * 0.8, drawW * 0.9, drawH * 0.7);
+      ctx.fillRect(posX - anchorX + 10 * scale, groundY - drawH * 0.8, drawW * 0.8, drawH * 0.7);
     }
 
     ctx.restore();
   }
 
-  private resolveSpriteKey(spriteKey?: 'ninja' | 'cruiser' | 'scooter', name?: string): 'ninja' | 'cruiser' | 'scooter' {
-    if (spriteKey) return spriteKey;
-    if (!name) return 'ninja';
+  private resolveSpriteKey(spriteKey?: VehicleSpriteKey, name?: string): Exclude<VehicleSpriteKey, 'ninja'> {
+    if (spriteKey) {
+      if (spriteKey === 'ninja') return 'supersport';
+      if (this.spriteConfigs[spriteKey]) return spriteKey;
+    }
+    if (!name) return 'supersport';
     const lower = name.toLowerCase();
+    if (lower.includes('maxi')) return 'maxi';
+    if (lower.includes('underbone')) return 'underbone';
     if (lower.includes('scooter')) return 'scooter';
-    if (lower.includes('cruiser')) return 'cruiser';
-    return 'ninja';
+    if (lower.includes('naked') || lower.includes('standard')) return 'naked';
+    if (lower.includes('adventure') || lower.includes('trail')) return 'adventure';
+    if (lower.includes('cruiser') || lower.includes('touring')) return 'cruiser';
+    if (lower.includes('supersport') || lower.includes('superbike') || lower.includes('sport')) return 'supersport';
+    return 'supersport';
   }
 }
