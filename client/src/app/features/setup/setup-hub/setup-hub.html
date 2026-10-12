@@ -1,4 +1,4 @@
-<div class="relative flex flex-col min-h-screen bg-[#FAF7F2] text-[#22201E] font-sans select-none overflow-x-hidden">
+<div class="relative flex flex-col min-h-screen bg-[var(--bg)] text-[var(--ink)] font-sans select-none overflow-x-hidden">
 
   <!-- ============ TECHNICAL AMBIENT BACKDROP ============ -->
   <div aria-hidden="true" class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -13,10 +13,10 @@
       class="absolute -right-36 -top-36 pointer-events-none"
       aria-hidden="true"
     >
-      <g fill="none" stroke="#DDD3C0">
+      <g fill="none" stroke="var(--kerb)">
         <circle r="152" stroke-width="1.2"></circle>
-        <circle r="144" stroke-width="8" stroke-dasharray="1 8.36" stroke="#E4DCCB"></circle>
-        <circle r="150" stroke-width="3" pathLength="100" stroke-dasharray="21 79" transform="rotate(-90)" stroke="#F2554A" opacity="0.55"></circle>
+        <circle r="144" stroke-width="8" stroke-dasharray="1 8.36" stroke="var(--concrete)"></circle>
+        <circle r="150" stroke-width="3" pathLength="100" stroke-dasharray="21 79" transform="rotate(-90)" stroke="var(--danger)" opacity="0.65"></circle>
         <g class="spin">
           <circle r="112" stroke-width="1.2"></circle>
           <circle r="100" stroke-width="7" stroke-linecap="round" stroke-dasharray="0.1 14.5"></circle>
@@ -38,12 +38,12 @@
       aria-hidden="true"
     >
       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 150 H390 M10 150 V10" stroke="#DDD3C0" stroke-width="1"></path>
-        <path d="M10 40 H390 M10 80 H390 M10 120 H390" stroke="#ECE5D8" stroke-width="1"></path>
-        <path class="trace" pathLength="1" d="M10 28 H80 C170 28 240 60 320 150" stroke="#F2554A" stroke-width="2" opacity="0.7"></path>
-        <path d="M80 150 V22" stroke="#DDD3C0" stroke-width="1" stroke-dasharray="3 5"></path>
+        <path d="M10 150 H390 M10 150 V10" stroke="var(--kerb)" stroke-width="1"></path>
+        <path d="M10 40 H390 M10 80 H390 M10 120 H390" stroke="var(--well)" stroke-width="1"></path>
+        <path class="trace" pathLength="1" d="M10 28 H80 C170 28 240 60 320 150" stroke="var(--danger)" stroke-width="2" opacity="0.8"></path>
+        <path d="M80 150 V22" stroke="var(--kerb)" stroke-width="1" stroke-dasharray="3 5"></path>
       </g>
-      <g font-family="'JetBrains Mono', monospace" font-size="10" fill="#B3A894">
+      <g font-family="'JetBrains Mono', monospace" font-size="10" fill="var(--ink-3)">
         <text x="14" y="14">v (m/s)</text>
         <text x="352" y="146" text-anchor="end">t (s)</text>
       </g>
@@ -57,106 +57,106 @@
       class="absolute -left-6 -bottom-6 sm:left-2 sm:bottom-2 pointer-events-none opacity-85"
       aria-hidden="true"
     >
-      <g fill="none" stroke="#CDC2AD" stroke-linecap="round" stroke-linejoin="round">
+      <g fill="none" stroke="var(--kerb)" stroke-linecap="round" stroke-linejoin="round">
         <!-- Cylinder Bore Sleeve Outer Profile -->
-        <path d="M75 14 V130 M145 14 V130" stroke="#DDD3C0" stroke-width="1.4" />
+        <path d="M75 14 V130 M145 14 V130" stroke="var(--kerb)" stroke-width="1.4" />
         <!-- Cylinder Cooling Fins -->
-        <path d="M55 30 H75 M145 30 H165 M55 50 H75 M145 50 H165 M55 70 H75 M145 70 H165 M55 90 H75 M145 90 H165 M55 110 H75 M145 110 H165" stroke="#E4DCCB" stroke-width="1.2" />
+        <path d="M55 30 H75 M145 30 H165 M55 50 H75 M145 50 H165 M55 70 H75 M145 70 H165 M55 90 H75 M145 90 H165 M55 110 H75 M145 110 H165" stroke="var(--well)" stroke-width="1.2" />
 
         <!-- Cylinder Top Crosshair & Spark Chamber -->
-        <path d="M75 14 Q110 4 145 14" stroke="#CDC2AD" stroke-width="1.4" />
-        <circle cx="110" cy="14" r="3" fill="#F2554A" stroke="none" />
+        <path d="M75 14 Q110 4 145 14" stroke="var(--kerb)" stroke-width="1.4" />
+        <circle cx="110" cy="14" r="3" fill="var(--danger)" stroke="none" />
 
         <!-- Reciprocating Piston Assembly -->
         <g class="piston-stroke">
           <!-- Piston Crown -->
-          <rect x="78" y="24" width="64" height="42" rx="2" stroke="#22201E" stroke-width="1.4" fill="#FAF7F2" />
+          <rect x="78" y="24" width="64" height="42" rx="2" stroke="var(--ink)" stroke-width="1.4" fill="var(--concrete)" />
           <!-- Piston Compression Rings -->
-          <line x1="82" y1="32" x2="138" y2="32" stroke="#6B645C" stroke-width="0.9" />
-          <line x1="82" y1="38" x2="138" y2="38" stroke="#6B645C" stroke-width="0.9" />
-          <line x1="82" y1="44" x2="138" y2="44" stroke="#6B645C" stroke-width="0.9" />
+          <line x1="82" y1="32" x2="138" y2="32" stroke="var(--ink-2)" stroke-width="0.9" />
+          <line x1="82" y1="38" x2="138" y2="38" stroke="var(--ink-2)" stroke-width="0.9" />
+          <line x1="82" y1="44" x2="138" y2="44" stroke="var(--ink-2)" stroke-width="0.9" />
           <!-- Wrist Pin Gudgeon -->
-          <circle cx="110" cy="48" r="6" stroke="#22201E" stroke-width="1.4" fill="#FFFFFF" />
+          <circle cx="110" cy="48" r="6" stroke="var(--ink)" stroke-width="1.4" fill="#FFFFFF" />
           <!-- Connecting Rod Shank -->
-          <path d="M107 54 L107 146 M113 54 L113 146" stroke="#6B645C" stroke-width="1.2" />
+          <path d="M107 54 L107 146 M113 54 L113 146" stroke="var(--ink-2)" stroke-width="1.2" />
           <!-- Small End & Big End Fillets -->
-          <path d="M103 146 Q110 152 117 146" stroke="#6B645C" stroke-width="1.2" />
+          <path d="M103 146 Q110 152 117 146" stroke="var(--ink-2)" stroke-width="1.2" />
         </g>
 
         <!-- Crankshaft & Main Drive Sprocket (Center: 110, 195) -->
         <g class="crank-spin">
           <!-- Crank Pitch Circle -->
-          <circle cx="110" cy="195" r="62" stroke="#DDD3C0" stroke-width="1" stroke-dasharray="3 3" />
+          <circle cx="110" cy="195" r="62" stroke="var(--kerb)" stroke-width="1" stroke-dasharray="3 3" />
           <!-- Flywheel Ring -->
-          <circle cx="110" cy="195" r="56" stroke="#22201E" stroke-width="1.5" />
-          <circle cx="110" cy="195" r="44" stroke="#CDC2AD" stroke-width="0.8" />
+          <circle cx="110" cy="195" r="56" stroke="var(--ink)" stroke-width="1.5" />
+          <circle cx="110" cy="195" r="44" stroke="var(--kerb)" stroke-width="0.8" />
           <!-- Counterweight Balance Lobe -->
-          <path d="M72 205 C75 235 145 235 148 205 Z" fill="#E4DCCB" fill-opacity="0.3" stroke="#22201E" stroke-width="1.2" />
+          <path d="M72 205 C75 235 145 235 148 205 Z" fill="var(--well)" fill-opacity="0.6" stroke="var(--ink)" stroke-width="1.2" />
           <!-- Crank Center Hub -->
-          <circle cx="110" cy="195" r="14" stroke="#22201E" stroke-width="1.4" fill="#FAF7F2" />
-          <circle cx="110" cy="195" r="4" fill="#22201E" />
+          <circle cx="110" cy="195" r="14" stroke="var(--ink)" stroke-width="1.4" fill="var(--concrete)" />
+          <circle cx="110" cy="195" r="4" fill="var(--ink)" />
           <!-- Crank Pin (Eccentric Journal at radius 24) -->
-          <circle cx="110" cy="171" r="7" stroke="#F2554A" stroke-width="1.6" fill="#FFFFFF" />
-          <line x1="110" y1="135" x2="110" y2="255" stroke="#DDD3C0" stroke-width="0.8" stroke-dasharray="2 4" />
-          <line x1="50" y1="195" x2="170" y2="195" stroke="#DDD3C0" stroke-width="0.8" stroke-dasharray="2 4" />
+          <circle cx="110" cy="171" r="7" stroke="var(--danger)" stroke-width="1.6" fill="#FFFFFF" />
+          <line x1="110" y1="135" x2="110" y2="255" stroke="var(--kerb)" stroke-width="0.8" stroke-dasharray="2 4" />
+          <line x1="50" y1="195" x2="170" y2="195" stroke="var(--kerb)" stroke-width="0.8" stroke-dasharray="2 4" />
           <!-- Degree Notch Ticks around rim -->
-          <circle cx="110" cy="195" r="56" stroke="#F2554A" stroke-width="3" stroke-dasharray="1 14.6" opacity="0.6" />
+          <circle cx="110" cy="195" r="56" stroke="var(--line)" stroke-width="3" stroke-dasharray="1 14.6" opacity="0.8" />
         </g>
 
         <!-- Interlocking Cam Timing Gear / Pinion (Center: 218, 120) -->
         <g class="cam-spin">
           <!-- Pitch Diameter Circle -->
-          <circle cx="218" cy="120" r="42" stroke="#DDD3C0" stroke-width="1" stroke-dasharray="2 2" />
+          <circle cx="218" cy="120" r="42" stroke="var(--kerb)" stroke-width="1" stroke-dasharray="2 2" />
           <!-- Cam Gear Outer Teeth Ring -->
-          <circle cx="218" cy="120" r="38" stroke="#22201E" stroke-width="1.4" />
-          <circle cx="218" cy="120" r="38" stroke="#CDC2AD" stroke-width="5" stroke-dasharray="0.1 7.4" stroke-linecap="round" />
+          <circle cx="218" cy="120" r="38" stroke="var(--ink)" stroke-width="1.4" />
+          <circle cx="218" cy="120" r="38" stroke="var(--kerb)" stroke-width="5" stroke-dasharray="0.1 7.4" stroke-linecap="round" />
           <!-- Inner Spoke Lightening Holes -->
-          <circle cx="218" cy="104" r="5" stroke="#CDC2AD" stroke-width="1" />
-          <circle cx="232" cy="128" r="5" stroke="#CDC2AD" stroke-width="1" />
-          <circle cx="204" cy="128" r="5" stroke="#CDC2AD" stroke-width="1" />
+          <circle cx="218" cy="104" r="5" stroke="var(--kerb)" stroke-width="1" />
+          <circle cx="232" cy="128" r="5" stroke="var(--kerb)" stroke-width="1" />
+          <circle cx="204" cy="128" r="5" stroke="var(--kerb)" stroke-width="1" />
           <!-- Camshaft Hub -->
-          <circle cx="218" cy="120" r="10" stroke="#22201E" stroke-width="1.2" fill="#FAF7F2" />
-          <circle cx="218" cy="120" r="3" fill="#F2554A" />
-          <path d="M218 80 V160 M178 120 H258" stroke="#DDD3C0" stroke-width="0.7" stroke-dasharray="2 4" />
+          <circle cx="218" cy="120" r="10" stroke="var(--ink)" stroke-width="1.2" fill="var(--concrete)" />
+          <circle cx="218" cy="120" r="3" fill="var(--line-deep)" />
+          <path d="M218 80 V160 M178 120 H258" stroke="var(--kerb)" stroke-width="0.7" stroke-dasharray="2 4" />
         </g>
 
         <!-- Continuous Looping Timing Chain / Belt connecting Crank to Cam -->
         <path
           d="M110 139 C145 130 185 102 218 82 M218 158 C185 175 145 220 110 251"
-          stroke="#B3A894"
+          stroke="var(--ink-2)"
           stroke-width="1.6"
           class="timing-chain"
         />
 
         <!-- Technical Callout Lines & Labels -->
-        <line x1="145" y1="40" x2="200" y2="40" stroke="#DDD3C0" stroke-width="0.8" />
-        <line x1="200" y1="40" x2="215" y2="30" stroke="#DDD3C0" stroke-width="0.8" />
+        <line x1="145" y1="40" x2="200" y2="40" stroke="var(--kerb)" stroke-width="0.8" />
+        <line x1="200" y1="40" x2="215" y2="30" stroke="var(--kerb)" stroke-width="0.8" />
 
-        <line x1="110" y1="265" x2="110" y2="280" stroke="#DDD3C0" stroke-width="0.8" />
-        <line x1="110" y1="280" x2="175" y2="280" stroke="#DDD3C0" stroke-width="0.8" />
+        <line x1="110" y1="265" x2="110" y2="280" stroke="var(--kerb)" stroke-width="0.8" />
+        <line x1="110" y1="280" x2="175" y2="280" stroke="var(--kerb)" stroke-width="0.8" />
       </g>
 
-      <g font-family="'JetBrains Mono', monospace" font-size="9" fill="#B3A894">
+      <g font-family="'JetBrains Mono', monospace" font-size="9" fill="var(--ink-3)">
         <text x="218" y="30">BORE ⌀54mm</text>
         <text x="180" y="284">CRANKSHAFT ω</text>
-        <text x="218" y="172" fill="#E5766D">TIMING 2:1</text>
+        <text x="218" y="172" fill="var(--warn)">TIMING 2:1</text>
       </g>
     </svg>
 
     <!-- 5. Motorcycle Technical Drawing Blueprint (Bottom Center) -->
     <svg
       viewBox="30 30 820 420"
-      class="absolute left-1/2 bottom-3 -translate-x-1/2 w-[clamp(760px,76vw,1200px)] pointer-events-none opacity-85"
+      class="absolute left-1/2 bottom-3 -translate-x-1/2 w-[clamp(760px,76vw,1200px)] pointer-events-none opacity-80"
       aria-hidden="true"
     >
-      <g fill="none" stroke="#CDC2AD" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
+      <g fill="none" stroke="var(--kerb)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
         <line x1="30" y1="385" x2="850" y2="385" stroke-width="1"></line>
 
         <!-- Rear Wheel Assembly -->
         <circle cx="180" cy="292" r="93"></circle>
         <circle cx="180" cy="292" r="82" stroke-width="0.8"></circle>
         <circle cx="180" cy="292" r="66"></circle>
-        <circle cx="180" cy="292" r="40" stroke-width="48" stroke-dasharray="1.6 19.34" stroke="#D9CFBB" stroke-linecap="butt"></circle>
+        <circle cx="180" cy="292" r="40" stroke-width="48" stroke-dasharray="1.6 19.34" stroke="var(--well)" stroke-linecap="butt"></circle>
         <circle cx="180" cy="292" r="16"></circle>
         <circle cx="180" cy="292" r="5"></circle>
         <circle cx="180" cy="292" r="30" stroke-width="0.8"></circle>
@@ -165,7 +165,7 @@
         <circle cx="720" cy="292" r="93"></circle>
         <circle cx="720" cy="292" r="82" stroke-width="0.8"></circle>
         <circle cx="720" cy="292" r="66"></circle>
-        <circle cx="720" cy="292" r="40" stroke-width="48" stroke-dasharray="1.6 19.34" stroke="#D9CFBB" stroke-linecap="butt"></circle>
+        <circle cx="720" cy="292" r="40" stroke-width="48" stroke-dasharray="1.6 19.34" stroke="var(--well)" stroke-linecap="butt"></circle>
         <circle cx="720" cy="292" r="16"></circle>
         <circle cx="720" cy="292" r="5"></circle>
         <circle cx="720" cy="292" r="52"></circle>
@@ -208,7 +208,7 @@
         <path d="M102 192 L76 238 L60 234" stroke-width="1.2"></path>
 
         <!-- CoG Indicator -->
-        <g stroke="#F2554A" stroke-width="1.4">
+        <g stroke="var(--danger)" stroke-width="1.4">
           <circle cx="440" cy="205" r="9"></circle>
           <path d="M440 190 V220 M425 205 H455"></path>
           <path d="M440 220 V385" stroke-dasharray="3 5" stroke-width="1"></path>
@@ -216,7 +216,7 @@
         </g>
 
         <!-- Dimension Lines -->
-        <g stroke="#B9AE98" stroke-width="1">
+        <g stroke="var(--ink-3)" stroke-width="1">
           <path d="M180 392 V430 M720 392 V430"></path>
           <path d="M180 420 H720"></path>
           <path d="M188 416 L180 420 L188 424 M712 416 L720 420 L712 424"></path>
@@ -224,25 +224,25 @@
       </g>
 
       <!-- Engineering Dimension Labels -->
-      <g font-family="'JetBrains Mono', monospace" font-size="12" fill="#B3A894">
+      <g font-family="'JetBrains Mono', monospace" font-size="12" fill="var(--ink-3)">
         <text x="450" y="414" text-anchor="middle">L = 1.42 m</text>
-        <text x="452" y="340" fill="#E5766D">h = 0.58 m</text>
-        <text x="458" y="196" fill="#E5766D">CoG</text>
+        <text x="452" y="340" fill="var(--warn)">h = 0.58 m</text>
+        <text x="458" y="196" fill="var(--warn)">CoG</text>
       </g>
     </svg>
   </div>
 
   <!-- ============ TOP APPLICATION HEADER ============ -->
-  <header class="relative z-10 flex items-center justify-between px-6 py-3.5 bg-white border-b border-[#E6DFD3] border-t-2 border-[#22201E] shrink-0">
+  <header class="relative z-10 flex items-center justify-between px-6 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)] border-t-2 border-[var(--ink)] shrink-0">
     <div class="flex items-center gap-3">
-      <div class="w-4 h-4 rounded-[3px] bg-[#F2554A] shrink-0"></div>
+      <div class="w-4 h-4 rounded-[3px] bg-[var(--line)] border border-[var(--ink)]/20 shrink-0"></div>
       <div>
-        <div class="text-sm font-bold tracking-tight text-[#22201E]">Moto-Braking Dynamics</div>
-        <div class="text-[11.5px] text-[#6B645C] font-medium">Computational Benchmark Workbench · Onboarding Gate</div>
+        <div class="text-sm font-bold tracking-tight text-[var(--ink)]">Moto-Braking Dynamics</div>
+        <div class="text-[11.5px] text-[var(--ink-2)] font-medium">Computational Benchmark Workbench · Onboarding Gate</div>
       </div>
     </div>
 
-    <div class="font-mono text-[11.5px] text-[#6B645C] bg-[#F4EFE6] px-3 py-1 rounded-md border border-[#E6DFD3]">
+    <div class="font-mono text-[11.5px] text-[var(--ink-2)] bg-[var(--well)] px-3 py-1 rounded-md border border-[var(--kerb)]">
       Step 1 of 2 · Vehicle Provenance
     </div>
   </header>
@@ -251,13 +251,13 @@
   <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6 pb-28 max-w-5xl mx-auto w-full">
     <!-- Title & Scientific Objective -->
     <div class="text-center max-w-2xl mb-8 flex flex-col items-center gap-3">
-      <span class="text-[11px] font-bold uppercase tracking-widest text-[#C93A30] px-3.5 py-1 bg-[#FDEBE8] rounded-full border border-[#F2554A]">
+      <span class="text-[11px] font-bold uppercase tracking-widest text-[var(--line-deep)] px-3.5 py-1 bg-[var(--line-tint)] rounded-full border border-[var(--line)]">
         INITIAL EXPERIMENT CALIBRATION
       </span>
-      <h1 class="text-2xl sm:text-3xl font-bold text-[#22201E] tracking-tight text-balance leading-snug">
+      <h1 class="text-2xl sm:text-3xl font-bold text-[var(--ink)] tracking-tight text-balance leading-snug">
         Select Your Motorcycle Evaluation Pathway
       </h1>
-      <p class="text-[13.5px] text-[#6B645C] leading-relaxed">
+      <p class="text-[13.5px] text-[var(--ink-2)] leading-relaxed">
         In computational braking dynamics, all trajectory integrations and thermal dissipation models depend on vehicle geometry, mass, and caliper specifications. Choose how you wish to initialize your experiment.
       </p>
     </div>
@@ -265,25 +265,25 @@
     <!-- 2 Frosted Glass Action Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-[880px]">
       <!-- Pathway A: Custom Setup -->
-      <section class="path-card rounded-xl p-6 border border-[#E6DFD3] shadow-sm flex flex-col justify-between">
+      <section class="path-card rounded-xl p-6 border border-[var(--kerb)] shadow-sm flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between gap-3">
-            <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase bg-[#FDEBE8] text-[#C93A30] border border-[#F2554A]">
+            <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)]">
               PATHWAY A · CUSTOM SETUP
             </span>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B645C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"></path>
             </svg>
           </div>
 
-          <h2 class="text-lg font-bold text-[#22201E] mt-4 mb-1.5 tracking-tight">
+          <h2 class="text-lg font-bold text-[var(--ink)] mt-4 mb-1.5 tracking-tight">
             Assemble Custom Motorcycle
           </h2>
-          <p class="text-[12.5px] text-[#6B645C] leading-relaxed">
+          <p class="text-[12.5px] text-[var(--ink-2)] leading-relaxed">
             Manually configure your motorcycle's category, engine displacement, total mass, and braking architecture before starting the simulation.
           </p>
 
-          <div class="my-4 border-t border-[#E6DFD3]"></div>
+          <div class="my-4 border-t border-[var(--kerb)]"></div>
 
           <!-- Features checklist -->
           <div class="space-y-2.5">
@@ -294,11 +294,11 @@
           </div>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-[#E6DFD3]">
+        <div class="mt-8 pt-4 border-t border-[var(--kerb)]">
           <button
             type="button"
             (click)="goToConfigure()"
-            class="btn-a w-full h-11 bg-[#F2554A] text-white rounded-lg text-[13.5px] font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+            class="btn-a w-full h-11 rounded-lg text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Configure Custom Motorcycle</span>
             <span aria-hidden="true">→</span>
@@ -307,25 +307,25 @@
       </section>
 
       <!-- Pathway B: Ground-Truth Baseline -->
-      <section class="path-card rounded-xl p-6 border border-[#E6DFD3] shadow-sm flex flex-col justify-between">
+      <section class="path-card rounded-xl p-6 border border-[var(--kerb)] shadow-sm flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between gap-3">
-            <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase bg-[#EBF7F0] text-[#1F7A50] border border-[#2F9E6B]">
+            <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)]">
               PATHWAY B · GROUND-TRUTH BASELINE
             </span>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E0A030" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--line-deep)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
             </svg>
           </div>
 
-          <h2 class="text-lg font-bold text-[#22201E] mt-4 mb-1.5 tracking-tight">
+          <h2 class="text-lg font-bold text-[var(--ink)] mt-4 mb-1.5 tracking-tight">
             Load Calibrated Baseline (125cc Scooter)
           </h2>
-          <p class="text-[12.5px] text-[#6B645C] leading-relaxed">
+          <p class="text-[12.5px] text-[var(--ink-2)] leading-relaxed">
             Immediately launch the workbench using the pre-calibrated 125cc commuter motorcycle baseline verified against published Cossalter (2006) road test data.
           </p>
 
-          <div class="my-4 border-t border-[#E6DFD3]"></div>
+          <div class="my-4 border-t border-[var(--kerb)]"></div>
 
           <!-- Features checklist -->
           <div class="space-y-2.5">
@@ -336,11 +336,11 @@
           </div>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-[#E6DFD3]">
+        <div class="mt-8 pt-4 border-t border-[var(--kerb)]">
           <button
             type="button"
             (click)="loadBaselineAndProceed()"
-            class="btn-b w-full h-11 bg-[#22201E] text-white rounded-lg text-[13.5px] font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+            class="btn-b w-full h-11 rounded-lg text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Load Baseline &amp; Enter Workbench</span>
             <span aria-hidden="true">→</span>
@@ -350,8 +350,8 @@
     </div>
 
     <!-- Academic Integrity Notice -->
-    <p class="mt-8 text-center text-xs text-[#6B645C] flex items-center justify-center gap-2">
-      <span class="w-[7px] h-[7px] rounded-full bg-[#2F9E6B] shrink-0"></span>
+    <p class="mt-8 text-center text-xs text-[var(--ink-2)] flex items-center justify-center gap-2">
+      <span class="w-[7px] h-[7px] rounded-full bg-[var(--ok)] shrink-0"></span>
       <span>You can modify your configured vehicle anytime via the left sidebar "Edit Configuration" button.</span>
     </p>
   </main>
