@@ -33,6 +33,7 @@ export class BenchmarkStore {
   readonly scrubTime = signal<number>(0.0);
   readonly isPlaying = signal<boolean>(false);
   readonly playbackSpeed = signal<number>(1.0);
+  readonly isVehicleConfigured = signal<boolean>(false);
 
   // Debounce pipeline for auto-recomputation
   private readonly triggerSimulation$ = new Subject<void>();
@@ -242,6 +243,99 @@ export class BenchmarkStore {
 
   toggleAutoCompute(): void {
     this.autoCompute.update(a => !a);
+  }
+
+  configureBaselineScooter(): void {
+    this.instances.update(list => {
+      return list.map(inst => {
+        if (inst.id === 'instance-1') {
+          return {
+            ...inst,
+            name: '125cc Commuter Scooter',
+            enabled: true,
+            vehicle: {
+              ...inst.vehicle,
+              mass: 165.0,
+              wheelbase: 1.28,
+              cogHeight: 0.62,
+              cogDistanceFront: 0.64,
+              cogDistanceRear: 0.64,
+              brakeBiasRatio: 0.30
+            },
+            brake: {
+              ...inst.brake,
+              brakeType: 'drum',
+              rotorMass: 1.20,
+              effectiveRadius: 0.110,
+              padFrictionNominal: 0.35,
+              fluidBoilTemperature: 230.0
+            },
+            simulation: {
+              ...inst.simulation,
+              initialVelocity: 16.67,
+              hazardDistance: 35.0
+            }
+          };
+        }
+        return { ...inst, enabled: false };
+      });
+    });
+    this.selectedInstanceId.set('instance-1');
+    this.isVehicleConfigured.set(true);
+    this.triggerSimulation();
+  }
+
+  configureCustomVehicle(custom: {
+    category: string;
+    title: string;
+    displacementCc: number;
+    massKg: number;
+    frontBrake: string;
+    rearBrake: string;
+    actuation: string;
+    wheelbase: number;
+    cogHeight: number;
+    rotorDiameterMm: number;
+    padFriction: number;
+    fluidBoilTemp: number;
+  }): void {
+    this.instances.update(list => {
+      return list.map(inst => {
+        if (inst.id === 'instance-1') {
+          return {
+            ...inst,
+            name: custom.title || `${custom.displacementCc}cc Custom ${custom.category}`,
+            enabled: true,
+            vehicle: {
+              ...inst.vehicle,
+              mass: custom.massKg,
+              wheelbase: custom.wheelbase,
+              cogHeight: custom.cogHeight,
+              cogDistanceFront: Number((custom.wheelbase * 0.5).toFixed(2)),
+              cogDistanceRear: Number((custom.wheelbase * 0.5).toFixed(2)),
+              brakeBiasRatio: custom.rearBrake === 'drum' ? 0.30 : 0.35
+            },
+            brake: {
+              ...inst.brake,
+              brakeType: custom.rearBrake === 'drum' ? 'drum' : 'disc',
+              rotorMass: custom.rotorDiameterMm > 280 ? 1.6 : 1.2,
+              effectiveRadius: Number((custom.rotorDiameterMm / 2000).toFixed(3)),
+              padFrictionNominal: custom.padFriction,
+              fluidBoilTemperature: custom.fluidBoilTemp
+            },
+            simulation: {
+              ...inst.simulation,
+              initialVelocity: 16.67,
+              hazardDistance: 35.0
+            }
+          };
+        }
+        return { ...inst, enabled: false };
+      });
+    });
+    this.selectedInstanceId.set('instance-1');
+    this.isVehicleConfigured.set(true);
+    this.triggerSimulation();
   }
 
   // --- Telemetry Interpolation Helper ---
