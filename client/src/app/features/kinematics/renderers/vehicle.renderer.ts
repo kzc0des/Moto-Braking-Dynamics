@@ -166,8 +166,8 @@ export class VehicleRenderer {
 
     const groundY = laneY + Math.min(laneHeight - 10, Math.max(drawH * 0.9, laneHeight * 0.78));
 
-    // Deceleration pitch angle (fork dive transient)
-    const pitchAngle = Math.min(0.12, Math.max(-0.04, (frame.deceleration / 9.81) * 0.08));
+    // Deceleration pitch angle (fork dive transient) - zeroed when idling at rest
+    const pitchAngle = params.forceIdle ? 0 : Math.min(0.12, Math.max(-0.04, (frame.deceleration / 9.81) * 0.08));
 
     // Wheel positions
     const rearWheelX = posX;

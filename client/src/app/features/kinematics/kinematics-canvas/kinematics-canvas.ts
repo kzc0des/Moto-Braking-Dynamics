@@ -45,11 +45,92 @@ export class KinematicsCanvas implements OnDestroy {
     return f ? Math.round(f.rotorTemperature) : Math.round(this.activeInst().simulation.initialRotorTemp);
   });
 
+  readonly activeResult = computed(() => {
+    const id = this.activeInst().id;
+    return this.store.activeResults().find(r => r.instanceId === id);
+  });
+
+  readonly frontLeverPct = computed(() => this.activeInst().actuation.frontLeverPct ?? 85);
+  readonly rearControlPct = computed(() => this.activeInst().actuation.rearControlPct ?? 65);
+  readonly rearControlLabel = computed(() => {
+    const key = this.activeInst().spriteKey;
+    return (key === 'scooter' || key === 'maxi') ? 'Left Hand Lever' : 'Right Foot Pedal';
+  });
+
+  readonly peakDecelG = computed(() => {
+    const res = this.activeResult();
+    return res ? (res.peakDeceleration / 9.81).toFixed(2) : '0.72';
+  });
+
+  readonly terminalOutcome = computed(() => {
+    return this.activeResult()?.terminalOutcome ?? 'Safe Stop';
+  });
+
+  readonly isCollisionOrCrash = computed(() => {
+    const out = this.terminalOutcome();
+    return out === 'Barrier Collision' || out === 'Front-Wheel Washout' || out === 'Rear-Wheel Lift-off';
+  });
+
+  readonly collisionDeficitM = computed(() => {
+    const res = this.activeResult();
+    if (!res) return '0.0';
+    const deficit = (res.reactionDistance ?? 0) + (res.mechanicalBrakingDistance ?? 0) - this.activeInst().simulation.hazardDistance;
+    return deficit > 0 ? deficit.toFixed(1) : '0.0';
+  });
+
+  readonly impactSpeedKmh = computed(() => {
+    const res = this.activeResult();
+    return res ? (res.finalVelocity * 3.6).toFixed(1) : '0.0';
+  });
+
+  readonly reactionDistM = computed(() => {
+    const res = this.activeResult();
+    return res?.reactionDistance ? res.reactionDistance.toFixed(1) : '16.7';
+  });
+
+  readonly mechanicalBrakingDistM = computed(() => {
+    const res = this.activeResult();
+    return res?.mechanicalBrakingDistance ? res.mechanicalBrakingDistance.toFixed(1) : '19.6';
+  });
+
+  readonly isIncidentModalOpen = signal<boolean>(false);
+  private hasShownIncidentModalForRun = false;
+
+  readonly isStagedAtStart = computed(() => {
+    return this.store.scrubTime() <= 0.05 && !this.store.isPlaying();
+  });
+
+  readonly isCollisionReached = computed(() => {
+    const f = this.liveFrame();
+    if (!f) return false;
+    const isAtHazard = f.distance >= this.activeInst().simulation.hazardDistance - 0.25;
+    return (this.isCollisionOrCrash() && isAtHazard) || (this.isAtEnd() && this.isCollisionOrCrash());
+  });
+
   readonly liveStatusText = computed(() => {
     const f = this.liveFrame();
-    if (!f) return 'Idle at Start';
-    if (f.velocity <= 0.08) return 'Standstill / Stopped';
-    return 'Decelerating (Brakes Applied)';
+    if (!f || this.isStagedAtStart()) return 'STAGED AT STARTING LINE · READY';
+    if (this.isCollisionReached()) {
+      return 'FAILED: BARRIER COLLISION';
+    }
+    if (f.velocity <= 0.08) return 'Standstill / Safe Stop';
+    if (f.isBrakingActive === false) return 'Reaction Delay (1.0s Free-Roll)';
+    return 'Active Deceleration (Brakes Clamped)';
+  });
+
+  readonly liveStatusDotClass = computed(() => {
+    if (this.isStagedAtStart()) return 'bg-[var(--line-deep)] animate-pulse';
+    if (this.isCollisionReached()) return 'bg-[var(--danger)] animate-ping';
+    const f = this.liveFrame();
+    if (f && f.velocity <= 0.08) return 'bg-[var(--ok)]';
+    return 'bg-[var(--line)]';
+  });
+
+  readonly liveStatusTextClass = computed(() => {
+    if (this.isCollisionReached()) return 'text-[var(--danger)] font-bold';
+    const f = this.liveFrame();
+    if (f && f.velocity <= 0.08) return 'text-[#156939] font-bold';
+    return 'text-[var(--ink)] font-semibold';
   });
 
   readonly isAtEnd = computed(() => {
@@ -84,16 +165,35 @@ export class KinematicsCanvas implements OnDestroy {
       this.handleReset();
       this.store.togglePlay();
     } else {
+      if (this.isIncidentModalOpen()) {
+        this.isIncidentModalOpen.set(false);
+      }
       this.store.togglePlay();
     }
   }
 
   handleReset(): void {
     this.store.resetPlayback();
+    this.hasShownIncidentModalForRun = false;
+    this.isIncidentModalOpen.set(false);
     const container = this.trackScrollContainerRef()?.nativeElement;
     if (container) {
       container.scrollLeft = 0;
     }
+  }
+
+  closeIncidentModal(): void {
+    this.isIncidentModalOpen.set(false);
+  }
+
+  openIncidentModal(): void {
+    this.isIncidentModalOpen.set(true);
+  }
+
+  replayFromModal(): void {
+    this.isIncidentModalOpen.set(false);
+    this.handleReset();
+    this.store.togglePlay();
   }
 
   ngOnDestroy(): void {
@@ -133,6 +233,10 @@ export class KinematicsCanvas implements OnDestroy {
         if (nextT >= this.store.maxRunTime()) {
           this.store.setScrubTime(this.store.maxRunTime());
           this.store.pause();
+          if (this.isCollisionOrCrash() && !this.hasShownIncidentModalForRun) {
+            this.isIncidentModalOpen.set(true);
+            this.hasShownIncidentModalForRun = true;
+          }
         } else {
           this.store.setScrubTime(nextT);
         }
@@ -167,13 +271,16 @@ export class KinematicsCanvas implements OnDestroy {
     const laneHeight = height - topOffset;
     const laneY = topOffset;
 
-    // Render single track
+    // Render single track with perception-reaction demarcation and collision failure callout
     this.trackRenderer.render({
       ctx,
       width,
       height,
       maxDistance: maxDist,
       hazardDistance: hazardDist,
+      reactionDistance: this.activeResult()?.reactionDistance,
+      isCollision: this.isCollisionReached(),
+      impactVelocityKmh: this.isCollisionReached() ? Math.round(Number(this.impactSpeedKmh())) : undefined,
       numLanes: 1,
       roadGradeAngle: roadGrade,
       pothole: this.activeInst().environment.potholeEnabled ? pothole : undefined
@@ -182,6 +289,11 @@ export class KinematicsCanvas implements OnDestroy {
     // Render vehicle
     const frame = scrubFrames[selectedId];
     if (frame) {
+      const isAtStart = this.store.scrubTime() <= 0.05;
+      const isPlaying = this.store.isPlaying();
+      const isStopped = frame.velocity <= 0.08;
+      const forceIdle = (isAtStart && !isPlaying) || isStopped;
+
       this.vehicleRenderer.render({
         ctx,
         laneY,
@@ -191,6 +303,8 @@ export class KinematicsCanvas implements OnDestroy {
         colorAccent: this.activeInst().colorAccent,
         name: this.activeInst().name,
         spriteKey: this.activeInst().spriteKey,
+        forceIdle,
+        animTime: typeof performance !== 'undefined' ? performance.now() / 1000 : undefined,
         frame
       });
     }

@@ -20,11 +20,17 @@ export interface TelemetrySeries {
 export interface InstanceSimulationResult {
   instanceId: string;
   terminalOutcome: TerminalOutcome;
-  stoppingDistance: number;    // m
+  stoppingDistance: number;    // m (total including Phase 1 reaction)
   stoppingTime: number;        // s
   peakDeceleration: number;    // m/s²
   finalVelocity: number;       // m/s
   maxRotorTemp: number;        // °C
+  reactionDistance?: number;   // m (Phase 1 free-rolling)
+  mechanicalBrakingDistance?: number; // m (Phase 2 mechanical)
+  peakFrontLeverPct?: number;  // %
+  peakRearControlPct?: number; // %
+  peakFrontPressureMpa?: number; // MPa
+  peakRearPressureMpa?: number;  // MPa
   rearLiftOffOccurred: boolean;
   frontWashoutOccurred: boolean;
   fluidBoilOccurred: boolean;
@@ -49,4 +55,7 @@ export interface InterpolatedScrubFrame {
   normalLoadRear: number;
   rotorTemperature: number;
   terminalOutcome: TerminalOutcome;
+  isBrakingActive?: boolean;   // true if t >= t_rxn
+  frontLeverPct?: number;
+  rearControlPct?: number;
 }
