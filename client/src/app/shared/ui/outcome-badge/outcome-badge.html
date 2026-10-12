@@ -2,5 +2,5 @@
   class="inline-flex items-center px-2.5 py-0.5 text-xs font-mono font-bold tracking-wider uppercase border rounded-md select-none transition-colors"
   [ngClass]="badgeClass()"
 >
-  [{{ outcome() }}]
+  [{{ outcome() === 'Safe Stop' ? 'PASSED · ' + outcome() : 'FAILED · ' + outcome() }}]
 </span>

@@ -14,13 +14,13 @@ export class OutcomeBadge {
   badgeClass(): string {
     switch (this.outcome()) {
       case 'Safe Stop':
-        return 'bg-[#EAF7EE] text-[#156939] border-[#1F9D55]/40';
+        return 'bg-[#EAF7EE] text-[#156939] border-[#1F9D55]/60';
       case 'Barrier Collision':
-        return 'bg-[#FDF0EF] text-[#9E241E] border-[#D93A32]/40';
+        return 'bg-[#FDF0EF] text-[#9E241E] border-2 border-[#D93A32] font-bold';
       case 'Front-Wheel Washout':
-        return 'bg-[#FFF6D1] text-[#7A5800] border-[#E8750F]/40';
+        return 'bg-[#FDF0EF] text-[#9E241E] border-2 border-[#D93A32] font-bold';
       case 'Rear-Wheel Lift-off':
-        return 'bg-[#FFF6D1] text-[#7A5800] border-[#E8750F]/40';
+        return 'bg-[#FDF0EF] text-[#9E241E] border-2 border-[#D93A32] font-bold';
       default:
         return 'bg-[var(--well)] text-[var(--ink-2)] border-[var(--kerb)]';
     }
