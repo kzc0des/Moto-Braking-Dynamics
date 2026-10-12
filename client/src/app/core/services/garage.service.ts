@@ -32,18 +32,18 @@ const STORAGE_KEY = 'moto_garage_collection_v1';
 
 export const BASELINE_SCOOTER_RECORD: CustomVehicleRecord = {
   id: 'baseline-scooter-125',
-  category: 'scooter',
+  category: 'step_through',
   title: '125cc Commuter Scooter',
   displacementCc: 125,
-  massKg: 165,
+  massKg: 130,
   frontBrake: 'single_disc',
   rearBrake: 'drum',
-  actuation: 'independent',
+  actuation: 'cbs',
   wheelbase: 1.28,
-  cogHeight: 0.62,
+  cogHeight: 0.48,
   rotorDiameterMm: 220,
   padFriction: 0.35,
-  fluidBoilTemp: 230,
+  fluidBoilTemp: 210,
   createdAt: Date.now()
 };
 
