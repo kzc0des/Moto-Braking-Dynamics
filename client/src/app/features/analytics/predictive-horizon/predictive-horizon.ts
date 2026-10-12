@@ -40,11 +40,33 @@ export class PredictiveHorizon {
     return Number((baseMu * conFactor).toFixed(2));
   });
 
+  // Biomechanical Dual-Brake Actuation parameters
+  readonly frontLeverPct = computed(() => this.selectedInst().actuation.frontLeverPct ?? 85);
+  readonly rearControlPct = computed(() => this.selectedInst().actuation.rearControlPct ?? 65);
+  readonly rearControlLabel = computed(() => {
+    const key = this.selectedInst().spriteKey;
+    return (key === 'scooter' || key === 'maxi') ? 'Left Hand Lever' : 'Right Foot Pedal';
+  });
+  readonly rearControlType = computed(() => {
+    const key = this.selectedInst().spriteKey;
+    return (key === 'scooter' || key === 'maxi') ? 'Fine-Motor (Hand)' : 'Gross-Motor (Foot)';
+  });
+  readonly peakFrontPressureMpa = computed(() => Number(((this.frontLeverPct() / 100) * 6.5).toFixed(1)));
+  readonly peakRearPressureMpa = computed(() => Number(((this.rearControlPct() / 100) * 5.0).toFixed(1)));
+
+  readonly modulationEfficiency = computed(() => {
+    const frontWeight = 1 - this.selectedInst().vehicle.brakeBiasRatio;
+    const rearWeight = this.selectedInst().vehicle.brakeBiasRatio;
+    return Math.min(1.0, Math.max(0.2, ((this.frontLeverPct() / 100) * frontWeight + (this.rearControlPct() / 100) * rearWeight)));
+  });
+
+  readonly modulationEfficiencyPct = computed(() => Math.round(this.modulationEfficiency() * 100));
+
   // Effective deceleration
   readonly decelMs2 = computed(() => {
     const mu = this.frictionCoeff();
     const th = this.selectedInst().environment.roadGradeAngle;
-    const eff = 0.85; // Conventional disc nominal efficiency
+    const eff = 0.85 * this.modulationEfficiency();
     const a = this.G * (mu * eff * Math.cos(th) + Math.sin(th));
     return Number(Math.max(0.5, a).toFixed(2));
   });
@@ -110,13 +132,13 @@ export class PredictiveHorizon {
     const m = this.margin();
     if (m >= 0) {
       return {
-        text: `SAFE STOP (+${m.toFixed(1)}m MARGIN)`,
-        badgeClass: 'bg-[#EAF7EE] border-[#1F9D55]/40 text-[#156939]'
+        text: `PASSED: SAFE STOP (+${m.toFixed(1)}m MARGIN)`,
+        badgeClass: 'bg-[#EAF7EE] border-2 border-[#1F9D55]/60 text-[#156939] font-bold shadow-xs'
       };
     }
     return {
-      text: `🛑 BARRIER IMPACT AT ${this.impactSpeedKmh()} KM/H`,
-      badgeClass: 'bg-[#FDF0EF] border-[#D93A32]/40 text-[#9E241E]'
+      text: `FAILED: BARRIER COLLISION (${this.impactSpeedKmh()} KM/H IMPACT)`,
+      badgeClass: 'bg-[#FDF0EF] border-2 border-[#D93A32] text-[#9E241E] font-bold shadow-xs'
     };
   });
 
@@ -256,7 +278,7 @@ export class PredictiveHorizon {
         widthPct: Number(wPct.toFixed(1)),
         barClass: col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]',
         chipClass: col ? 'text-[#9E241E]' : 'text-[#156939]',
-        chip: col ? `🔴 Collision (${Math.abs(m)}m deficit)` : `🟢 Safe Stop (${m}m margin)`
+        chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });
   });
@@ -290,7 +312,7 @@ export class PredictiveHorizon {
         widthPct: Number(wPct.toFixed(1)),
         barClass: col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]',
         chipClass: col ? 'text-[#9E241E]' : 'text-[#156939]',
-        chip: col ? `🔴 Collision (${Math.abs(m)}m deficit)` : `🟢 Safe Stop (${m}m margin)`
+        chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });
   });
