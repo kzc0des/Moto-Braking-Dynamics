@@ -1,0 +1,248 @@
+<aside class="w-[300px] shrink-0 h-full bg-white border-r border-[#E6DFD3] p-4 flex flex-col gap-4 overflow-y-auto select-none">
+  <!-- 1. VEHICLE ANATOMY SCHEMATIC HEADER -->
+  <div class="flex flex-col gap-2 shrink-0">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-[#6B645C]">Vehicle anatomy</div>
+    
+    <div class="border border-[#E6DFD3] rounded-lg bg-[#FAF7F2] p-1.5 flex items-center justify-center">
+      <svg width="100%" height="86" viewBox="0 0 268 96" role="img" class="block">
+        <!-- Ground Line -->
+        <line x1="6" y1="84" x2="262" y2="84" stroke="#DDD6C9" stroke-width="1" />
+        <!-- Rear Wheel -->
+        <circle [attr.cx]="svgCoords().rx" cy="64" r="20" fill="none" stroke="#22201E" stroke-width="2" />
+        <circle [attr.cx]="svgCoords().rx" cy="64" r="3" fill="#22201E" />
+        <!-- Front Wheel -->
+        <circle [attr.cx]="svgCoords().fx" cy="64" r="20" fill="none" stroke="#22201E" stroke-width="2" />
+        <circle [attr.cx]="svgCoords().fx" cy="64" r="3" fill="#22201E" />
+        <!-- Chassis Frame -->
+        <polyline [attr.points]="svgCoords().frame" fill="none" stroke="#6B645C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+        <!-- Seat Line -->
+        <line [attr.x1]="svgCoords().seatA" y1="40" [attr.x2]="svgCoords().seatB" y2="40" stroke="#22201E" stroke-width="4" stroke-linecap="round" />
+        <!-- CoG Target Indicator -->
+        <circle [attr.cx]="svgCoords().cx" [attr.cy]="svgCoords().cy" r="5" fill="#FFFFFF" stroke="#F2554A" stroke-width="2" />
+        <line [attr.x1]="svgCoords().cx" [attr.y1]="svgCoords().cyTop" [attr.x2]="svgCoords().cx" [attr.y2]="svgCoords().cyBot" stroke="#F2554A" stroke-width="1" />
+        <!-- Wheelbase Measurement Dimension Line -->
+        <line [attr.x1]="svgCoords().rx" y1="92" [attr.x2]="svgCoords().fx" y2="92" stroke="#A39B90" stroke-width="1" />
+        <line [attr.x1]="svgCoords().rx" y1="89" [attr.x2]="svgCoords().rx" y2="95" stroke="#A39B90" stroke-width="1" />
+        <line [attr.x1]="svgCoords().fx" y1="89" [attr.x2]="svgCoords().fx" y2="95" stroke="#A39B90" stroke-width="1" />
+      </svg>
+    </div>
+
+    <div class="flex items-center justify-between gap-2">
+      <span class="inline-flex px-2 py-0.5 rounded-md bg-[#FDEBE8] text-[#C93A30] text-[11px] font-semibold truncate max-w-[190px]">
+        {{ vehicleTitle() }}
+      </span>
+      <span class="font-mono text-[11px] text-[#6B645C] shrink-0">
+        L = {{ wheelbase() }} m
+      </span>
+    </div>
+  </div>
+
+  <!-- 2. CUSTOM VEHICLE CONFIGURATION PROFILE CARD & EDIT BUTTON -->
+  <div class="flex flex-col gap-2.5 shrink-0 bg-[#FAF7F2] p-3 border border-[#E6DFD3] rounded-xl">
+    <div class="flex items-center justify-between">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-[#6B645C]">Vehicle Fleet</div>
+      <span class="text-[10px] font-mono text-[#2F9E6B] font-bold">{{ garageVehicles().length }} In Garage</span>
+    </div>
+
+    <!-- Fleet Switcher Select -->
+    <div class="relative">
+      <select
+        [ngModel]="activeVehicleId()"
+        (ngModelChange)="onSelectVehicle($event)"
+        class="w-full h-8 px-2.5 bg-white border border-[#E6DFD3] rounded-lg text-xs font-semibold text-[#22201E] focus:border-[#F2554A] focus:outline-none cursor-pointer"
+      >
+        @for (v of garageVehicles(); track v.id) {
+          <option [value]="v.id">{{ v.title }} ({{ v.displacementCc }}cc)</option>
+        }
+      </select>
+    </div>
+
+    <!-- Specifications tags -->
+    <div class="flex flex-wrap gap-1.5 text-[10.5px]">
+      <span class="px-2 py-0.5 rounded-md bg-white border border-[#E6DFD3] font-mono font-medium text-[#22201E]">
+        {{ mass() }} kg
+      </span>
+      <span class="px-2 py-0.5 rounded-md bg-white border border-[#E6DFD3] font-mono font-medium text-[#22201E]">
+        h = {{ cogHeight() }}m
+      </span>
+      <span class="px-2 py-0.5 rounded-md bg-white border border-[#E6DFD3] font-medium text-[#22201E]">
+        {{ brakeHardwareLabel() }}
+      </span>
+      <span class="px-2 py-0.5 rounded-md bg-[#FDEBE8] text-[#C93A30] font-mono font-medium">
+        Cap: {{ maxSpeedKmh() }} km/h
+      </span>
+    </div>
+
+    <!-- Actions Row: Edit Specs + Create Another Motorcycle -->
+    <div class="grid grid-cols-2 gap-1.5 mt-1">
+      <button
+        type="button"
+        (click)="editConfiguration()"
+        class="py-1.5 px-2 bg-white hover:bg-[#FDEBE8] text-[#22201E] hover:text-[#C93A30] border border-[#E6DFD3] hover:border-[#F2554A] rounded-lg text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-1 cursor-pointer truncate"
+        title="Edit Active Motorcycle Specs"
+      >
+        <span class="text-xs">⚙️</span>
+        <span>Edit Specs</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="createAnotherMotorcycle()"
+        class="py-1.5 px-2 bg-[#22201E] hover:bg-[#3A3835] text-white rounded-lg text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-1 cursor-pointer truncate"
+        title="Create Another Motorcycle"
+      >
+        <span class="text-xs">＋</span>
+        <span>Add Bike</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. OPERATING KINEMATICS -->
+  <div class="flex flex-col gap-2.5 shrink-0">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-[#6B645C]">Operating kinematics</div>
+    
+    <!-- Speed -->
+    <div class="flex flex-col gap-1.5">
+      <div class="flex items-baseline justify-between text-xs">
+        <span class="font-medium text-[#22201E]">Initial speed <i class="italic font-serif">v</i><sub>0</sub></span>
+        <span class="font-mono text-xs font-medium text-[#22201E]">
+          {{ speedKmh() }} km/h <span class="text-[#6B645C]">({{ speedMs() }} m/s)</span>
+        </span>
+      </div>
+      <input
+        type="range"
+        min="20"
+        [max]="maxSpeedKmh()"
+        step="1"
+        [ngModel]="speedKmh()"
+        (ngModelChange)="onSpeedChange($event)"
+        class="w-full accent-[#F2554A] cursor-pointer"
+      />
+      <div class="flex justify-between font-mono text-[10px] text-[#A39B90]">
+        <span>20 km/h</span>
+        <span>{{ maxSpeedKmh() }} km/h ({{ displacementCc() }}cc limit)</span>
+      </div>
+    </div>
+
+    <!-- Hazard Distance -->
+    <div class="flex flex-col gap-1.5 mt-1">
+      <div class="flex items-baseline justify-between text-xs">
+        <span class="font-medium text-[#22201E]">Hazard distance <i class="italic font-serif">X</i><sub>hazard</sub></span>
+        <span class="font-mono text-xs font-medium text-[#22201E]">
+          {{ hazardDistance() }} m
+        </span>
+      </div>
+      <input
+        type="range"
+        min="10"
+        max="80"
+        step="0.5"
+        [ngModel]="hazardDistance()"
+        (ngModelChange)="onHazardChange($event)"
+        class="w-full accent-[#F2554A] cursor-pointer"
+      />
+      <div class="flex justify-between font-mono text-[10px] text-[#A39B90]">
+        <span>10 m</span>
+        <span>80 m</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. ROADWAY & ENVIRONMENT -->
+  <div class="flex flex-col gap-2.5 shrink-0">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-[#6B645C]">Roadway & environment</div>
+    
+    <!-- Substrate -->
+    <div class="flex flex-col gap-1">
+      <span class="text-[11px] font-medium text-[#6B645C]">Substrate</span>
+      <div class="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[#F4EFE6] border border-[#E6DFD3]">
+        @for (sub of substrates; track sub.key) {
+          <button
+            type="button"
+            (click)="onSubstrateChange(sub.key)"
+            class="h-6 rounded-md text-[11px] font-bold transition-all cursor-pointer"
+            [ngClass]="activeSubstrate() === sub.key
+              ? 'bg-white border border-[#E6DFD3] text-[#22201E] shadow-2xs'
+              : 'text-[#6B645C] hover:text-[#22201E]'"
+          >
+            {{ sub.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Contaminant -->
+    <div class="flex flex-col gap-1 mt-1">
+      <span class="text-[11px] font-medium text-[#6B645C]">Contaminant</span>
+      <div class="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[#F4EFE6] border border-[#E6DFD3]">
+        @for (con of contaminants; track con.key) {
+          <button
+            type="button"
+            (click)="onContaminantChange(con.key)"
+            class="h-6 rounded-md text-[11px] font-bold transition-all cursor-pointer truncate px-1"
+            [ngClass]="activeContaminant() === con.key
+              ? 'bg-white border border-[#E6DFD3] text-[#22201E] shadow-2xs'
+              : 'text-[#6B645C] hover:text-[#22201E]'"
+          >
+            {{ con.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Road Grade -->
+    <div class="flex flex-col gap-1.5 mt-1">
+      <div class="flex items-baseline justify-between text-xs">
+        <span class="font-medium text-[#22201E]">Road grade <i class="italic font-serif">θ</i></span>
+        <span class="font-mono text-xs font-medium text-[#22201E]">
+          {{ gradeDeg() > 0 ? '+' : '' }}{{ gradeDeg() }}°
+        </span>
+      </div>
+      <input
+        type="range"
+        min="-12"
+        max="12"
+        step="1"
+        [ngModel]="gradeDeg()"
+        (ngModelChange)="onGradeChange($event)"
+        class="w-full accent-[#F2554A] cursor-pointer"
+      />
+      <div class="flex justify-between font-mono text-[10px] text-[#A39B90]">
+        <span>−12° downhill</span>
+        <span>+12° uphill</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. TIER 2 ADVANCED ACCORDION -->
+  <div class="border-t border-[#E6DFD3] pt-3 shrink-0">
+    <button
+      type="button"
+      (click)="isTier2Open.set(!isTier2Open())"
+      class="w-full flex items-center justify-between text-xs font-bold text-[#22201E] hover:text-[#F2554A] transition-colors cursor-pointer"
+    >
+      <span>{{ isTier2Open() ? '▼' : '▶' }} Tier 2: Caliper & Pad Specs</span>
+    </button>
+
+    @if (isTier2Open()) {
+      <div class="mt-2.5 p-2.5 rounded-lg bg-[#FAF7F2] border border-[#E6DFD3] flex flex-col gap-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-[#6B645C]">Rotor diameter</span>
+          <span class="font-mono font-semibold text-[#22201E]">{{ rotorDiameter() }} mm</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[#6B645C]">Pad nominal friction μ</span>
+          <span class="font-mono font-semibold text-[#22201E]">{{ padFriction() }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[#6B645C]">Fluid boiling point</span>
+          <span class="font-mono font-semibold text-[#22201E]">230 °C (DOT 4)</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[#6B645C]">Brake bias (front/rear)</span>
+          <span class="font-mono font-semibold text-[#22201E]">{{ brakeBias() }}% front</span>
+        </div>
+      </div>
+    }
+  </div>
+</aside>
