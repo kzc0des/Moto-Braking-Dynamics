@@ -1,16 +1,27 @@
 <div class="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-white border border-[var(--kerb)] rounded-xl shadow-2xs select-none">
-  <!-- 1. Play / Pause / Replay Button with Idle Stance Indicator -->
+  <!-- 1. Play / Pause / Replay Button -->
   <button
     type="button"
     (click)="handlePlay()"
     class="px-3.5 py-1.5 font-bold rounded-lg transition-colors cursor-pointer text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs shrink-0 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)]"
-    [title]="store.isPlaying() ? 'Pause playback (enters idle stance)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
+    [title]="store.isPlaying() ? 'Pause playback' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
   >
-    <span>{{ store.isPlaying() ? '❚❚ Pause' : (isAtEnd() ? '↺ Replay' : '► Play') }}</span>
-    @if (!store.isPlaying() && !isAtEnd()) {
-      <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/15 text-[var(--ink)] font-mono font-medium tracking-wide">
-        IDLE
-      </span>
+    @if (store.isPlaying()) {
+      <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+      </svg>
+      <span>Pause</span>
+    } @else if (isAtEnd()) {
+      <svg class="w-3.5 h-3.5 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+        <path d="M3 3v5h5" />
+      </svg>
+      <span>Replay</span>
+    } @else {
+      <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+      <span>Play</span>
     }
   </button>
 
@@ -18,10 +29,14 @@
   <button
     type="button"
     (click)="store.resetPlayback()"
-    class="px-2.5 py-1.5 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] font-semibold rounded-lg border border-[var(--kerb)] flex items-center gap-1 transition-colors cursor-pointer text-xs shrink-0 shadow-2xs"
+    class="px-2.5 py-1.5 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] font-semibold rounded-lg border border-[var(--kerb)] flex items-center gap-1.5 transition-colors cursor-pointer text-xs shrink-0 shadow-2xs"
     title="Reset playback to start line (t = 0.00s)"
   >
-    <span>↺ Reset</span>
+    <svg class="w-3 h-3 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+      <path d="M3 3v5h5" />
+    </svg>
+    <span>Reset</span>
   </button>
 
   <!-- 3. Scrub Time Readout -->

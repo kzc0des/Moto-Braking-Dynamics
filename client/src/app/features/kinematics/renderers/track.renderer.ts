@@ -9,6 +9,9 @@ export interface TrackRenderParams {
   numLanes: number;
   roadGradeAngle?: number;
   pothole?: PotholeDefect;
+  reactionDistance?: number;
+  isCollision?: boolean;
+  impactVelocityKmh?: number;
 }
 
 export class TrackRenderer {
@@ -36,8 +39,27 @@ export class TrackRenderer {
 
       // Vertical line across all lanes
       if (m === 0) {
+        // High-contrast starting line
         ctx.strokeStyle = '#1F2328';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x, topOffset);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+
+        // Pavement start mark amber accent line
+        ctx.strokeStyle = '#D97706';
         ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x - 3, topOffset);
+        ctx.lineTo(x - 3, height);
+        ctx.stroke();
+
+        ctx.fillStyle = '#1F2328';
+        ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('START 0 m', x, 18);
+        continue;
       } else {
         ctx.strokeStyle = '#DDE0E4';
         ctx.lineWidth = 1;
@@ -48,18 +70,35 @@ export class TrackRenderer {
       ctx.lineTo(x, height);
       ctx.stroke();
 
-      // Top distance tick labels: "0 m", "10 m", "20 m", ...
-      ctx.fillStyle = m === 0 ? '#1F2328' : '#656C76';
+      // Top distance tick labels: "10 m", "20 m", ...
+      ctx.fillStyle = '#656C76';
       ctx.textAlign = 'center';
-      const label = m === 0 ? '0 m' : `${m} m`;
-      ctx.fillText(label, x, 18);
+      ctx.fillText(`${m} m`, x, 18);
     }
 
-    // 3. Hazard Barrier at hazardDistance (55 m) - Red signal dashed line
+    // 2b. Reaction Distance / Brake Onset Demarcation Line (Neutral Cool Slate)
+    if (params.reactionDistance && params.reactionDistance > 0 && params.reactionDistance < maxDistance) {
+      const rxnX = meterToPx(params.reactionDistance);
+      ctx.strokeStyle = '#656C76';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(rxnX, topOffset);
+      ctx.lineTo(rxnX, height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#656C76';
+      ctx.font = '600 10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`, rxnX, topOffset + 14);
+    }
+
+    // 3. Hazard Barrier at hazardDistance - Red Signal Barrier
     const barrierX = meterToPx(hazardDistance);
     if (barrierX <= width) {
       ctx.strokeStyle = '#D93A32';
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 2.2;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(barrierX, topOffset);
@@ -67,11 +106,34 @@ export class TrackRenderer {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // "Barrier 55 m" label
+      // "Barrier 32.5 m" label
       ctx.fillStyle = '#D93A32';
-      ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(`Barrier ${hazardDistance} m`, barrierX - 6, 32);
+      ctx.fillText(`Hazard Barrier ${hazardDistance} m`, barrierX - 6, 32);
+
+      // High-Visibility Red Canvas Callout if Collision Occurred
+      if (params.isCollision) {
+        ctx.font = '700 10.5px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const spdText = params.impactVelocityKmh ? ` · ${params.impactVelocityKmh} km/h` : '';
+        const impactLabel = `CRITICAL IMPACT${spdText} · FAILED`;
+        const pillW = Math.max(180, ctx.measureText(impactLabel).width + 24);
+        const pillH = 22;
+        const pillX = barrierX - pillW / 2;
+        const pillY = topOffset + 18;
+
+        ctx.fillStyle = '#FDF0EF';
+        ctx.strokeStyle = '#D93A32';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(pillX, pillY, pillW, pillH, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#9E241E';
+        ctx.textAlign = 'center';
+        ctx.fillText(impactLabel, barrierX, pillY + 15);
+      }
     }
 
     // 4. Horizontal lane dividing lines between multiple vehicles - Yellow pavement marking lines

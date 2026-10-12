@@ -1,15 +1,27 @@
 <div class="relative w-full h-full flex-1 min-h-0 bg-white border border-[var(--kerb)] rounded-xl shadow-xs p-3 sm:p-4 flex flex-col gap-3 select-none">
   <!-- Top Track Viewport Header -->
   <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-2 border-b border-[var(--kerb)]/60 shrink-0">
-    <!-- Left: Title & Active Configured Vehicle Badge -->
-    <div class="flex items-center gap-3">
+    <!-- Left: Title & Active Configured Vehicle Badge + Outcome Badge -->
+    <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
       <span class="font-bold text-[var(--ink)] text-base">2D Kinematics Track</span>
       <span class="px-2.5 py-0.5 text-xs bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)] rounded-full font-semibold">
         {{ activeInst().name }}
       </span>
-      <span class="text-xs font-mono text-[var(--ink-2)] hidden md:inline">
-        Single-Track Evaluation
-      </span>
+
+      <!-- Prominent High-Visibility Run Outcome Badge -->
+      @if (isAtEnd() || isCollisionReached()) {
+        @if (isCollisionOrCrash()) {
+          <span class="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-[#FDF0EF] border-2 border-[#D93A32] text-[#9E241E] shadow-2xs flex items-center gap-1.5 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-[var(--danger)]"></span>
+            <span>FAILED: BARRIER COLLISION</span>
+          </span>
+        } @else {
+          <span class="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-[#EAF7EE] border border-[#1F9D55]/60 text-[#156939] shadow-2xs flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[var(--ok)]"></span>
+            <span>PASSED: SAFE STOP</span>
+          </span>
+        }
+      }
     </div>
 
     <!-- Right: Hazard distance, time readout, Play button, Reset button -->
@@ -29,20 +41,46 @@
       <button
         type="button"
         (click)="handlePlay()"
-        class="px-3 py-1 text-xs font-bold rounded-md transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)]"
-        [title]="store.isPlaying() ? 'Pause playback (Space)' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory (Space)')"
+        class="px-3 py-1 text-xs font-bold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0"
+        [ngClass]="isStagedAtStart() ? 'bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] ring-2 ring-[var(--line-deep)]/40' : 'bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)]'"
+        [title]="store.isPlaying() ? 'Pause playback (Space)' : (isAtEnd() ? 'Replay simulation from start' : (isStagedAtStart() ? 'Launch braking run (Space)' : 'Resume playback (Space)'))"
       >
-        <span>{{ store.isPlaying() ? '❚❚ Pause' : (isAtEnd() ? '↺ Replay' : '► Play') }}</span>
+        @if (store.isPlaying()) {
+          <svg class="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+          </svg>
+          <span>Pause</span>
+        } @else if (isAtEnd()) {
+          <svg class="w-3 h-3 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          <span>Replay</span>
+        } @else if (isStagedAtStart()) {
+          <svg class="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <span>Launch Run</span>
+        } @else {
+          <svg class="w-3 h-3 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <span>Play</span>
+        }
       </button>
 
       <!-- Reset Button -->
       <button
         type="button"
         (click)="handleReset()"
-        class="px-2.5 py-1 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] rounded-md border border-[var(--kerb)] text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0"
+        class="px-2.5 py-1 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] rounded-md border border-[var(--kerb)] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-2xs"
         title="Reset to start line"
       >
-        Reset
+        <svg class="w-3 h-3 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        <span>Reset</span>
       </button>
     </div>
   </div>
@@ -80,10 +118,47 @@
             <b class="text-[var(--ink)]">{{ liveTempC() }}°C</b>
           </div>
         </div>
+
+        <!-- Biomechanical Peak Inputs -->
+        <div class="space-y-1 font-mono text-[10.5px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2 mt-2">
+          <div class="text-[9px] font-bold uppercase text-[var(--ink-3)] tracking-wider mb-0.5">
+            Peak Braking Inputs
+          </div>
+          <div class="flex justify-between">
+            <span>Front Lever:</span>
+            <b class="text-[var(--ink)]">{{ frontLeverPct() }}%</b>
+          </div>
+          <div class="flex justify-between truncate" [title]="'Rear ' + rearControlLabel()">
+            <span class="truncate">Rear {{ rearControlLabel().split(' ')[0] }}:</span>
+            <b class="text-[var(--ink)]">{{ rearControlPct() }}%</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Peak Decel:</span>
+            <b class="text-[var(--ink)]">{{ peakDecelG() }}g</b>
+          </div>
+        </div>
       </div>
 
       <div class="text-[10.5px] font-mono text-[var(--ink-3)] border-t border-[var(--kerb)] pt-2">
-        Status: <span class="font-bold text-[var(--ink)]">{{ liveStatusText() }}</span>
+        <div class="flex items-center gap-1.5 mb-0.5">
+          <span class="w-2 h-2 rounded-full shrink-0" [ngClass]="liveStatusDotClass()"></span>
+          <span class="leading-snug" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
+        </div>
+
+        @if (isCollisionOrCrash() && (isAtEnd() || isCollisionReached())) {
+          <button
+            type="button"
+            (click)="openIncidentModal()"
+            class="w-full mt-2 py-1.5 px-2 bg-[#FDF0EF] hover:bg-[#FCE8E6] text-[#9E241E] border-2 border-[#D93A32] rounded-lg text-[10px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span>FAILED: Inspect Incident</span>
+          </button>
+        }
       </div>
     </div>
 
@@ -102,4 +177,106 @@
       ></canvas>
     </div>
   </div>
+
+  <!-- FORENSIC INCIDENT WARNING MODAL -->
+  @if (isIncidentModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+      <div
+        class="bg-white border-2 border-[#D93A32] rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-6 flex flex-col gap-4 text-[var(--ink)]"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <!-- Modal Header -->
+        <div class="flex items-start justify-between gap-3 border-b border-[var(--kerb)] pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-full bg-[#FDF0EF] border border-[#D93A32]/40 text-[#9E241E] flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </span>
+            <div>
+              <h3 id="modal-title" class="font-bold text-base sm:text-lg text-[#9E241E] leading-tight">
+                {{ terminalOutcome() === 'Barrier Collision' ? 'HAZARD IMPACT INCIDENT REPORT' : 'UNSTABLE TERMINAL RUN DETECTED' }}
+              </h3>
+              <p class="text-xs text-[var(--ink-2)] font-mono">
+                SAE J214 / Green (2000) Kinematic Reconstruction
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            (click)="closeIncidentModal()"
+            class="text-[var(--ink-3)] hover:text-[var(--ink)] p-1.5 rounded-lg hover:bg-[var(--kerb)] transition-colors cursor-pointer"
+            aria-label="Close modal"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Telemetry Audit Grid -->
+        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
+            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Impact Speed</span>
+            <b class="text-base text-[#9E241E]">{{ impactSpeedKmh() }} km/h</b>
+          </div>
+          <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
+            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Overrun Deficit</span>
+            <b class="text-base text-[#9E241E]">-{{ collisionDeficitM() }} m</b>
+          </div>
+          <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
+            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Reaction Delay</span>
+            <b class="text-sm text-[var(--ink)]">{{ reactionDistM() }} m (1.0s lag)</b>
+          </div>
+          <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
+            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Active Braking Needed</span>
+            <b class="text-sm text-[var(--ink)]">{{ mechanicalBrakingDistM() }} m ({{ peakDecelG() }}g)</b>
+          </div>
+        </div>
+
+        <!-- Physical Root Cause Debrief -->
+        <div class="p-3 bg-[#FDF0EF] border border-[#D93A32]/30 rounded-xl text-xs space-y-1.5 text-[var(--ink)]">
+          <div class="font-bold text-[#9E241E] flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span>Biomechanical Root-Cause Attribution:</span>
+          </div>
+          <p class="text-[11.5px] leading-relaxed text-[var(--ink-2)]">
+            The rider travelled <b class="text-[var(--ink)]">{{ reactionDistM() }}m</b> during the 1.0-second perception-reaction interval before hydraulic clamping began. This left only <b class="text-[var(--ink)]">{{ (activeInst().simulation.hazardDistance - (+reactionDistM())).toFixed(1) }}m</b> of braking runway before the {{ activeInst().simulation.hazardDistance }}m barrier, but mechanical stopping required <b class="text-[var(--ink)]">{{ mechanicalBrakingDistM() }}m</b>.
+          </p>
+          <div class="text-[11px] font-medium text-[var(--ink)] pt-1 border-t border-[#D93A32]/20">
+            Peak Inputs Recorded: Front Lever {{ frontLeverPct() }}% (Right Hand) · Rear {{ rearControlLabel() }} {{ rearControlPct() }}%
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-2 pt-1 border-t border-[var(--kerb)]/60">
+          <button
+            type="button"
+            (click)="closeIncidentModal()"
+            class="px-3.5 py-1.5 rounded-lg border border-[var(--kerb)] text-xs font-semibold text-[var(--ink)] hover:bg-[var(--well)] cursor-pointer"
+          >
+            Review Simulation
+          </button>
+          <button
+            type="button"
+            (click)="replayFromModal()"
+            class="px-4 py-1.5 rounded-lg bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            <span>Replay Run</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

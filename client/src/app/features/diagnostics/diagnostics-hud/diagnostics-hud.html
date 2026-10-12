@@ -34,9 +34,12 @@
       <button
         type="button"
         (click)="diagnostics.toggleHud()"
-        class="text-[var(--ink-2)] hover:text-[var(--ink)] font-bold px-1.5 text-sm cursor-pointer"
+        class="text-[var(--ink-2)] hover:text-[var(--ink)] p-1 rounded-md hover:bg-[var(--kerb)] transition-colors cursor-pointer"
+        aria-label="Close diagnostics"
       >
-        ✕
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+        </svg>
       </button>
     </div>
 
