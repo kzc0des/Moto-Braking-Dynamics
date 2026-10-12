@@ -1,30 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* surfaces */
-  --bg:        #FAF7F2;  /* page (cream) */
-  --panel:     #FFFFFF;  /* cards, viewport, inspector */
-  --well:      #F3EEE6;  /* track lanes, chart backgrounds */
-  --border:    #E6DFD3;  /* borders, gridlines */
+  /* surfaces (white, light only) */
+  --bg:        #FFFFFF;  /* page */
+  --concrete:  #F4F5F6;  /* panels, sidebar */
+  --well:      #ECEEF0;  /* tracks, input wells */
+  --kerb:      #DDE0E4;  /* borders, gridlines */
 
-  /* text */
-  --ink:       #22201E;  /* main text */
-  --ink-2:     #6B645C;  /* labels, secondary */
-  --ink-3:     #A39B90;  /* hints, disabled, axis ticks */
+  /* asphalt greys */
+  --ink:       #1F2328;  /* main text, dark button */
+  --asphalt-7: #3B4048;
+  --ink-2:     #656C76;  /* labels, secondary text */
+  --ink-3:     #A3A9B1;  /* ticks, disabled */
 
-  /* accent: coral */
-  --coral:      #F2554A; /* buttons, active states, key lines */
-  --coral-deep: #C93A30; /* coral text and links */
-  --coral-tint: #FDEBE8; /* hover and selected backgrounds */
+  /* pavement line yellow (accent) */
+  --line:        #FFC800;  /* primary button, active state, key line */
+  --line-hover:  #E6B400;
+  --line-tint:   #FFF6D1;  /* selected rows, soft chips */
+  --line-deep:   #7A5800;  /* yellow text */
 
-  /* data series */
-  --series-1:  #F2554A;  /* coral (the selected bike or main line) */
-  --series-2:  #2E2C33;  /* ink */
-  --series-3:  #6F8FAF;  /* slate blue */
+  /* road signals */
+  --danger:    #D93A32;  /* collision, brake-light red */
+  --warn:      #E8750F;  /* caution, traffic-cone orange */
+  --ok:        #1F9D55;  /* safe stop */
+  --info:      #2B6CB0;  /* data series, guide-sign blue */
 
-  /* status */
-  --ok:        #2F9E6B;
-  --caution:   #E0A030;
+  /* compatibility aliases */
+  --panel:     var(--concrete);
+  --border:    var(--kerb);
+  --coral:     var(--danger);
+  --coral-deep:#B52A23;
+  --coral-tint:#FDEBE8;
+  --caution:   var(--warn);
 }
 
 @theme {
@@ -32,17 +39,26 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --color-bg: var(--bg);
-  --color-panel: var(--panel);
+  --color-concrete: var(--concrete);
   --color-well: var(--well);
-  --color-border: var(--border);
+  --color-kerb: var(--kerb);
+  --color-panel: var(--concrete);
+  --color-border: var(--kerb);
 
   --color-ink: var(--ink);
+  --color-asphalt-7: var(--asphalt-7);
   --color-ink-muted: var(--ink-2);
   --color-ink-subtle: var(--ink-3);
 
-  --color-coral: var(--coral);
-  --color-coral-deep: var(--coral-deep);
-  --color-coral-tint: var(--coral-tint);
+  --color-line: var(--line);
+  --color-line-hover: var(--line-hover);
+  --color-line-tint: var(--line-tint);
+  --color-line-deep: var(--line-deep);
+
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --color-ok: var(--ok);
+  --color-info: var(--info);
 }
 
 html, body {
@@ -60,8 +76,12 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom range input styling matching the editorial coral / charcoal aesthetic */
-input[type="range"].coral-slider {
+/* Custom range input styling matching road pavement ambiance */
+input[type="range"] {
+  accent-color: var(--line);
+}
+
+input[type="range"].road-slider {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
@@ -69,37 +89,39 @@ input[type="range"].coral-slider {
   border-radius: 9999px;
   outline: none;
 }
-input[type="range"].coral-slider::-webkit-slider-runnable-track {
+input[type="range"].road-slider::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   height: 8px;
   border-radius: 9999px;
-  background: var(--track-bg, var(--border));
+  background: var(--well);
+  border: 1px solid var(--kerb);
 }
-input[type="range"].coral-slider::-webkit-slider-thumb {
+input[type="range"].road-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--line);
   cursor: pointer;
   margin-top: -5px;
-  border: 2px solid #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
-input[type="range"].coral-slider::-moz-range-track {
+input[type="range"].road-slider::-moz-range-track {
   height: 8px;
   border-radius: 9999px;
-  background: var(--track-bg, var(--border));
+  background: var(--well);
+  border: 1px solid var(--kerb);
 }
-input[type="range"].coral-slider::-moz-range-thumb {
+input[type="range"].road-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--line);
   cursor: pointer;
-  border: 2px solid #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 /* Hide native scrollbars while preserving touch/trackpad scrolling */
