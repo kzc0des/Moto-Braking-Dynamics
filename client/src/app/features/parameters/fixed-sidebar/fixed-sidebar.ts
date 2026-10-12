@@ -91,20 +91,22 @@ export class FixedSidebar {
     this.router.navigate(['/configure'], { queryParams: { mode: 'new' } });
   }
 
-  onSpeedChange(valKmh: number): void {
+  onSpeedChange(valKmh: number | string): void {
+    const num = Number(valKmh);
     const maxAllowed = this.maxSpeedKmh();
-    const clamped = Math.min(Math.max(valKmh, 20), maxAllowed);
+    const clamped = Math.min(Math.max(num, 20), maxAllowed);
     this.store.updateSelectedInstance('simulation', {
       ...this.selectedInst().simulation,
       initialVelocity: Number((clamped / 3.6).toFixed(2))
     });
   }
 
-  onHazardChange(valM: number): void {
-    if (valM >= 10 && valM <= 80) {
+  onHazardChange(valM: number | string): void {
+    const num = Number(valM);
+    if (num >= 10 && num <= 80) {
       this.store.updateSelectedInstance('simulation', {
         ...this.selectedInst().simulation,
-        hazardDistance: Number(valM)
+        hazardDistance: num
       });
     }
   }
@@ -117,8 +119,9 @@ export class FixedSidebar {
     this.store.updateEnvironmentParam('contaminant', con);
   }
 
-  onGradeChange(deg: number): void {
-    const rad = Number((deg * Math.PI / 180).toFixed(4));
+  onGradeChange(deg: number | string): void {
+    const num = Number(deg);
+    const rad = Number((num * Math.PI / 180).toFixed(4));
     this.store.updateEnvironmentParam('roadGradeAngle', rad);
   }
 }
