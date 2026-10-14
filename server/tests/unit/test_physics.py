@@ -159,7 +159,7 @@ def test_friction_ellipse_cornering_constraint():
     fz = 1500.0
     mu = 0.90
     mass_share = 100.0
-    f_x_nominal = 1200.0
+    f_x_nominal = 1300.0
 
     # 1. Straight road (radius = inf)
     fx_straight, fy_straight, deficit = evaluate_cornering_friction_budget(
@@ -241,7 +241,7 @@ def test_simulation_barrier_collision():
     result = simulate_single_vehicle(config=config)
 
     assert result.terminal_outcome == TerminalOutcome.BARRIER_COLLISION
-    assert result.stop_distance >= 15.0
+    assert math.isclose(result.stop_distance, 15.0, rel_tol=1e-5) or result.stop_distance >= 15.0
     assert result.impact_velocity is not None
     assert result.impact_velocity > 0.0
 

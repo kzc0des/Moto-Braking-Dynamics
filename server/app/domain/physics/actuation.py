@@ -25,7 +25,7 @@ class ProgressiveSqueezeProfile:
     dynamic normal load transfer before reaching maximum clamping effort.
     """
 
-    target_pressure: float = 5.0e6  # 50 bar in Pa
+    target_pressure: float = 2.2e6  # 22 bar in Pa (realistic progressive threshold braking)
     rise_time: float = 0.50  # Seconds to ramp from 0 to target_pressure
 
     def __post_init__(self) -> None:

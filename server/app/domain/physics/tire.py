@@ -23,16 +23,16 @@ class PacejkaCoefficients:
 
 SUBSTRATE_MATRIX: dict[SurfaceSubstrate, PacejkaCoefficients] = {
     SurfaceSubstrate.ASPHALT: PacejkaCoefficients(
-        base_friction=0.90, stiffness_b=10.0, shape_c=1.65, curvature_e=0.97, critical_slip=0.15
+        base_friction=0.90, stiffness_b=16.0, shape_c=1.65, curvature_e=0.80, critical_slip=0.15
     ),
     SurfaceSubstrate.CONCRETE: PacejkaCoefficients(
-        base_friction=0.85, stiffness_b=11.5, shape_c=1.65, curvature_e=0.95, critical_slip=0.13
+        base_friction=0.85, stiffness_b=18.0, shape_c=1.65, curvature_e=0.80, critical_slip=0.13
     ),
     SurfaceSubstrate.LOOSE_GRAVEL: PacejkaCoefficients(
-        base_friction=0.45, stiffness_b=5.0, shape_c=1.40, curvature_e=0.50, critical_slip=0.22
+        base_friction=0.45, stiffness_b=11.0, shape_c=1.40, curvature_e=0.50, critical_slip=0.22
     ),
     SurfaceSubstrate.CRATERED_ASPHALT: PacejkaCoefficients(
-        base_friction=0.75, stiffness_b=9.0, shape_c=1.60, curvature_e=0.90, critical_slip=0.16
+        base_friction=0.75, stiffness_b=15.0, shape_c=1.60, curvature_e=0.80, critical_slip=0.16
     ),
 }
 
