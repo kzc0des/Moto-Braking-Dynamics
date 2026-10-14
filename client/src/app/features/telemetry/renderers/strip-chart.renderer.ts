@@ -30,9 +30,9 @@ export class StripChartRenderer {
   render(params: StripChartRenderParams): void {
     const { ctx, width, height, title, curves, thresholds, maxTime, scrubTime } = params;
 
-    const padLeft = 16;
+    const padLeft = 28;
     const padRight = 16;
-    const padTop = 12;
+    const padTop = 14;
     const padBottom = 24;
     const plotW = width - padLeft - padRight;
     const plotH = height - padTop - padBottom;
@@ -59,6 +59,11 @@ export class StripChartRenderer {
           if (v > maxY) maxY = v;
         });
       });
+      if (thresholds) {
+        thresholds.forEach(th => {
+          if (th.value > maxY) maxY = th.value * 1.05;
+        });
+      }
       if (minY === Infinity) minY = 0;
       if (maxY === -Infinity || maxY === minY) maxY = minY + 1;
     }
@@ -67,7 +72,7 @@ export class StripChartRenderer {
     const timeToX = (t: number) => padLeft + (t / maxTime) * plotW;
     const valToY = (v: number) => padTop + plotH - ((v - minY) / yRange) * plotH;
 
-    // 3. Horizontal Gridlines (--kerb / #DDE0E4)
+    // 3. Horizontal Gridlines & Y-axis Reference Labels (--kerb / #DDE0E4)
     ctx.strokeStyle = '#DDE0E4';
     ctx.lineWidth = 1;
     const gridDivs = 3;
@@ -79,9 +84,16 @@ export class StripChartRenderer {
       ctx.stroke();
     }
 
+    // Y-axis Bounds Annotation
+    ctx.fillStyle = '#8C959F';
+    ctx.font = '500 9.5px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(maxY >= 1000 ? `${(maxY / 1000).toFixed(1)}k` : `${Math.round(maxY)}`, padLeft - 4, padTop + 10);
+    ctx.fillText(`${Math.round(minY)}`, padLeft - 4, padTop + plotH);
+
     // 4. Bottom Time Axis Ticks & Labels
-    ctx.fillStyle = '#A3A9B1';
-    ctx.font = '500 11px system-ui, sans-serif';
+    ctx.fillStyle = '#656C76';
+    ctx.font = '500 10.5px system-ui, sans-serif';
     ctx.textAlign = 'center';
 
     const stepT = maxTime > 3 ? 1.0 : 0.5;
@@ -100,19 +112,26 @@ export class StripChartRenderer {
       ctx.fillText(label, x, padTop + plotH + 16);
     }
 
-    // 5. Threshold Lines (if applicable)
+    // 5. Threshold Lines & Labels (if applicable)
     if (thresholds) {
       thresholds.forEach(th => {
         if (th.value >= minY && th.value <= maxY) {
           const y = valToY(th.value);
           ctx.strokeStyle = th.color;
-          ctx.lineWidth = 1;
-          if (th.dashed) ctx.setLineDash([3, 3]);
+          ctx.lineWidth = 1.2;
+          if (th.dashed) ctx.setLineDash([4, 4]);
           ctx.beginPath();
           ctx.moveTo(padLeft, y);
           ctx.lineTo(padLeft + plotW, y);
           ctx.stroke();
           ctx.setLineDash([]);
+
+          if (th.label) {
+            ctx.font = '600 9.5px monospace';
+            ctx.fillStyle = th.color;
+            ctx.textAlign = 'right';
+            ctx.fillText(th.label, padLeft + plotW - 6, Math.max(padTop + 11, y - 4));
+          }
         }
       });
     }

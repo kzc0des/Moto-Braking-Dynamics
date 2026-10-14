@@ -82,10 +82,10 @@
         <!-- Mode 1: Predictive Horizon (Analytics Mode - Zero Scroll Single Screen) -->
         <app-predictive-horizon (simulateTrigger)="switchToSimulation()" />
       } @else {
-        <!-- Mode 2: Dynamic Track Viewport (Simulation Mode) -->
-        <div class="flex-1 min-h-0 flex flex-col p-3 gap-2.5 overflow-hidden">
+        <!-- Mode 2: Dynamic Track Viewport (Simulation Mode - Scrollable Stage) -->
+        <div class="flex-1 min-h-0 flex flex-col p-3 gap-2.5 overflow-y-auto">
           <!-- Kinematics Track Canvas Container -->
-          <div class="flex-1 min-h-0 flex flex-col rounded-xl overflow-hidden border border-[var(--kerb)] shadow-2xs bg-white">
+          <div class="min-h-[460px] flex-1 shrink-0 flex flex-col rounded-xl overflow-hidden border border-[var(--kerb)] shadow-2xs bg-white">
             <app-kinematics-canvas class="flex-1 min-h-0 flex flex-col h-full" />
           </div>
 
@@ -95,10 +95,11 @@
           </div>
 
           <!-- Collapsible Multi-Channel Telemetry Toggle -->
-          <div class="shrink-0 flex items-center justify-between px-3 py-1.5 bg-white border border-[var(--kerb)] rounded-xl text-xs">
+          <div class="shrink-0 flex items-center justify-between px-3.5 py-2 bg-white border border-[var(--kerb)] rounded-xl text-xs shadow-2xs">
             <div class="flex items-center gap-2">
-              <span class="font-bold text-[var(--ink)]">Multi-channel Strip Telemetry</span>
-              <span class="text-[var(--ink-2)] text-[11px]">(Velocity, Decel, Slip, Normal Load, Temperature)</span>
+              <span class="w-2 h-2 rounded-full bg-[var(--line)]"></span>
+              <span class="font-bold text-[var(--ink)]">Multi-Channel Strip Telemetry</span>
+              <span class="text-[var(--ink-2)] text-[11px] hidden sm:inline">(Velocity, Decel, Normal Loads Front/Rear, Rotor Temperature)</span>
             </div>
             <button
               type="button"
@@ -113,7 +114,7 @@
           </div>
 
           @if (isTelemetryOpen()) {
-            <div class="h-44 shrink-0 overflow-y-auto bg-white border border-[var(--kerb)] rounded-xl p-3 shadow-2xs">
+            <div class="shrink-0">
               <app-telemetry-panel />
             </div>
           }

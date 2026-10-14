@@ -11,8 +11,8 @@ import { StripChartRenderer } from '../renderers/strip-chart.renderer';
 })
 export class TelemetryPanel implements OnDestroy {
   readonly store = inject(BenchmarkStore);
-  readonly showLoads = signal<boolean>(false);
-  readonly showThermals = signal<boolean>(false);
+  readonly showLoads = signal<boolean>(true);
+  readonly showThermals = signal<boolean>(true);
 
   readonly canvasVelocityRef = viewChild<ElementRef<HTMLCanvasElement>>('canvasVelocity');
   readonly canvasDecelRef = viewChild<ElementRef<HTMLCanvasElement>>('canvasDecel');
@@ -62,32 +62,26 @@ export class TelemetryPanel implements OnDestroy {
 
   private setupCanvases(): void {
     this.resizeObserver = new ResizeObserver(() => {
-      this.resizeAll();
       this.drawAll();
     });
 
     const c1 = this.canvasVelocityRef()?.nativeElement;
     if (c1) this.resizeObserver.observe(c1);
-
-    this.resizeAll();
   }
 
-  private resizeAll(): void {
-    const list = [
-      this.canvasVelocityRef()?.nativeElement,
-      this.canvasDecelRef()?.nativeElement,
-      this.canvasLoadsRef()?.nativeElement,
-      this.canvasThermalsRef()?.nativeElement
-    ].filter(Boolean) as HTMLCanvasElement[];
+  private ensureCanvasSize(c: HTMLCanvasElement): { width: number; height: number; dpr: number } | null {
+    const rect = c.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
 
     const dpr = window.devicePixelRatio || 1;
-    list.forEach(c => {
-      const rect = c.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        c.width = Math.floor(rect.width * dpr);
-        c.height = Math.floor(rect.height * dpr);
-      }
-    });
+    const targetW = Math.floor(rect.width * dpr);
+    const targetH = Math.floor(rect.height * dpr);
+
+    if (c.width !== targetW || c.height !== targetH) {
+      c.width = targetW;
+      c.height = targetH;
+    }
+    return { width: rect.width, height: rect.height, dpr };
   }
 
   private startRenderLoop(): void {
@@ -113,77 +107,108 @@ export class TelemetryPanel implements OnDestroy {
     // 1. Velocity Canvas (--info / #2B6CB0)
     const cVel = this.canvasVelocityRef()?.nativeElement;
     if (cVel) {
-      const ctx = cVel.getContext('2d');
-      if (ctx && cVel.width > 0 && cVel.height > 0) {
-        this.renderer.render({
-          ctx,
-          width: cVel.width,
-          height: cVel.height,
-          curves: [
-            { name: 'Velocity', color: '#2B6CB0', times: telem.time, values: telem.velocity, unit: ' m/s' }
-          ],
-          maxTime: maxT,
-          scrubTime: scrubT,
-          yMin: 0
-        });
+      const dim = this.ensureCanvasSize(cVel);
+      if (dim) {
+        const ctx = cVel.getContext('2d');
+        if (ctx) {
+          ctx.save();
+          ctx.scale(dim.dpr, dim.dpr);
+          this.renderer.render({
+            ctx,
+            width: dim.width,
+            height: dim.height,
+            curves: [
+              { name: 'Velocity', color: '#2B6CB0', times: telem.time, values: telem.velocity, unit: ' m/s' }
+            ],
+            maxTime: maxT,
+            scrubTime: scrubT,
+            yMin: 0
+          });
+          ctx.restore();
+        }
       }
     }
 
     // 2. Deceleration Canvas (Asphalt ink #1F2328)
     const cDec = this.canvasDecelRef()?.nativeElement;
     if (cDec) {
-      const ctx = cDec.getContext('2d');
-      if (ctx && cDec.width > 0 && cDec.height > 0) {
-        this.renderer.render({
-          ctx,
-          width: cDec.width,
-          height: cDec.height,
-          curves: [
-            { name: 'Decel', color: '#1F2328', times: telem.time, values: telem.deceleration, unit: ' m/s²' }
-          ],
-          maxTime: maxT,
-          scrubTime: scrubT,
-          yMin: 0
-        });
+      const dim = this.ensureCanvasSize(cDec);
+      if (dim) {
+        const ctx = cDec.getContext('2d');
+        if (ctx) {
+          ctx.save();
+          ctx.scale(dim.dpr, dim.dpr);
+          this.renderer.render({
+            ctx,
+            width: dim.width,
+            height: dim.height,
+            curves: [
+              { name: 'Decel', color: '#1F2328', times: telem.time, values: telem.deceleration, unit: ' m/s²' }
+            ],
+            maxTime: maxT,
+            scrubTime: scrubT,
+            yMin: 0
+          });
+          ctx.restore();
+        }
       }
     }
 
     // 3. Normal Loads Canvas (if shown)
     const cLoads = this.canvasLoadsRef()?.nativeElement;
     if (cLoads && this.showLoads()) {
-      const ctx = cLoads.getContext('2d');
-      if (ctx && cLoads.width > 0 && cLoads.height > 0) {
-        this.renderer.render({
-          ctx,
-          width: cLoads.width,
-          height: cLoads.height,
-          curves: [
-            { name: 'Front Fz', color: '#E8750F', times: telem.time, values: telem.normalLoadFront, unit: ' N' },
-            { name: 'Rear Fz', color: '#2B6CB0', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
-          ],
-          maxTime: maxT,
-          scrubTime: scrubT,
-          yMin: 0
-        });
+      const dim = this.ensureCanvasSize(cLoads);
+      if (dim) {
+        const ctx = cLoads.getContext('2d');
+        if (ctx) {
+          ctx.save();
+          ctx.scale(dim.dpr, dim.dpr);
+          this.renderer.render({
+            ctx,
+            width: dim.width,
+            height: dim.height,
+            curves: [
+              { name: 'Front Fz', color: '#E8750F', times: telem.time, values: telem.normalLoadFront, unit: ' N' },
+              { name: 'Rear Fz', color: '#2B6CB0', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
+            ],
+            thresholds: [
+              { value: 0, label: 'Lift-Off Limit (0 N)', color: '#D93A32', dashed: true }
+            ],
+            maxTime: maxT,
+            scrubTime: scrubT,
+            yMin: 0
+          });
+          ctx.restore();
+        }
       }
     }
 
     // 4. Rotor Temperature Canvas (if shown: physical danger heat #D93A32)
     const cThermals = this.canvasThermalsRef()?.nativeElement;
     if (cThermals && this.showThermals()) {
-      const ctx = cThermals.getContext('2d');
-      if (ctx && cThermals.width > 0 && cThermals.height > 0) {
-        this.renderer.render({
-          ctx,
-          width: cThermals.width,
-          height: cThermals.height,
-          curves: [
-            { name: 'Rotor Temp', color: '#D93A32', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
-          ],
-          maxTime: maxT,
-          scrubTime: scrubT,
-          yMin: 20
-        });
+      const dim = this.ensureCanvasSize(cThermals);
+      if (dim) {
+        const ctx = cThermals.getContext('2d');
+        if (ctx) {
+          ctx.save();
+          ctx.scale(dim.dpr, dim.dpr);
+          this.renderer.render({
+            ctx,
+            width: dim.width,
+            height: dim.height,
+            curves: [
+              { name: 'Rotor Temp', color: '#D93A32', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
+            ],
+            thresholds: [
+              { value: 230, label: 'Boil Limit (230°C)', color: '#D93A32', dashed: true }
+            ],
+            maxTime: maxT,
+            scrubTime: scrubT,
+            yMin: 20,
+            yMax: 260
+          });
+          ctx.restore();
+        }
       }
     }
   }

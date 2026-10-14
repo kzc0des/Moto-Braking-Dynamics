@@ -1,78 +1,115 @@
-<div class="bg-white border border-[var(--kerb)] rounded-xl shadow-xs p-4 flex flex-col gap-3.5 select-none">
+<div class="bg-white border border-[var(--kerb)] rounded-xl shadow-xs p-4 flex flex-col gap-4 select-none">
   <!-- Top Header: Title & Channel Toggles -->
-  <div class="flex items-center justify-between pb-1 border-b border-[var(--kerb)]/60">
-    <div class="font-bold text-[var(--ink)] text-base">Synchronized telemetry</div>
+  <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--kerb)]/60">
+    <div class="flex items-center gap-2.5">
+      <div class="w-2.5 h-2.5 rounded-full bg-[var(--line)] animate-pulse"></div>
+      <div class="font-bold text-[var(--ink)] text-sm sm:text-base">Synchronized Multi-Channel Strip Telemetry</div>
+      <span class="text-[11px] font-mono text-[var(--ink-2)] bg-[var(--well)] px-2 py-0.5 rounded border border-[var(--kerb)]">
+        ODE RK45 · Synchronized
+      </span>
+    </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 text-xs">
+      <span class="text-[var(--ink-2)] text-[11px] font-medium hidden sm:inline">Active channels:</span>
       <button
         type="button"
         (click)="showLoads.set(!showLoads())"
-        class="px-3 py-1 text-xs font-semibold border rounded-md transition-colors cursor-pointer"
+        class="px-2.5 py-1 text-xs font-semibold border rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
         [ngClass]="showLoads() ? 'bg-[var(--line-tint)] text-[var(--line-deep)] border-[var(--line)]' : 'bg-white text-[var(--ink-2)] border-[var(--kerb)] hover:text-[var(--ink)]'"
       >
-        Normal loads
+        <span class="w-2 h-2 rounded-full" [ngClass]="showLoads() ? 'bg-[var(--line)]' : 'bg-[var(--kerb)]'"></span>
+        Normal loads (F_z)
       </button>
       <button
         type="button"
         (click)="showThermals.set(!showThermals())"
-        class="px-3 py-1 text-xs font-semibold border rounded-md transition-colors cursor-pointer"
+        class="px-2.5 py-1 text-xs font-semibold border rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
         [ngClass]="showThermals() ? 'bg-[var(--line-tint)] text-[var(--line-deep)] border-[var(--line)]' : 'bg-white text-[var(--ink-2)] border-[var(--kerb)] hover:text-[var(--ink)]'"
       >
-        Brake temp
+        <span class="w-2 h-2 rounded-full" [ngClass]="showThermals() ? 'bg-[#D93A32]' : 'bg-[var(--kerb)]'"></span>
+        Brake temp (°C)
       </button>
     </div>
   </div>
 
-  <!-- Primary Charts: Velocity (Left) & Deceleration (Right) Side-by-Side -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- 2x2 Grid of Telemetry Channels -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <!-- Chart 1: Velocity -->
-    <div class="flex flex-col gap-1.5">
-      <div class="flex items-center justify-between text-xs px-1">
-        <span class="text-[var(--ink-2)]">Velocity (m/s)</span>
-        <span class="font-bold text-[var(--ink)] text-sm tabular-nums">{{ currentVelocity().toFixed(1) }}</span>
+    <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
+      <div class="flex items-center justify-between text-xs px-0.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#2B6CB0]"></span>
+          <span class="font-bold text-[var(--ink)]">Forward Velocity</span>
+          <span class="text-[10px] font-mono text-[var(--ink-2)]">(m/s)</span>
+        </div>
+        <div class="font-mono font-bold text-sm text-[var(--ink)] tabular-nums">
+          {{ currentVelocity().toFixed(1) }} <span class="text-[10.5px] font-normal text-[var(--ink-2)]">m/s</span>
+          <span class="text-xs font-normal text-[var(--ink-3)] ml-1">({{ (currentVelocity() * 3.6).toFixed(0) }} km/h)</span>
+        </div>
       </div>
-      <div class="w-full h-32 rounded-lg overflow-hidden border border-[var(--kerb)]">
+      <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
         <canvas #canvasVelocity class="w-full h-full block"></canvas>
       </div>
     </div>
 
     <!-- Chart 2: Deceleration -->
-    <div class="flex flex-col gap-1.5">
-      <div class="flex items-center justify-between text-xs px-1">
-        <span class="text-[var(--ink-2)]">Deceleration (m/s²)</span>
-        <span class="font-bold text-[var(--ink)] text-sm tabular-nums">{{ currentDeceleration().toFixed(1) }}</span>
+    <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
+      <div class="flex items-center justify-between text-xs px-0.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#1F2328]"></span>
+          <span class="font-bold text-[var(--ink)]">Instantaneous Deceleration</span>
+          <span class="text-[10px] font-mono text-[var(--ink-2)]">(m/s²)</span>
+        </div>
+        <div class="font-mono font-bold text-sm text-[var(--ink)] tabular-nums">
+          {{ currentDeceleration().toFixed(2) }} <span class="text-[10.5px] font-normal text-[var(--ink-2)]">m/s²</span>
+          <span class="text-xs font-normal text-[var(--ink-3)] ml-1">({{ (currentDeceleration() / 9.81).toFixed(2) }} g)</span>
+        </div>
       </div>
-      <div class="w-full h-32 rounded-lg overflow-hidden border border-[var(--kerb)]">
+      <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
         <canvas #canvasDecel class="w-full h-full block"></canvas>
       </div>
     </div>
+
+    <!-- Chart 3: Normal Loads (Front & Rear Fz) -->
+    @if (showLoads()) {
+      <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
+        <div class="flex items-center justify-between text-xs px-0.5">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-[var(--ink)]">Normal Load Transfer (F_z)</span>
+            <span class="text-[10px] font-mono text-[var(--ink-2)]">(Front / Rear N)</span>
+          </div>
+          <div class="font-mono font-bold text-xs text-[var(--ink)] tabular-nums flex items-center gap-2">
+            <span class="text-[#E8750F]">Front: {{ (currentFrontLoad() / 1000).toFixed(2) }} kN</span>
+            <span class="text-[var(--kerb)]">|</span>
+            <span class="text-[#2B6CB0]">Rear: {{ (currentRearLoad() / 1000).toFixed(2) }} kN</span>
+          </div>
+        </div>
+        <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
+          <canvas #canvasLoads class="w-full h-full block"></canvas>
+        </div>
+      </div>
+    }
+
+    <!-- Chart 4: Brake Rotor Temperature -->
+    @if (showThermals()) {
+      <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
+        <div class="flex items-center justify-between text-xs px-0.5">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#D93A32]"></span>
+            <span class="font-bold text-[var(--ink)]">Rotor Temperature & Boil Margin</span>
+            <span class="text-[10px] font-mono text-[var(--ink-2)]">(°C)</span>
+          </div>
+          <div class="font-mono font-bold text-sm tabular-nums" [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32]' : 'text-[var(--ink)]'">
+            {{ currentRotorTemp().toFixed(1) }} <span class="text-[10.5px] font-normal text-[var(--ink-2)]">°C</span>
+            <span class="text-[11px] font-normal ml-1" [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32] font-bold' : 'text-[#156939]'">
+              ({{ (230 - currentRotorTemp()).toFixed(0) }}°C margin)
+            </span>
+          </div>
+        </div>
+        <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
+          <canvas #canvasThermals class="w-full h-full block"></canvas>
+        </div>
+      </div>
+    }
   </div>
-
-  <!-- Optional Strip 3: Normal Loads (Front & Rear Fz) -->
-  @if (showLoads()) {
-    <div class="flex flex-col gap-1.5 pt-2 border-t border-[var(--kerb)]/60">
-      <div class="flex items-center justify-between text-xs px-1">
-        <span class="text-[var(--ink-2)]">Normal load distribution (Front & Rear) (N)</span>
-        <span class="font-bold text-[var(--ink)] text-sm tabular-nums">
-          F: {{ (currentFrontLoad() / 1000).toFixed(2) }} kN · R: {{ (currentRearLoad() / 1000).toFixed(2) }} kN
-        </span>
-      </div>
-      <div class="w-full h-28 rounded-lg overflow-hidden border border-[var(--kerb)]">
-        <canvas #canvasLoads class="w-full h-full block"></canvas>
-      </div>
-    </div>
-  }
-
-  <!-- Optional Strip 4: Brake Rotor Temperature -->
-  @if (showThermals()) {
-    <div class="flex flex-col gap-1.5 pt-2 border-t border-[var(--kerb)]/60">
-      <div class="flex items-center justify-between text-xs px-1">
-        <span class="text-[var(--ink-2)]">Rotor temperature (°C)</span>
-        <span class="font-bold text-[var(--ink)] text-sm tabular-nums">{{ currentRotorTemp().toFixed(1) }} °C</span>
-      </div>
-      <div class="w-full h-28 rounded-lg overflow-hidden border border-[var(--kerb)]">
-        <canvas #canvasThermals class="w-full h-full block"></canvas>
-      </div>
-    </div>
-  }
 </div>
