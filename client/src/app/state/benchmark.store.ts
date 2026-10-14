@@ -28,6 +28,7 @@ export class BenchmarkStore {
   readonly activeWarnings = signal<string[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly autoCompute = signal<boolean>(true);
+  readonly engineStatus = signal<'connected' | 'fallback'>('connected');
 
   // --- Playback & Scrubbing State ---
   readonly scrubTime = signal<number>(0.0);
@@ -86,6 +87,7 @@ export class BenchmarkStore {
         if (enabled.length === 0) return of(null);
 
         if (!isPlatformBrowser(this.platformId)) {
+          this.engineStatus.set('fallback');
           this.generateLocalFallbackResults();
           return of(null);
         }
@@ -97,6 +99,7 @@ export class BenchmarkStore {
         return this.api.runBenchmark(payload).pipe(
           tap((response: BenchmarkResponse) => {
             const latency = Math.round(performance.now() - startTime);
+            this.engineStatus.set('connected');
             this.activeResults.set(response.instances);
             this.activeWarnings.set(response.warnings || []);
             this.isLoading.set(false);
@@ -115,8 +118,20 @@ export class BenchmarkStore {
           }),
           catchError(err => {
             this.isLoading.set(false);
+            this.engineStatus.set('fallback');
             console.warn('[BenchmarkStore] Simulation API error, falling back to local approximation:', err);
             this.generateLocalFallbackResults();
+            this.diagnostics.recordMetrics(
+              {
+                roundtripLatencyMs: 0,
+                solverExecutionTimeMs: 0,
+                lastRunTimestamp: new Date().toLocaleTimeString(),
+                pointsGenerated: 150,
+                activeWarnings: ['FastAPI Backend Offline — Results running on client-side approximation fallback']
+              },
+              payload,
+              { fallback: true }
+            );
             return of(null);
           })
         );

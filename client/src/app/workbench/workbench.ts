@@ -7,6 +7,7 @@ import { PredictiveHorizon } from '../features/analytics/predictive-horizon/pred
 import { KinematicsCanvas } from '../features/kinematics/kinematics-canvas/kinematics-canvas';
 import { TelemetryPanel } from '../features/telemetry/telemetry-panel/telemetry-panel';
 import { TrajectoryScrubber } from '../features/telemetry/trajectory-scrubber/trajectory-scrubber';
+import { DiagnosticsHud } from '../features/diagnostics/diagnostics-hud/diagnostics-hud';
 
 @Component({
   selector: 'app-workbench',
@@ -16,7 +17,8 @@ import { TrajectoryScrubber } from '../features/telemetry/trajectory-scrubber/tr
     PredictiveHorizon,
     KinematicsCanvas,
     TrajectoryScrubber,
-    TelemetryPanel
+    TelemetryPanel,
+    DiagnosticsHud
   ],
   templateUrl: './workbench.html',
   styleUrl: './workbench.css'

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DiagnosticsService } from '../diagnostics.service';
 import { BenchmarkStore } from '../../../state/benchmark.store';
@@ -12,4 +12,11 @@ import { BenchmarkStore } from '../../../state/benchmark.store';
 export class DiagnosticsHud {
   readonly diagnostics = inject(DiagnosticsService);
   readonly store = inject(BenchmarkStore);
+
+  @HostListener('window:keydown.escape')
+  onEscape(): void {
+    if (this.diagnostics.isHudOpen()) {
+      this.diagnostics.isHudOpen.set(false);
+    }
+  }
 }

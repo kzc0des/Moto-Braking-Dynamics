@@ -1,108 +1,179 @@
-<!-- HUD Floating Toggle Badge -->
-<div class="fixed bottom-3 right-3 z-50">
-  <button
-    type="button"
-    (click)="diagnostics.toggleHud()"
-    class="px-3.5 py-2 bg-white border border-[var(--kerb)] hover:border-[var(--line)] text-[var(--ink)] text-xs sm:text-sm font-mono font-bold rounded-lg shadow-md flex items-center gap-2 transition-colors cursor-pointer"
-    [ngClass]="
-      diagnostics.errors().length > 0
-        ? 'border-[var(--danger)] text-[#9E241E] bg-[#FDF0EF]'
-        : ''
-    "
-  >
-    <span class="w-2.5 h-2.5 rounded-full" [ngClass]="diagnostics.errors().length > 0 ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]'"></span>
-    <span>DIAGNOSTICS HUD</span>
+<!-- Top Header Pill Button -->
+<button
+  type="button"
+  (click)="diagnostics.toggleHud()"
+  class="h-8 px-3 bg-white border border-[var(--kerb)] hover:border-[var(--line)] text-[var(--ink)] rounded-lg transition-colors text-xs font-semibold flex items-center gap-2 shadow-2xs cursor-pointer"
+  [ngClass]="
+    diagnostics.errors().length > 0
+      ? 'border-[var(--danger)] text-[#9E241E] bg-[#FDF0EF]'
+      : ''
+  "
+  title="Click to view Physics Engine diagnostics and state inspector (Esc to close)"
+>
+  <span class="w-2 h-2 rounded-full shrink-0" [ngClass]="
+    diagnostics.errors().length > 0
+      ? 'bg-[var(--danger)] animate-pulse'
+      : store.engineStatus() === 'connected'
+      ? 'bg-[#2DA44E]'
+      : 'bg-[#E8750F]'
+  "></span>
+  <span class="font-medium text-[var(--ink)]">Physics Engine:</span>
+  @if (store.engineStatus() === 'connected') {
+    <span class="font-bold text-[#1E7E34]">Online</span>
     @if (diagnostics.metrics(); as m) {
-      <span class="text-xs text-[var(--ink-2)] font-normal">({{ m.roundtripLatencyMs }}ms)</span>
+      <span class="text-[10px] text-[var(--ink-2)] font-mono hidden md:inline">({{ m.solverExecutionTimeMs }}ms)</span>
     }
-  </button>
-</div>
+  } @else {
+    <span class="font-bold text-[#E8750F]">Offline</span>
+    <span class="text-[10px] text-[#7A5800] bg-[#FFF6D1] px-1 py-0.2 rounded border border-[#E8750F]/30 hidden lg:inline">Fallback</span>
+  }
+</button>
 
-<!-- Collapsible Diagnostics Drawer -->
+<!-- Slide-over Diagnostics Drawer (From Right) -->
 @if (diagnostics.isHudOpen()) {
-  <div class="fixed bottom-12 right-3 w-128 max-w-[90vw] max-h-96 bg-white border border-[var(--kerb)] rounded-xl shadow-2xl z-50 flex flex-col font-mono text-xs overflow-hidden">
-    <!-- Header -->
-    <div class="flex items-center justify-between px-3.5 py-2.5 bg-[var(--concrete)] border-b border-[var(--kerb)]">
-      <span class="font-bold text-[var(--ink)] flex items-center gap-2 text-sm">
-        <span>DIAGNOSTICS & STATE INSPECTOR</span>
-        @if (diagnostics.metrics(); as m) {
-          <span class="px-2 py-0.5 text-xs bg-[var(--well)] text-[var(--ink)] rounded-md font-semibold border border-[var(--kerb)]">
-            {{ m.solverExecutionTimeMs }}ms SOLVER
-          </span>
-        }
-      </span>
-      <button
-        type="button"
-        (click)="diagnostics.toggleHud()"
-        class="text-[var(--ink-2)] hover:text-[var(--ink)] p-1 rounded-md hover:bg-[var(--kerb)] transition-colors cursor-pointer"
-        aria-label="Close diagnostics"
-      >
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+  <!-- Backdrop Overlay -->
+  <div
+    (click)="diagnostics.toggleHud()"
+    class="fixed inset-0 bg-black/30 z-50 backdrop-blur-2xs transition-opacity"
+  ></div>
+}
+
+<div
+  class="fixed inset-y-0 right-0 z-55 w-full sm:w-[480px] bg-white border-l border-[var(--kerb)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out font-sans select-none"
+  [class.translate-x-0]="diagnostics.isHudOpen()"
+  [class.translate-x-full]="!diagnostics.isHudOpen()"
+>
+  <!-- Drawer Header -->
+  <div class="flex items-center justify-between px-5 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)]">
+    <div class="flex items-center gap-2.5">
+      <span class="w-6 h-6 rounded-md bg-[var(--line-tint)] border border-[var(--line)] flex items-center justify-center text-[var(--line-deep)] shrink-0">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
         </svg>
-      </button>
-    </div>
-
-    <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
-      <!-- Warnings & Physical Limits -->
-      @if (store.activeWarnings().length > 0) {
-        <div class="p-2.5 bg-[#FFF6D1] border border-[#E8750F]/40 rounded-lg">
-          <span class="text-[#7A5800] font-bold text-xs sm:text-sm">PHYSICAL SAFEGUARD WARNINGS:</span>
-          <ul class="list-disc list-inside mt-1.5 text-xs text-[#7A5800] space-y-0.5">
-            @for (warn of store.activeWarnings(); track warn) {
-              <li>{{ warn }}</li>
-            }
-          </ul>
+      </span>
+      <div>
+        <div class="text-base font-bold text-[var(--ink)]">Physics Engine Diagnostics</div>
+        <div class="text-xs text-[var(--ink-2)] font-mono">
+          {{ store.engineStatus() === 'connected' ? 'SciPy RK45 Connected' : 'Client Approximation Fallback' }}
         </div>
-      }
-
-      <!-- Errors Log -->
-      @if (diagnostics.errors().length > 0) {
-        <div class="p-2.5 bg-[#FDF0EF] border border-[#D93A32]/40 rounded-lg flex flex-col gap-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[#9E241E] font-bold text-xs sm:text-sm">HTTP / RUNTIME ERRORS:</span>
-            <button
-              type="button"
-              (click)="diagnostics.clearErrors()"
-              class="text-xs text-[#9E241E] hover:underline font-semibold cursor-pointer"
-            >
-              Clear
-            </button>
-          </div>
-          @for (err of diagnostics.errors(); track err.timestamp) {
-            <div class="text-xs text-[#9E241E] border-t border-[#D93A32]/20 pt-1">
-              <span class="text-[var(--ink-2)]">[{{ err.timestamp }}]</span> {{ err.message }}
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Solver Performance Metrics -->
-      @if (diagnostics.metrics(); as m) {
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 bg-[var(--concrete)] border border-[var(--kerb)] rounded-lg">
-            <div class="text-[var(--ink-2)] font-medium">Network Latency:</div>
-            <div class="text-[var(--ink)] font-bold text-sm">{{ m.roundtripLatencyMs }} ms</div>
-          </div>
-          <div class="p-2.5 bg-[var(--concrete)] border border-[var(--kerb)] rounded-lg">
-            <div class="text-[var(--ink-2)] font-medium">SciPy Solver Runtime:</div>
-            <div class="text-[var(--ink)] font-bold text-sm">{{ m.solverExecutionTimeMs }} ms</div>
-          </div>
-        </div>
-      }
-
-      <!-- State Snapshot Inspection -->
-      <div class="p-2.5 bg-[var(--concrete)] border border-[var(--kerb)] rounded-lg flex flex-col gap-1.5">
-        <span class="text-[var(--ink)] font-semibold text-xs">ACTIVE INSTANCES STATE:</span>
-        <div class="text-xs text-[var(--ink-2)]">
-          Enabled: {{ store.enabledInstances().length }} / 3 | Scrub Time: {{ store.scrubTime().toFixed(2) }}s
-        </div>
-        <details class="text-xs">
-          <summary class="text-[var(--ink)] hover:text-[var(--line-deep)] cursor-pointer hover:underline font-medium">View Raw Request Payload</summary>
-          <pre class="mt-1 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded text-[var(--ink)] overflow-x-auto max-h-32 text-xs font-mono">{{ diagnostics.rawRequestPayload() | json }}</pre>
-        </details>
       </div>
     </div>
+    <button
+      type="button"
+      (click)="diagnostics.toggleHud()"
+      class="px-2.5 py-1 bg-white border border-[var(--kerb)] hover:border-[var(--line)] hover:bg-[var(--line-tint)] text-[var(--ink)] rounded-lg text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+      </svg>
+      ESC
+    </button>
   </div>
-}
+
+  <!-- Scrollable Content -->
+  <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3.5 bg-[var(--concrete)]">
+    <!-- Engine Status Banner -->
+    @if (store.engineStatus() === 'connected') {
+      <div class="p-3 bg-[#EBF7EE] border border-[#2DA44E]/40 rounded-xl flex items-start gap-2.5 shadow-2xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#2DA44E] shrink-0 mt-0.5 animate-pulse"></span>
+        <div class="leading-snug">
+          <div class="font-bold text-[#1E7E34] text-xs">Python Backend Solver Active</div>
+          <div class="text-[#1E7E34] text-[11px] mt-0.5">
+            Simulations are computed using high-fidelity SciPy <code>solve_ivp</code> (explicit Runge-Kutta 4(5)) with non-linear Pacejka tire curves and dynamic weight transfer.
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="p-3 bg-[#FFF6D1] border border-[#E8750F]/60 rounded-xl flex items-start gap-2.5 shadow-2xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#E8750F] shrink-0 mt-0.5"></span>
+        <div class="leading-snug">
+          <div class="font-bold text-[#7A5800] text-xs">Backend Offline — Approximate Client Fallback</div>
+          <div class="text-[#7A5800] text-[11px] mt-0.5">
+            The Python FastAPI solver is unreachable. The application is running on an in-browser kinematic approximation. Start the Python server to restore SciPy multi-physics computation.
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Performance & Latency Metrics -->
+    @if (diagnostics.metrics(); as m) {
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="p-3 bg-white border border-[var(--kerb)] rounded-xl shadow-2xs">
+          <div class="text-[var(--ink-2)] text-[11px] font-medium">Solver Execution:</div>
+          <div class="text-[var(--ink)] font-bold text-sm mt-0.5">
+            {{ store.engineStatus() === 'connected' ? m.solverExecutionTimeMs + ' ms' : 'N/A (Offline)' }}
+          </div>
+        </div>
+        <div class="p-3 bg-white border border-[var(--kerb)] rounded-xl shadow-2xs">
+          <div class="text-[var(--ink-2)] text-[11px] font-medium">Roundtrip Latency:</div>
+          <div class="text-[var(--ink)] font-bold text-sm mt-0.5">
+            {{ store.engineStatus() === 'connected' ? m.roundtripLatencyMs + ' ms' : '0 ms' }}
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Active Physical Safeguard Warnings -->
+    @if (store.activeWarnings().length > 0) {
+      <div class="p-3 bg-[#FFF6D1] border border-[#E8750F]/40 rounded-xl shadow-2xs">
+        <span class="text-[#7A5800] font-bold text-xs uppercase tracking-wider">Physical Safeguard Warnings</span>
+        <ul class="list-disc list-inside mt-1.5 text-xs text-[#7A5800] space-y-1">
+          @for (warn of store.activeWarnings(); track warn) {
+            <li>{{ warn }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    <!-- HTTP / Runtime Errors -->
+    @if (diagnostics.errors().length > 0) {
+      <div class="p-3 bg-[#FDF0EF] border border-[#D93A32]/40 rounded-xl flex flex-col gap-1.5 shadow-2xs">
+        <div class="flex items-center justify-between">
+          <span class="text-[#9E241E] font-bold text-xs uppercase tracking-wider">Connection & Runtime Errors</span>
+          <button
+            type="button"
+            (click)="diagnostics.clearErrors()"
+            class="text-xs text-[#9E241E] hover:underline font-semibold cursor-pointer"
+          >
+            Clear
+          </button>
+        </div>
+        @for (err of diagnostics.errors(); track err.timestamp) {
+          <div class="text-xs text-[#9E241E] border-t border-[#D93A32]/20 pt-1 font-mono">
+            <span class="text-[var(--ink-2)]">[{{ err.timestamp }}]</span> {{ err.message }}
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Simulation State & Raw Inspection -->
+    <div class="p-3 bg-white border border-[var(--kerb)] rounded-xl shadow-2xs flex flex-col gap-2 font-mono text-xs">
+      <div class="font-bold text-[var(--ink)] font-sans text-xs uppercase tracking-wider">State Inspection</div>
+      <div class="text-[var(--ink-2)]">
+        Evaluation: Active Garage Vehicle | Scrub: {{ store.scrubTime().toFixed(2) }}s
+      </div>
+      <details class="text-xs">
+        <summary class="text-[var(--ink)] hover:text-[var(--line-deep)] cursor-pointer hover:underline font-sans font-medium">View Raw Request Payload</summary>
+        <pre class="mt-1.5 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded-lg text-[var(--ink)] overflow-x-auto max-h-40 text-[11px] leading-tight">{{ diagnostics.rawRequestPayload() | json }}</pre>
+      </details>
+      <details class="text-xs">
+        <summary class="text-[var(--ink)] hover:text-[var(--line-deep)] cursor-pointer hover:underline font-sans font-medium">View Raw Solver Response</summary>
+        <pre class="mt-1.5 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded-lg text-[var(--ink)] overflow-x-auto max-h-40 text-[11px] leading-tight">{{ diagnostics.rawResponsePayload() | json }}</pre>
+      </details>
+    </div>
+  </div>
+
+  <!-- Drawer Footer -->
+  <div class="px-5 py-3 bg-[var(--concrete)] border-t border-[var(--kerb)] flex items-center justify-between text-xs">
+    <div class="text-[var(--ink-2)] text-[11px]">Engine: FastAPI + SciPy RK45</div>
+    <button
+      type="button"
+      (click)="diagnostics.toggleHud()"
+      class="px-5 py-1.5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] rounded-lg font-bold transition-colors text-xs shadow-2xs cursor-pointer"
+    >
+      Close
+    </button>
+  </div>
+</div>
