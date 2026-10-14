@@ -424,9 +424,13 @@
     </div>
   </div>
 
-    <!-- Expandable Forensic Assessment Statement Callout (Flows naturally in scroll canvas below cards) -->
+  </div>
+
+  <!-- ZONE 4: PINNED MISSION CONTROL DOCK BAR -->
+  <footer class="shrink-0 px-3.5 pb-2.5 pt-2 bg-[var(--bg)]/95 backdrop-blur-xs border-t border-[var(--kerb)] flex flex-col z-10 shadow-xs relative">
+    <!-- Expandable Forensic Assessment Statement Callout Tray -->
     @if (isStatementOpen()) {
-      <section class="p-3.5 bg-white border border-[var(--kerb)] rounded-xl shadow-xs text-xs space-y-2 shrink-0 transition-all">
+      <section class="mb-2 p-3.5 bg-white/98 backdrop-blur-md border border-[var(--kerb)] rounded-xl shadow-lg text-xs space-y-2 shrink-0 max-h-72 overflow-y-auto transition-all">
         <div class="flex items-center justify-between border-b border-[var(--kerb)]/60 pb-1.5">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 bg-[var(--line)] rounded-xs"></span>
@@ -462,10 +466,7 @@
         </div>
       </section>
     }
-  </div>
 
-  <!-- ZONE 4: PINNED MISSION CONTROL DOCK BAR -->
-  <footer class="shrink-0 px-3.5 pb-2.5 pt-2 bg-[var(--bg)]/95 backdrop-blur-xs border-t border-[var(--kerb)] flex flex-col z-10 shadow-xs">
     <!-- Dock Bar -->
     <div class="h-9 px-3 bg-white border border-[var(--kerb)] rounded-xl flex items-center justify-between shrink-0 shadow-2xs text-[11px]">
       <div class="flex items-center gap-2">

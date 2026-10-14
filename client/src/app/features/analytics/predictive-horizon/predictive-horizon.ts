@@ -12,7 +12,7 @@ export class PredictiveHorizon {
   readonly store = inject(BenchmarkStore);
   readonly simulateTrigger = output<void>();
 
-  readonly isStatementOpen = signal<boolean>(true);
+  readonly isStatementOpen = signal<boolean>(false);
 
   // --- Physical Reference Constants ---
   private readonly G = 9.81;
