@@ -54,6 +54,7 @@ def compute_instantaneous_telemetry(
     env: EnvironmentParams,
     actuation: BrakeActuationProfile,
     config: SimulationConfig,
+    rear_brake_assembly: BrakeAssembly | None = None,
 ) -> InstantaneousTelemetry:
     """Calculate all instantaneous forces, slip, loads, and torques at (t, y)."""
     x = float(y[0])
@@ -77,7 +78,12 @@ def compute_instantaneous_telemetry(
     # 1. Brake actuation & torque
     p_applied = actuation.applied_pressure(t)
     tb_front = evaluate_brake_torque(brake_assembly, p_applied, temp)
-    tb_rear = params.brake_bias_ratio * tb_front
+    if hasattr(actuation, "applied_rear_pressure"):
+        p_rear = actuation.applied_rear_pressure(t)
+        rear_asm = rear_brake_assembly if rear_brake_assembly is not None else brake_assembly
+        tb_rear = evaluate_brake_torque(rear_asm, p_rear, temp)
+    else:
+        tb_rear = params.brake_bias_ratio * tb_front
 
     # 2. Emergent slip ratio
     kappa_f = evaluate_emergent_slip_ratio(
@@ -135,6 +141,7 @@ def evaluate_system_derivatives(
     env: EnvironmentParams,
     actuation: BrakeActuationProfile,
     config: SimulationConfig,
+    rear_brake_assembly: BrakeAssembly | None = None,
 ) -> np.ndarray:
     """Calculate the 4-state derivative vector dy/dt = [dx/dt, dv/dt, dω/dt, dT/dt].
 
@@ -152,7 +159,9 @@ def evaluate_system_derivatives(
         return np.array([0.0, 0.0, 0.0, dt_halt], dtype=np.float64)
 
     # Calculate instantaneous physical interactions
-    telem = compute_instantaneous_telemetry(t, y, params, brake_assembly, env, actuation, config)
+    telem = compute_instantaneous_telemetry(
+        t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+    )
 
     # Forces opposing linear vehicle motion
     f_drag = evaluate_aerodynamic_drag(params, env, v)

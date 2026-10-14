@@ -21,6 +21,7 @@ from app.domain.physics.actuation import (
     BrakeActuationProfile,
     ProgressiveSqueezeProfile,
     SuddenLockupProfile,
+    BiomechanicalDualBrakeProfile,
 )
 from app.domain.physics.weight_transfer import compute_normal_loads, evaluate_aerodynamic_drag
 from app.domain.physics.tire import (
@@ -59,6 +60,7 @@ __all__ = [
     "BrakeActuationProfile",
     "ProgressiveSqueezeProfile",
     "SuddenLockupProfile",
+    "BiomechanicalDualBrakeProfile",
     "compute_normal_loads",
     "evaluate_aerodynamic_drag",
     "SUBSTRATE_MATRIX",

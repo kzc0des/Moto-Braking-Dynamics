@@ -32,6 +32,7 @@ def simulate_single_vehicle(
     env: EnvironmentParams | None = None,
     actuation: BrakeActuationProfile | None = None,
     config: SimulationConfig | None = None,
+    rear_brake_assembly: BrakeAssembly | None = None,
 ) -> SimulationResult:
     """Execute a single-vehicle emergency braking simulation run.
 
@@ -57,7 +58,9 @@ def simulate_single_vehicle(
 
     # Derivative wrapper for SciPy solve_ivp
     def rhs(t: float, y: np.ndarray) -> np.ndarray:
-        return evaluate_system_derivatives(t, y, params, brake_assembly, env, actuation, config)
+        return evaluate_system_derivatives(
+            t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+        )
 
     # Substrate critical slip threshold for washout
     kappa_crit = SUBSTRATE_MATRIX[env.substrate].critical_slip
@@ -78,7 +81,9 @@ def simulate_single_vehicle(
 
     # 3. Event: Front-Wheel Washout (slip exceeds κ_crit or lateral deficit)
     def event_front_washout(t: float, y: np.ndarray) -> float:
-        telem = compute_instantaneous_telemetry(t, y, params, brake_assembly, env, actuation, config)
+        telem = compute_instantaneous_telemetry(
+            t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+        )
         if telem.lateral_washout:
             return -1.0
         # Zero-crossing from positive to negative when kappa_f exceeds kappa_crit
@@ -89,7 +94,9 @@ def simulate_single_vehicle(
 
     # 4. Event: Rear-Wheel Lift-off (F_z,rear <= 0)
     def event_rear_liftoff(t: float, y: np.ndarray) -> float:
-        telem = compute_instantaneous_telemetry(t, y, params, brake_assembly, env, actuation, config)
+        telem = compute_instantaneous_telemetry(
+            t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+        )
         # Pitch-over occurs when normal load on rear tire drops to zero
         return float(telem.normal_load_rear)
 
@@ -176,7 +183,7 @@ def simulate_single_vehicle(
         yk = y_grid[:, k]
         tk = float(t_grid[k])
         telem_k = compute_instantaneous_telemetry(
-            tk, yk, params, brake_assembly, env, actuation, config
+            tk, yk, params, brake_assembly, env, actuation, config, rear_brake_assembly
         )
         slip_col[k] = telem_k.slip_ratio
         fz_front_col[k] = telem_k.normal_load_front

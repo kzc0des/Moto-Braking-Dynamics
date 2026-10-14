@@ -19,7 +19,11 @@ from app.domain.physics.models import (
     SimulationConfig,
     TerminalOutcome,
 )
-from app.domain.physics.actuation import ProgressiveSqueezeProfile, SuddenLockupProfile
+from app.domain.physics.actuation import (
+    ProgressiveSqueezeProfile,
+    SuddenLockupProfile,
+    BiomechanicalDualBrakeProfile,
+)
 from app.domain.physics.weight_transfer import (
     compute_normal_loads,
     evaluate_aerodynamic_drag,
@@ -253,3 +257,102 @@ def test_simulation_sudden_lockup_washout():
 
     # Panic lockup without ABS will exceed critical slip, causing front washout
     assert result.terminal_outcome in (TerminalOutcome.FRONT_WHEEL_WASHOUT, TerminalOutcome.REAR_WHEEL_LIFTOFF)
+
+
+def test_biomechanical_dual_brake_validation():
+    """Ensure invalid biomechanical actuation parameters raise PhysicalParameterError."""
+    with pytest.raises(PhysicalParameterError):
+        BiomechanicalDualBrakeProfile(front_lever_pct=-5.0)
+
+    with pytest.raises(PhysicalParameterError):
+        BiomechanicalDualBrakeProfile(rear_control_pct=105.0)
+
+    with pytest.raises(PhysicalParameterError):
+        BiomechanicalDualBrakeProfile(t_reaction=-0.1)
+
+    with pytest.raises(PhysicalParameterError):
+        BiomechanicalDualBrakeProfile(rise_time_front=0.0)
+
+
+def test_biomechanical_dual_brake_two_phase_pressures():
+    """Verify free-rolling zero pressure during reaction phase and ramped mechanical pressure."""
+    profile = BiomechanicalDualBrakeProfile(
+        front_lever_pct=80.0,
+        rear_control_pct=60.0,
+        t_reaction=1.0,
+        rise_time_front=0.40,
+        rise_time_rear=0.20,
+        peak_front_pressure=3.5e6,
+        peak_rear_pressure=2.5e6,
+    )
+
+    # 1. Perception-Reaction phase: strictly zero pressure
+    assert profile.applied_pressure(0.0) == 0.0
+    assert profile.applied_rear_pressure(0.0) == 0.0
+    assert profile.applied_pressure(0.5) == 0.0
+    assert profile.applied_rear_pressure(0.5) == 0.0
+    assert profile.applied_pressure(1.0) == 0.0
+    assert profile.applied_rear_pressure(1.0) == 0.0
+
+    # 2. Mid-ramp mechanical phase
+    # Front at t=1.2s: dt=0.2s, ramp=0.2/0.4 = 0.5 -> 3.5e6 * 0.8 * 0.5 = 1.4e6 Pa
+    assert math.isclose(profile.applied_pressure(1.2), 1.4e6, rel_tol=1e-4)
+    # Rear at t=1.1s: dt=0.1s, ramp=0.1/0.2 = 0.5 -> 2.5e6 * 0.6 * 0.5 = 7.5e5 Pa
+    assert math.isclose(profile.applied_rear_pressure(1.1), 7.5e5, rel_tol=1e-4)
+
+    # 3. Fully developed mechanical phase (t >= 1.4s)
+    # Front target: 3.5e6 * 0.80 = 2.8e6 Pa
+    assert math.isclose(profile.applied_pressure(1.5), 2.8e6, rel_tol=1e-4)
+    # Rear target: 2.5e6 * 0.60 = 1.5e6 Pa
+    assert math.isclose(profile.applied_rear_pressure(1.5), 1.5e6, rel_tol=1e-4)
+
+
+def test_biomechanical_dual_brake_two_phase_simulation():
+    """Verify full ODE integration under BiomechanicalDualBrakeProfile with perception lag."""
+    actuation = BiomechanicalDualBrakeProfile(
+        front_lever_pct=75.0,
+        rear_control_pct=50.0,
+        t_reaction=1.0,
+    )
+    config = SimulationConfig(
+        initial_velocity=16.67,  # 60 km/h
+        hazard_distance=80.0,
+        num_telemetry_points=150,
+    )
+    result = simulate_single_vehicle(actuation=actuation, config=config)
+
+    # Must halt safely before the 80m barrier
+    assert result.terminal_outcome == TerminalOutcome.SAFE_STOP
+    # Reaction distance alone is ~16.67m, total distance should be between 30m and 55m
+    assert 30.0 < result.stop_distance < 60.0
+    # Stop time must exceed perception-reaction lag (1.0s)
+    assert result.stop_time > 1.0
+
+
+def test_biomechanical_dual_brake_with_rear_drum():
+    """Verify simulation handles mixed front disc and rear drum hardware cleanly."""
+    actuation = BiomechanicalDualBrakeProfile(
+        front_lever_pct=80.0,
+        rear_control_pct=60.0,
+        t_reaction=0.8,
+    )
+    front_brake = BrakeAssembly(brake_type=BrakeType.DISC)
+    rear_brake = BrakeAssembly(
+        brake_type=BrakeType.DRUM,
+        drum_amplification=1.5,
+        piston_area=0.00060,
+        effective_radius=0.080,
+    )
+    config = SimulationConfig(initial_velocity=15.0, hazard_distance=60.0)
+
+    result = simulate_single_vehicle(
+        brake_assembly=front_brake,
+        rear_brake_assembly=rear_brake,
+        actuation=actuation,
+        config=config,
+    )
+
+    assert result.terminal_outcome == TerminalOutcome.SAFE_STOP
+    assert result.stop_distance < 60.0
+    assert len(result.time) == 150
+
