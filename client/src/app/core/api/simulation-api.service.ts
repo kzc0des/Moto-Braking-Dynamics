@@ -13,10 +13,14 @@ export interface BenchmarkApiPayload {
 })
 export class SimulationApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/simulation';
+  private readonly baseUrl = '/api/v1/simulation';
 
   runBenchmark(payload: BenchmarkApiPayload): Observable<BenchmarkResponse> {
     return this.http.post<BenchmarkResponse>(`${this.baseUrl}/benchmark`, payload);
+  }
+
+  checkHealth(): Observable<{ status: string; engine: string }> {
+    return this.http.get<{ status: string; engine: string }>(`${this.baseUrl}/health`);
   }
 
   getPresets(): Observable<ArchetypePreset[]> {
