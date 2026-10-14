@@ -200,3 +200,99 @@ def test_benchmark_barrier_collision_detection():
     res = data["instances"][0]
     assert res["terminalOutcome"] == "Barrier Collision"
     assert res["finalVelocity"] > 0.0
+
+
+def test_custom_garage_vehicle_e2e_verification():
+    """Verify custom garage motorcycle evaluation against Cossalter (2006) physical dynamics."""
+    sport_payload = {
+        "instances": [
+            {
+                "id": "garage-sport-750",
+                "name": "Custom 750cc Sport Prototype",
+                "enabled": True,
+                "colorAccent": "#00f0ff",
+                "vehicle": {
+                    "mass": 210.0,
+                    "wheelbase": 1.44,
+                    "cogDistanceFront": 0.72,
+                    "cogDistanceRear": 0.72,
+                    "cogHeight": 0.55,
+                    "wheelRadius": 0.31,
+                    "wheelInertia": 0.65,
+                    "dragCoefficient": 0.58,
+                    "frontalArea": 0.60,
+                    "brakeBiasRatio": 0.70,
+                },
+                "brake": {
+                    "brakeType": "disc",
+                    "rotorMass": 1.80,
+                    "specificHeat": 460.0,
+                    "surfaceArea": 0.055,
+                    "pistonArea": 0.0012,
+                    "effectiveRadius": 0.145,
+                    "padFrictionNominal": 0.45,
+                    "fadeTemperature": 280.0,
+                    "fadeCoefficient": 0.003,
+                    "fluidBoilTemperature": 260.0,
+                    "vaporTransitionBand": 40.0,
+                    "thermalEfficiency": 0.90,
+                    "drumAmplification": 1.0,
+                },
+                "actuation": {
+                    "type": "biomechanical",
+                    "frontLeverPct": 85.0,
+                    "rearControlPct": 45.0,
+                    "tReaction": 0.8,
+                    "riseTime": 0.30,
+                    "targetPressure": 2.2e6,
+                },
+                "environment": {
+                    "substrate": "asphalt",
+                    "contaminant": "dry",
+                    "roadGradeAngle": 0.0,
+                    "curveRadius": None,
+                    "potholeEnabled": False,
+                    "ambientTemperature": 24.0,
+                    "airDensity": 1.225,
+                },
+                "simulation": {
+                    "initialVelocity": 16.67,  # 60 km/h
+                    "initialRotorTemp": 25.0,
+                    "hazardDistance": 60.0,
+                    "maxSimulationTime": 10.0,
+                    "numTelemetryPoints": 150,
+                    "standstillCutoffVelocity": 0.05,
+                    "lowSpeedEpsilon": 0.10,
+                },
+            }
+        ]
+    }
+
+    response = client.post("/api/v1/simulation/benchmark", json=sport_payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["instances"]) == 1
+    res = data["instances"][0]
+
+    # Verify physical bounds and Cossalter stopping bounds
+    assert res["terminalOutcome"] == "Safe Stop"
+    assert 25.0 < res["stoppingDistance"] < 45.0
+    assert 15.0 < res["mechanicalBrakingDistance"] < 28.0
+    assert 5.0 <= res["peakDeceleration"] <= 12.0  # m/s^2 (~0.5 - 1.2 g)
+
+    # Verify columnar telemetry format (exact 150 points for all series)
+    telem = res["telemetry"]
+    expected_cols = [
+        "time", "distance", "velocity", "deceleration", "omega",
+        "slipRatioFront", "slipRatioRear",
+        "normalLoadFront", "normalLoadRear", "rotorTemperature"
+    ]
+    for col in expected_cols:
+        assert len(telem[col]) == 150
+
+    # Normal load balance check: normalLoadFront + normalLoadRear ~ total weight
+    total_weight = 210.0 * 9.80665
+    mid_fz = telem["normalLoadFront"][75] + telem["normalLoadRear"][75]
+    assert abs(mid_fz - total_weight) / total_weight < 0.05
+    assert telem["normalLoadFront"][75] > telem["normalLoadRear"][75]
+

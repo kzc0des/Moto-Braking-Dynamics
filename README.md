@@ -248,39 +248,78 @@ moto-braking-dynamics/
 ### Prerequisites
 * **Node.js**: v20.x or higher
 * **npm**: v10.x or higher
-* **Python**: v3.10 or higher
+* **Python**: v3.11 or higher
 
 ---
 
-### Step 1: Start the Backend Simulation Server
+### Option A: Single-Command Full-Stack Startup (Recommended)
+You can launch both the **FastAPI + SciPy solver** and the **Angular client** concurrently using a single command:
+
+**On Windows (CMD or File Explorer):**
+```cmd
+run-dev.bat
+```
+
+**On Windows (PowerShell):**
+```powershell
+.\run-dev.ps1
+```
+
+**Via npm in `client/`:**
 ```bash
-# Navigate to the server root
+cd moto-braking-dynamics/client
+npm run dev:full
+```
+
+* Angular Development Server: **[http://localhost:4200](http://localhost:4200)** (with reverse proxy forwarding `/api` → `http://127.0.0.1:8000`)
+* FastAPI Interactive Swagger Documentation: **[http://localhost:8000/docs](http://localhost:8000/docs)**
+* Solver Health Check: **[http://localhost:8000/api/v1/simulation/health](http://localhost:8000/api/v1/simulation/health)**
+
+---
+
+### Option B: Manual Two-Terminal Startup
+
+#### Terminal 1 — Python Simulation Engine (FastAPI)
+```bash
 cd moto-braking-dynamics/server
 
-# Install scientific dependencies
-pip install numpy scipy fastapi uvicorn
+# Create virtual environment (first time only)
+python -m venv .venv
 
-# Start the FastAPI simulation server
-uvicorn app.main:app --reload --port 8000
+# Activate and install dependencies
+.\.venv\Scripts\activate   # Windows
+pip install -e .
+
+# Start solver daemon
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-* Interactive API Documentation (Swagger): [http://localhost:8000/docs](http://localhost:8000/docs)
-* Health Check Endpoint: `http://localhost:8000/api/simulation/presets`
 
----
-
-### Step 2: Start the Frontend Telemetry Workbench
-Open a separate terminal window:
+#### Terminal 2 — Angular Telemetry Workbench
 ```bash
-# Navigate to the client root
 cd moto-braking-dynamics/client
 
 # Install frontend dependencies
 npm install
 
-# Start the Angular development server
-npm run start
+# Start Angular with reverse proxy to FastAPI
+npm start
 ```
-* Open your browser and navigate to: **[http://localhost:4200](http://localhost:4200)**
+
+---
+
+### Automated Verification & Physics Tests
+
+To run the full suite of unit and integration tests (validating Pacejka curve calibration, biomechanical dual-brake profiles, thermal fade, and closed-form dynamic weight transfer):
+```bash
+cd moto-braking-dynamics/server
+.\.venv\Scripts\python.exe -m pytest
+```
+
+To run the automated end-to-end garage vehicle evaluation script against the live solver:
+```bash
+cd moto-braking-dynamics/server
+.\.venv\Scripts\python.exe tests/e2e_verify.py
+```
 
 ---
 
