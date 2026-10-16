@@ -3,7 +3,8 @@
   <div class="analytics-scroll-canvas flex-1 min-w-0 min-h-0 overflow-y-auto p-2.5 sm:p-3 flex flex-col gap-2.5">
     <!-- ZONE 1: PRIMARY FORECAST HERO BANNER -->
     <section
-      class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col xl:flex-row items-stretch xl:items-center gap-3 sm:gap-5 shrink-0">
+      class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col gap-2.5 shrink-0">
+      <div class="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 sm:gap-5">
       <!-- Verdict & Primary Numeric Stats -->
       <div class="flex flex-wrap items-center gap-3 sm:gap-5 shrink-0">
         <span
@@ -87,20 +88,27 @@
           </span>
         </div>
       </div>
-    </section>
+      </div>
 
-    <!-- ZONES 2 + 3: 50/50 PILLARS -->
-    <div class="flex flex-col xl:flex-row gap-2.5 sm:gap-3 shrink-0">
-      <!-- ZONE 2: DYNAMICS & ENERGY DISSIPATION PILLAR (Left 50%) -->
-      <div class="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+      <!-- Plain-language verdict -->
+      <p class="text-sm sm:text-[15px] font-medium leading-snug border-t border-[var(--kerb)]/60 pt-2.5"
+        [ngClass]="margin() >= 0 ? 'text-[#156939]' : 'text-[#9E241E]'">
+        {{ plainSummary() }}
+        @if (rearLoadPct() <= 10) {
+        <span class="block text-[#9E241E] font-semibold text-xs mt-1">Warning: the rear wheel is close to lifting off the ground.</span>
+        }
+      </p>
+        </section>
+
+    <!-- KEY CARDS: the three things most people need -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
         <!-- Card 1: Deceleration (MFDD) -->
         <div
           class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Deceleration
-                efficiency</span>
-              <span class="font-mono text-[9.5px] sm:text-[10px] text-[var(--ink-3)]">SAE J214</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Braking strength</span>
+              <span class="font-mono text-[9.5px] sm:text-[10px] text-[var(--ink-3)]" [style.display]="showDetails() ? null : 'none'">SAE J214</span>
             </div>
             <div class="font-mono text-xl sm:text-2xl font-bold text-[var(--ink)] mt-1">
               {{ mfddG() }} <span class="text-sm font-medium text-[var(--ink-2)]">g</span>
@@ -108,11 +116,10 @@
             </div>
             <!-- Mathematical equation callout -->
             <div
-              class="font-mono text-[10px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block">
+              class="font-mono text-[10px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block" [style.display]="showDetails() ? null : 'none'">
               MFDD = (v_b² − v_e²) / [2(s_e − s_b)]
             </div>
-            <div class="text-[10.5px] sm:text-[11px] text-[var(--ink-2)] mt-1">Steady-state interval (80% to 10% of v_0)
-            </div>
+            <div class="text-[10.5px] sm:text-[11px] text-[var(--ink-2)] mt-1">{{ decelPlain() }}</div>
           </div>
           <div class="mt-2 flex items-center justify-between gap-1 text-[10px]">
             <span
@@ -122,26 +129,24 @@
             <span class="text-[var(--ink-2)] whitespace-nowrap">Rise lag: 0.15s</span>
           </div>
         </div>
-
         <!-- Card 2: Tire Grip & Slip Saturation -->
         <div
           class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Tire grip & slip
-                saturation</span>
-              <span class="font-mono text-[9.5px] sm:text-[10px] text-[var(--ink-3)]">Pacejka '96</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Tire grip</span>
+              <span class="font-mono text-[9.5px] sm:text-[10px] text-[var(--ink-3)]" [style.display]="showDetails() ? null : 'none'">Pacejka '96</span>
             </div>
             <div class="font-mono text-xl sm:text-2xl font-bold text-[var(--ink)] mt-1">
-              κ = {{ peakSlip() }}
-              <span class="text-xs font-normal text-[var(--ink-2)] ml-1">(κ_crit: {{ criticalSlip() }})</span>
+              {{ (+peakSlip() * 100).toFixed(0) }}% <span class="text-sm font-medium text-[var(--ink-2)]">tire slip</span>
+              <span class="text-xs font-normal text-[var(--ink-2)] ml-1">(limit {{ (criticalSlip() * 100).toFixed(0) }}%)</span>
             </div>
             <div
-              class="font-mono text-[10px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block">
+              class="font-mono text-[10px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block" [style.display]="showDetails() ? null : 'none'">
               κ = (v − ω·R_w) / max(v, ε)
             </div>
             <div class="text-[10.5px] sm:text-[11px] text-[var(--ink-2)] mt-1">
-              Effective adhesion: μ_eff = <b class="font-mono text-[var(--ink)]">{{ frictionCoeff() }}</b>
+              Road grip level: <b class="font-mono text-[var(--ink)]">{{ frictionCoeff() }}</b>
             </div>
           </div>
           <div
@@ -150,7 +155,123 @@
             {{ slipStatus().text }}
           </div>
         </div>
+        <!-- Card 4: Rotor Thermal Envelope -->
+        <div
+          class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Brake heat</span>
+              <span class="font-mono text-[10px] text-[var(--ink-3)]" [style.display]="showDetails() ? null : 'none'">Q̇ = η·T_b·ω</span>
+            </div>
+            <div class="font-mono text-xl sm:text-2xl font-bold mt-1"
+              [ngClass]="peakTemp() > 210 ? 'text-[var(--danger)]' : 'text-[var(--ink)]'">
+              {{ peakTemp() }}<span class="text-sm font-medium">°C</span>
+            </div>
+            <div class="font-mono text-[11px] text-[var(--ink-2)] mt-0.5 leading-tight">
+              {{ thermalMarginText() }}
+            </div>
+          </div>
+          <div class="mt-1.5">
+            <div class="h-1.5 w-full rounded-full flex overflow-hidden">
+              <div class="w-[55%] bg-[#1F9D55]"></div>
+              <div class="w-[28%] bg-[var(--warn)]"></div>
+              <div class="w-[17%] bg-[var(--danger)]"></div>
+            </div>
+            <div class="flex justify-between font-mono text-[9.5px] text-[var(--ink-2)] mt-0.5">
+              <span>T_amb 25°C</span>
+              <span>T_boil 230°C</span>
+            </div>
+          </div>
+        </div>
+    </div>
 
+    <!-- COMPARISON: one panel, two what-if tabs -->
+    <div class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col gap-2 shrink-0">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--kerb)]/60 pb-2">
+        <div class="inline-flex p-0.5 gap-0.5 rounded-lg bg-[var(--well)] border border-[var(--kerb)]" role="tablist">
+          <button type="button" role="tab" [attr.aria-selected]="compareTab() === 'brakes'" (click)="compareTab.set('brakes')"
+            class="h-8 px-3 rounded-md text-xs font-bold cursor-pointer transition-all"
+            [ngClass]="compareTab() === 'brakes' ? 'bg-white border border-[var(--kerb)] text-[var(--ink)] shadow-2xs' : 'text-[var(--ink-2)] hover:text-[var(--ink)]'">
+            What if: different brakes
+          </button>
+          <button type="button" role="tab" [attr.aria-selected]="compareTab() === 'road'" (click)="compareTab.set('road')"
+            class="h-8 px-3 rounded-md text-xs font-bold cursor-pointer transition-all"
+            [ngClass]="compareTab() === 'road' ? 'bg-white border border-[var(--kerb)] text-[var(--ink)] shadow-2xs' : 'text-[var(--ink-2)] hover:text-[var(--ink)]'">
+            What if: different road
+          </button>
+        </div>
+        <span class="text-[11px] sm:text-xs text-[var(--ink-2)]">
+          @if (compareTab() === 'brakes') { Current road: <b class="text-[var(--ink)]">{{ currentRoadTitle() }}</b> }
+          @else { Same bike and braking, different surface }
+        </span>
+      </div>
+
+      @if (compareTab() === 'brakes') {
+      <div class="flex flex-col gap-2 my-1">
+            @for (row of techRows(); track row.name) {
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <div class="w-28 sm:w-32 shrink-0 flex flex-col leading-tight">
+                <span class="text-[11px] sm:text-xs font-semibold text-[var(--ink)] whitespace-nowrap">{{ row.name
+                  }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-[var(--line-deep)] min-h-[14px]">{{
+                  row.activeTag }}</span>
+              </div>
+
+              <div class="relative flex-1 min-w-[60px] h-4.5 sm:h-5 bg-[var(--well)] rounded-md overflow-hidden">
+                <div class="h-full rounded-md transition-all duration-150" [style.width.%]="row.widthPct"
+                  [ngClass]="row.barClass"></div>
+                <!-- Hazard line marker inside bar -->
+                <div class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dotted border-[var(--danger)]"
+                  [style.left.%]="tape().barrierPct"></div>
+              </div>
+
+              <div class="w-32 sm:w-36 shrink-0 flex flex-col items-start gap-0.5">
+                <b class="font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)]">{{ row.dist }} m</b>
+                <span class="text-[9.5px] sm:text-[10px] font-semibold leading-tight" [ngClass]="row.chipClass">{{
+                  row.chip }}</span>
+              </div>
+            </div>
+            }
+      </div>
+      } @else {
+      <div class="flex flex-col gap-2 my-1">
+            @for (row of surfRows(); track row.name) {
+            <div class="flex items-center gap-2 sm:gap-2.5">
+              <div class="w-28 sm:w-32 shrink-0 flex flex-col leading-tight">
+                <span class="text-[11px] sm:text-xs font-semibold text-[var(--ink)] whitespace-nowrap">{{ row.name
+                  }}</span>
+                <span class="font-mono text-[9.5px] sm:text-[10px] text-[var(--ink-2)]">
+                  μ = {{ row.mu }} <span class="font-bold text-[var(--line-deep)]">{{ row.activeTag }}</span>
+                </span>
+              </div>
+
+              <div class="relative flex-1 min-w-[60px] h-4.5 sm:h-5 bg-[var(--well)] rounded-md overflow-hidden">
+                <div class="h-full rounded-md transition-all duration-150" [style.width.%]="row.widthPct"
+                  [ngClass]="row.barClass"></div>
+                <div class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dotted border-[var(--danger)]"
+                  [style.left.%]="tape().barrierPct"></div>
+              </div>
+
+              <div class="w-32 sm:w-36 shrink-0 flex flex-col items-start gap-0.5">
+                <b class="font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)]">{{ row.dist }} m</b>
+                <span class="text-[9.5px] sm:text-[10px] font-semibold leading-tight" [ngClass]="row.chipClass">{{
+                  row.chip }}</span>
+              </div>
+            </div>
+            }
+      </div>
+      }
+    </div>
+
+    <!-- DETAILS TOGGLE -->
+    <button type="button" (click)="showDetails.set(!showDetails())" [attr.aria-expanded]="showDetails()"
+      class="shrink-0 h-10 px-4 rounded-xl border border-[var(--kerb)] bg-white hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs">
+      <span>{{ showDetails() ? 'Hide engineering details' : 'Show engineering details' }}</span>
+      <svg class="w-3.5 h-3.5 transition-transform duration-200" [class.rotate-180]="showDetails()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+    </button>
+
+    @if (showDetails()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
         <!-- Card 3: Dynamic Normal Load Transfer -->
         <div
           class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
@@ -190,37 +311,6 @@
             {{ rearLoadPct() > 10 ? 'Safe Pitch Stability (F_z,rear > 0)' : 'Warning: Near Stoppie / Rear Lift' }}
           </div>
         </div>
-
-        <!-- Card 4: Rotor Thermal Envelope -->
-        <div
-          class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Rotor thermal
-                envelope</span>
-              <span class="font-mono text-[10px] text-[var(--ink-3)]">Q̇ = η·T_b·ω</span>
-            </div>
-            <div class="font-mono text-xl sm:text-2xl font-bold mt-1"
-              [ngClass]="peakTemp() > 210 ? 'text-[var(--danger)]' : 'text-[var(--ink)]'">
-              {{ peakTemp() }}<span class="text-sm font-medium">°C</span>
-            </div>
-            <div class="font-mono text-[11px] text-[var(--ink-2)] mt-0.5 leading-tight">
-              {{ thermalMarginText() }}
-            </div>
-          </div>
-          <div class="mt-1.5">
-            <div class="h-1.5 w-full rounded-full flex overflow-hidden">
-              <div class="w-[55%] bg-[#1F9D55]"></div>
-              <div class="w-[28%] bg-[var(--warn)]"></div>
-              <div class="w-[17%] bg-[var(--danger)]"></div>
-            </div>
-            <div class="flex justify-between font-mono text-[9.5px] text-[var(--ink-2)] mt-0.5">
-              <span>T_amb 25°C</span>
-              <span>T_boil 230°C</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Card 5: Kinetic Energy Dissipated -->
         <div
           class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
@@ -251,7 +341,6 @@
             </div>
           </div>
         </div>
-
         <!-- Card 6: Caliper Clamping & Torque Split -->
         <div
           class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
@@ -290,10 +379,7 @@
             <span>Rear: <b class="text-[var(--ink)]">{{ peakRearPressureMpa() }} MPa</b></span>
           </div>
         </div>
-      </div>
-
-      <!-- ZONE 3: COMPARATIVE SENSITIVITY MATRIX PILLAR (Right 50%) -->
-      <div class="flex-1 min-w-0 flex flex-col gap-3">
+    </div>
         <!-- Card 0: Biomechanical Peak Braking & Control Actuation Forecast -->
         <div
           class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between">
@@ -356,81 +442,6 @@
           </div>
         </div>
 
-        <!-- Card 1: Brake Technology Delta -->
-        <div
-          class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex-1 flex flex-col justify-between">
-          <div class="flex items-baseline justify-between gap-2 border-b border-[var(--kerb)]/60 pb-1.5">
-            <span class="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Brake
-              technology delta</span>
-            <span class="text-[11px] sm:text-xs text-[var(--ink-2)]">Current road: <b class="text-[var(--ink)]">{{
-                currentRoadTitle() }}</b></span>
-          </div>
-
-          <div class="flex flex-col justify-around gap-2 my-1.5">
-            @for (row of techRows(); track row.name) {
-            <div class="flex items-center gap-2 sm:gap-2.5">
-              <div class="w-28 sm:w-32 shrink-0 flex flex-col leading-tight">
-                <span class="text-[11px] sm:text-xs font-semibold text-[var(--ink)] whitespace-nowrap">{{ row.name
-                  }}</span>
-                <span class="text-[9.5px] sm:text-[10px] font-bold text-[var(--line-deep)] min-h-[14px]">{{
-                  row.activeTag }}</span>
-              </div>
-
-              <div class="relative flex-1 min-w-[60px] h-4.5 sm:h-5 bg-[var(--well)] rounded-md overflow-hidden">
-                <div class="h-full rounded-md transition-all duration-150" [style.width.%]="row.widthPct"
-                  [ngClass]="row.barClass"></div>
-                <!-- Hazard line marker inside bar -->
-                <div class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dotted border-[var(--danger)]"
-                  [style.left.%]="tape().barrierPct"></div>
-              </div>
-
-              <div class="w-32 sm:w-36 shrink-0 flex flex-col items-start gap-0.5">
-                <b class="font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)]">{{ row.dist }} m</b>
-                <span class="text-[9.5px] sm:text-[10px] font-semibold leading-tight" [ngClass]="row.chipClass">{{
-                  row.chip }}</span>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-
-        <!-- Card 2: Surface Adhesion Sensitivity -->
-        <div
-          class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex-1 flex flex-col justify-between">
-          <div class="flex items-baseline justify-between gap-2 border-b border-[var(--kerb)]/60 pb-1.5">
-            <span class="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Surface
-              adhesion sensitivity</span>
-            <span class="text-[11px] sm:text-xs text-[var(--ink-2)]">Holding active vehicle constant</span>
-          </div>
-
-          <div class="flex flex-col justify-around gap-2 my-1.5">
-            @for (row of surfRows(); track row.name) {
-            <div class="flex items-center gap-2 sm:gap-2.5">
-              <div class="w-28 sm:w-32 shrink-0 flex flex-col leading-tight">
-                <span class="text-[11px] sm:text-xs font-semibold text-[var(--ink)] whitespace-nowrap">{{ row.name
-                  }}</span>
-                <span class="font-mono text-[9.5px] sm:text-[10px] text-[var(--ink-2)]">
-                  μ = {{ row.mu }} <span class="font-bold text-[var(--line-deep)]">{{ row.activeTag }}</span>
-                </span>
-              </div>
-
-              <div class="relative flex-1 min-w-[60px] h-4.5 sm:h-5 bg-[var(--well)] rounded-md overflow-hidden">
-                <div class="h-full rounded-md transition-all duration-150" [style.width.%]="row.widthPct"
-                  [ngClass]="row.barClass"></div>
-                <div class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dotted border-[var(--danger)]"
-                  [style.left.%]="tape().barrierPct"></div>
-              </div>
-
-              <div class="w-32 sm:w-36 shrink-0 flex flex-col items-start gap-0.5">
-                <b class="font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)]">{{ row.dist }} m</b>
-                <span class="text-[9.5px] sm:text-[10px] font-semibold leading-tight" [ngClass]="row.chipClass">{{
-                  row.chip }}</span>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-
         <!-- Road Grade Penalty Pill -->
         <div
           class="p-2 px-3 sm:px-4 rounded-xl border text-xs font-semibold flex items-center justify-between shadow-2xs"
@@ -445,8 +456,8 @@
           </div>
           <span class="font-mono text-[11px] text-[var(--ink-2)]">θ = {{ gradeDeg() }}°</span>
         </div>
-      </div>
-    </div>
+    }
+
 
   </div>
 
