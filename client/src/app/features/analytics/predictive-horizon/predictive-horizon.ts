@@ -13,7 +13,7 @@ export class PredictiveHorizon {
   readonly simulateTrigger = output<void>();
 
   readonly isStatementOpen = signal<boolean>(false);
-  readonly showDetails = signal<boolean>(false);
+  readonly showDetails = signal<boolean>(true);
   readonly compareTab = signal<'brakes' | 'road'>('brakes');
 
   // --- Physical Reference Constants ---
