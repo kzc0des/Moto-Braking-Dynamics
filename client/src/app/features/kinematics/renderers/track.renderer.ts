@@ -88,13 +88,17 @@ export class TrackRenderer {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = '#656C76';
-      ctx.font = '600 10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`, rxnX, topOffset + 14);
+      const onsetLabel = `BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`;
+      const onsetW = ctx.measureText(onsetLabel).width + 10;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(rxnX - onsetW / 2, topOffset + 3, onsetW, 16);
+      ctx.fillStyle = '#4A5059';
+      ctx.fillText(onsetLabel, rxnX, topOffset + 15);
     }
 
-    // 3. Hazard Barrier at hazardDistance - Red Signal Barrier
+    // 3. Impact Barrier at X_impact (hazardDistance) - Red Signal Barrier
     const barrierX = meterToPx(hazardDistance);
     if (barrierX <= width) {
       ctx.strokeStyle = '#D93A32';
@@ -110,7 +114,12 @@ export class TrackRenderer {
       ctx.fillStyle = '#D93A32';
       ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(`Hazard Barrier ${hazardDistance} m`, barrierX - 6, 32);
+      const barrierLabel = `Impact Barrier ${hazardDistance} m`;
+      const barrierW = ctx.measureText(barrierLabel).width + 10;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(barrierX - 4 - barrierW, topOffset + 20, barrierW, 16);
+      ctx.fillStyle = '#D93A32';
+      ctx.fillText(barrierLabel, barrierX - 9, topOffset + 32);
 
       // High-Visibility Red Canvas Callout if Collision Occurred
       if (params.isCollision) {

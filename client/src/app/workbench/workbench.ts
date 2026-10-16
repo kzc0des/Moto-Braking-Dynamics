@@ -30,7 +30,7 @@ export class Workbench {
   readonly currentMode = signal<'analytics' | 'simulation'>('analytics');
   readonly isMembersDrawerOpen = signal<boolean>(false);
   readonly isSidebarOpen = signal<boolean>(false);
-  readonly isTelemetryOpen = signal<boolean>(false);
+  readonly isTelemetryOpen = signal<boolean>(true);
 
   readonly members = [
     { name: 'Vidal, Kenzo Shenel N.', initials: 'KV', role: 'Project Author & Lead Developer', isLead: true },
