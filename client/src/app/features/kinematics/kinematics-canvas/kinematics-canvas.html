@@ -1,23 +1,23 @@
-<div class="relative w-full h-full flex-1 min-h-0 bg-white border border-[var(--kerb)] rounded-xl shadow-xs p-3 sm:p-4 flex flex-col gap-3 select-none">
+<div class="relative w-full h-full flex-1 min-h-0 bg-white p-2 sm:p-3 flex flex-col gap-1.5 sm:gap-2 select-none overflow-hidden">
   <!-- Top Track Viewport Header -->
-  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-2 border-b border-[var(--kerb)]/60 shrink-0">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pb-1.5 border-b border-[var(--kerb)]/60 shrink-0">
     <!-- Left: Title & Active Configured Vehicle Badge + Outcome Badge -->
-    <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-      <span class="font-bold text-[var(--ink)] text-base">2D Kinematics Track</span>
-      <span class="px-2.5 py-0.5 text-xs bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)] rounded-full font-semibold">
+    <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+      <span class="font-bold text-[var(--ink)] text-sm sm:text-base">2D Kinematics Track</span>
+      <span class="px-2 py-0.5 text-[11px] bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)] rounded-full font-semibold">
         {{ activeInst().name }}
       </span>
 
       <!-- Prominent High-Visibility Run Outcome Badge -->
       @if (isAtEnd() || isCollisionReached()) {
         @if (isCollisionOrCrash()) {
-          <span class="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-[#FDF0EF] border-2 border-[#D93A32] text-[#9E241E] shadow-2xs flex items-center gap-1.5 animate-pulse">
-            <span class="w-2 h-2 rounded-full bg-[var(--danger)]"></span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-[#FDF0EF] border-2 border-[#D93A32] text-[#9E241E] shadow-2xs flex items-center gap-1.5 animate-pulse">
+            <span class="w-1.5 h-1.5 rounded-full bg-[var(--danger)]"></span>
             <span>FAILED: BARRIER COLLISION</span>
           </span>
         } @else {
-          <span class="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-[#EAF7EE] border border-[#1F9D55]/60 text-[#156939] shadow-2xs flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-[var(--ok)]"></span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-[#EAF7EE] border border-[#1F9D55]/60 text-[#156939] shadow-2xs flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)]"></span>
             <span>PASSED: SAFE STOP</span>
           </span>
         }
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Right: Hazard distance, time readout, Play button, Reset button -->
-    <div class="flex items-center gap-2 sm:gap-3 text-xs flex-wrap">
+    <div class="flex items-center gap-2 sm:gap-2.5 text-xs flex-wrap">
       <div class="flex items-center gap-1 text-[var(--ink-2)] whitespace-nowrap shrink-0">
         <span>Hazard</span>
         <span class="font-bold text-[var(--ink)] tabular-nums">{{ activeInst().simulation.hazardDistance }}m</span>
@@ -41,7 +41,7 @@
       <button
         type="button"
         (click)="handlePlay()"
-        class="px-3 py-1 text-xs font-bold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0"
+        class="px-2.5 py-0.5 text-xs font-bold rounded-md transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap shrink-0"
         [ngClass]="isStagedAtStart() ? 'bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] ring-2 ring-[var(--line-deep)]/40' : 'bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)]'"
         [title]="store.isPlaying() ? 'Pause playback (Space)' : (isAtEnd() ? 'Replay simulation from start' : (isStagedAtStart() ? 'Launch braking run (Space)' : 'Resume playback (Space)'))"
       >
@@ -73,7 +73,7 @@
       <button
         type="button"
         (click)="handleReset()"
-        class="px-2.5 py-1 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] rounded-md border border-[var(--kerb)] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-2xs"
+        class="px-2 py-0.5 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] rounded-md border border-[var(--kerb)] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0 shadow-2xs"
         title="Reset to start line"
       >
         <svg class="w-3 h-3 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -87,30 +87,30 @@
 
   <!-- Track Grid: Left Vehicle Telemetry Pin + Right Canvas Viewport -->
   <div
-    class="w-full flex-1 flex items-stretch border border-[var(--kerb)] rounded-lg overflow-hidden bg-white shadow-xs min-h-[320px]"
+    class="w-full flex-1 min-h-0 flex items-stretch border border-[var(--kerb)] rounded-lg overflow-hidden bg-white shadow-xs"
   >
     <!-- Vehicle Info Column (Pinned on Left) -->
-    <div class="w-36 sm:w-44 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-3 z-10 shadow-xs">
+    <div class="w-44 sm:w-52 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-2.5 sm:p-3 z-10 shadow-xs overflow-y-auto min-h-0 text-xs">
       <div>
-        <div class="text-[10px] font-bold text-[var(--ink-3)] uppercase tracking-wider mb-2">
-          Live Vehicle Telemetry
+        <div class="text-[9.5px] font-bold text-[var(--ink-3)] uppercase tracking-wider mb-1">
+          Live Telemetry
         </div>
 
-        <div class="text-xs sm:text-sm font-bold text-[var(--ink)] truncate mb-1">
+        <div class="text-xs font-bold text-[var(--ink)] leading-snug break-words mb-0.5">
           {{ activeInst().name }}
         </div>
 
-        <div class="font-mono text-xs font-bold text-[var(--ink)] mb-2">
+        <div class="font-mono text-xs font-bold text-[var(--ink)] mb-1.5">
           {{ liveSpeedKmh() }} km/h
         </div>
 
-        <div class="space-y-1 font-mono text-[11px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2">
+        <div class="space-y-0.5 font-mono text-[10.5px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-1.5">
           <div class="flex justify-between">
             <span>Distance x:</span>
             <b class="text-[var(--ink)]">{{ liveDistanceM() }}m</b>
           </div>
           <div class="flex justify-between">
-            <span>Deceleration:</span>
+            <span>Decel:</span>
             <b class="text-[var(--ink)]">{{ liveDecelG() }}g</b>
           </div>
           <div class="flex justify-between">
@@ -120,16 +120,16 @@
         </div>
 
         <!-- Biomechanical Peak Inputs -->
-        <div class="space-y-1 font-mono text-[10.5px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2 mt-2">
-          <div class="text-[9px] font-bold uppercase text-[var(--ink-3)] tracking-wider mb-0.5">
+        <div class="space-y-0.5 font-mono text-[10px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-1.5 mt-1.5">
+          <div class="text-[8.5px] font-bold uppercase text-[var(--ink-3)] tracking-wider mb-0.5">
             Peak Braking Inputs
           </div>
           <div class="flex justify-between">
             <span>Front Lever:</span>
             <b class="text-[var(--ink)]">{{ frontLeverPct() }}%</b>
           </div>
-          <div class="flex justify-between truncate" [title]="'Rear ' + rearControlLabel()">
-            <span class="truncate">Rear {{ rearControlLabel().split(' ')[0] }}:</span>
+          <div class="flex justify-between items-center gap-1" [title]="'Rear ' + rearControlLabel()">
+            <span class="text-[var(--ink-2)]">Rear {{ rearControlLabel().split(' ')[0] }}:</span>
             <b class="text-[var(--ink)]">{{ rearControlPct() }}%</b>
           </div>
           <div class="flex justify-between">
@@ -139,24 +139,24 @@
         </div>
       </div>
 
-      <div class="text-[10.5px] font-mono text-[var(--ink-3)] border-t border-[var(--kerb)] pt-2">
-        <div class="flex items-center gap-1.5 mb-0.5">
-          <span class="w-2 h-2 rounded-full shrink-0" [ngClass]="liveStatusDotClass()"></span>
-          <span class="leading-snug" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
+      <div class="text-[10px] font-mono text-[var(--ink-3)] border-t border-[var(--kerb)] pt-1.5 mt-1.5">
+        <div class="flex items-start gap-1.5 mb-1">
+          <span class="w-2 h-2 rounded-full shrink-0 mt-0.5" [ngClass]="liveStatusDotClass()"></span>
+          <span class="leading-tight break-words text-[10.5px]" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
         </div>
 
         @if (isCollisionOrCrash() && (isAtEnd() || isCollisionReached())) {
           <button
             type="button"
             (click)="openIncidentModal()"
-            class="w-full mt-2 py-1.5 px-2 bg-[#FDF0EF] hover:bg-[#FCE8E6] text-[#9E241E] border-2 border-[#D93A32] rounded-lg text-[10px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+            class="w-full mt-2 py-1.5 px-2 bg-[#FDF0EF] hover:bg-[#FCE8E6] text-[#9E241E] border-2 border-[#D93A32] rounded-lg text-[10px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs leading-tight"
           >
             <svg class="w-3.5 h-3.5 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
               <line x1="12" y1="9" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
-            <span>FAILED: Inspect Incident</span>
+            <span class="break-words">FAILED: Inspect Incident</span>
           </button>
         }
       </div>

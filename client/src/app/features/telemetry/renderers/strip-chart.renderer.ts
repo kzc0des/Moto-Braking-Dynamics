@@ -31,7 +31,7 @@ export class StripChartRenderer {
     const { ctx, width, height, title, curves, thresholds, maxTime, scrubTime } = params;
 
     const padLeft = 28;
-    const padRight = 16;
+    const padRight = 22;
     const padTop = 14;
     const padBottom = 24;
     const plotW = width - padLeft - padRight;
@@ -127,10 +127,19 @@ export class StripChartRenderer {
           ctx.setLineDash([]);
 
           if (th.label) {
-            ctx.font = '600 9.5px monospace';
+            ctx.font = '700 9.5px monospace';
+            const labelMetrics = ctx.measureText(th.label);
+            const labelW = labelMetrics.width;
+            const labelX = padLeft + plotW - 6;
+            const labelY = Math.max(padTop + 11, Math.min(padTop + plotH - 3, y - 4));
+
+            // Background pill to prevent dashed grid/threshold lines from striking through warning labels
+            ctx.fillStyle = '#ECEEF0';
+            ctx.fillRect(labelX - labelW - 3, labelY - 9, labelW + 5, 12);
+
             ctx.fillStyle = th.color;
             ctx.textAlign = 'right';
-            ctx.fillText(th.label, padLeft + plotW - 6, Math.max(padTop + 11, y - 4));
+            ctx.fillText(th.label, labelX - 1, labelY);
           }
         }
       });
