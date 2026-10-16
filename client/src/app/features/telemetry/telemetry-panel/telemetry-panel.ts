@@ -1,4 +1,4 @@
-import { Component, ElementRef, viewChild, inject, afterNextRender, signal, OnDestroy } from '@angular/core';
+import { Component, ElementRef, viewChild, inject, afterNextRender, signal, model, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { StripChartRenderer } from '../renderers/strip-chart.renderer';
@@ -11,8 +11,8 @@ import { StripChartRenderer } from '../renderers/strip-chart.renderer';
 })
 export class TelemetryPanel implements OnDestroy {
   readonly store = inject(BenchmarkStore);
-  readonly showLoads = signal<boolean>(true);
-  readonly showThermals = signal<boolean>(true);
+  readonly isOpen = model<boolean>(false);
+  readonly activeTooltip = signal<string | null>(null);
 
   readonly canvasVelocityRef = viewChild<ElementRef<HTMLCanvasElement>>('canvasVelocity');
   readonly canvasDecelRef = viewChild<ElementRef<HTMLCanvasElement>>('canvasDecel');
@@ -28,6 +28,26 @@ export class TelemetryPanel implements OnDestroy {
       this.setupCanvases();
       this.startRenderLoop();
     });
+  }
+
+  toggleOpen(): void {
+    this.isOpen.set(!this.isOpen());
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+      this.drawAll();
+    }, 50);
+  }
+
+  toggleTooltip(id: string): void {
+    if (this.activeTooltip() === id) {
+      this.activeTooltip.set(null);
+    } else {
+      this.activeTooltip.set(id);
+    }
+  }
+
+  closeTooltip(): void {
+    this.activeTooltip.set(null);
   }
 
   ngOnDestroy(): void {
@@ -66,7 +86,13 @@ export class TelemetryPanel implements OnDestroy {
     });
 
     const c1 = this.canvasVelocityRef()?.nativeElement;
+    const c2 = this.canvasDecelRef()?.nativeElement;
+    const c3 = this.canvasLoadsRef()?.nativeElement;
+    const c4 = this.canvasThermalsRef()?.nativeElement;
     if (c1) this.resizeObserver.observe(c1);
+    if (c2) this.resizeObserver.observe(c2);
+    if (c3) this.resizeObserver.observe(c3);
+    if (c4) this.resizeObserver.observe(c4);
   }
 
   private ensureCanvasSize(c: HTMLCanvasElement): { width: number; height: number; dpr: number } | null {
@@ -154,9 +180,9 @@ export class TelemetryPanel implements OnDestroy {
       }
     }
 
-    // 3. Normal Loads Canvas (if shown)
+    // 3. Normal Loads Canvas (Fixated)
     const cLoads = this.canvasLoadsRef()?.nativeElement;
-    if (cLoads && this.showLoads()) {
+    if (cLoads) {
       const dim = this.ensureCanvasSize(cLoads);
       if (dim) {
         const ctx = cLoads.getContext('2d');
@@ -183,9 +209,9 @@ export class TelemetryPanel implements OnDestroy {
       }
     }
 
-    // 4. Rotor Temperature Canvas (if shown: physical danger heat #D93A32)
+    // 4. Rotor Temperature Canvas (Fixated)
     const cThermals = this.canvasThermalsRef()?.nativeElement;
-    if (cThermals && this.showThermals()) {
+    if (cThermals) {
       const dim = this.ensureCanvasSize(cThermals);
       if (dim) {
         const ctx = cThermals.getContext('2d');

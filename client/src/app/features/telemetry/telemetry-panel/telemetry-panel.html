@@ -1,115 +1,300 @@
-<div class="bg-white border border-[var(--kerb)] rounded-xl shadow-xs p-4 flex flex-col gap-4 select-none">
-  <!-- Top Header: Title & Channel Toggles -->
-  <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--kerb)]/60">
-    <div class="flex items-center gap-2.5">
-      <div class="w-2.5 h-2.5 rounded-full bg-[var(--line)] animate-pulse"></div>
-      <div class="font-bold text-[var(--ink)] text-sm sm:text-base">Synchronized Multi-Channel Strip Telemetry</div>
-      <span class="text-[11px] font-mono text-[var(--ink-2)] bg-[var(--well)] px-2 py-0.5 rounded border border-[var(--kerb)]">
-        ODE RK45 · Synchronized
+<div class="bg-white flex flex-col select-none h-full min-h-0">
+  <!-- 1. Drawer Header / Clickable Handle Bar -->
+  <div (click)="toggleOpen()"
+    class="px-3 sm:px-4 h-10 bg-white hover:bg-[var(--well)]/40 border-t border-[var(--kerb)] transition-colors cursor-pointer flex items-center justify-between gap-2 shrink-0 select-none"
+    role="button" tabindex="0" (keydown.enter)="toggleOpen()" (keydown.space)="$event.preventDefault(); toggleOpen()"
+    [attr.aria-expanded]="isOpen()" aria-label="Toggle live braking telemetry drawer">
+    <!-- Left: Pulsing Dot + Title + Subtitle -->
+    <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+      <span class="w-2.5 h-2.5 rounded-full bg-[var(--line)] animate-pulse shrink-0"></span>
+      <span class="font-bold text-[var(--ink)] text-xs sm:text-sm tracking-tight whitespace-nowrap">
+        Live Braking Telemetry
+      </span>
+
+      <span
+        class="text-[10px] font-mono text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] shrink-0 hidden md:inline">
+        ODE RK45
+      </span>
+
+      <span class="text-[11px] text-[var(--ink-2)] font-medium truncate hidden 2xl:inline">
+        Speed, stopping g-force, weight transfer, and brake heat
       </span>
     </div>
 
-    <div class="flex items-center gap-2 text-xs">
-      <span class="text-[var(--ink-2)] text-[11px] font-medium hidden sm:inline">Active channels:</span>
-      <button
-        type="button"
-        (click)="showLoads.set(!showLoads())"
-        class="px-2.5 py-1 text-xs font-semibold border rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
-        [ngClass]="showLoads() ? 'bg-[var(--line-tint)] text-[var(--line-deep)] border-[var(--line)]' : 'bg-white text-[var(--ink-2)] border-[var(--kerb)] hover:text-[var(--ink)]'"
-      >
-        <span class="w-2 h-2 rounded-full" [ngClass]="showLoads() ? 'bg-[var(--line)]' : 'bg-[var(--kerb)]'"></span>
-        Normal loads (F_z)
-      </button>
-      <button
-        type="button"
-        (click)="showThermals.set(!showThermals())"
-        class="px-2.5 py-1 text-xs font-semibold border rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
-        [ngClass]="showThermals() ? 'bg-[var(--line-tint)] text-[var(--line-deep)] border-[var(--line)]' : 'bg-white text-[var(--ink-2)] border-[var(--kerb)] hover:text-[var(--ink)]'"
-      >
-        <span class="w-2 h-2 rounded-full" [ngClass]="showThermals() ? 'bg-[#D93A32]' : 'bg-[var(--kerb)]'"></span>
-        Brake temp (°C)
-      </button>
+    <!-- Center: Quick Live Readout Pills (All 4 channels fixated) -->
+    <div class="flex items-center gap-1 sm:gap-1.5 text-[10.5px] sm:text-[11px] font-mono tabular-nums shrink-0">
+      <span
+        class="px-1.5 sm:px-2 py-0.5 rounded bg-[var(--well)] border border-[var(--kerb)] text-[var(--ink)] font-semibold"
+        title="Forward Velocity">
+        {{ currentVelocity().toFixed(1) }} <span class="text-[9px] text-[var(--ink-2)] font-normal">m/s</span>
+        <span class="text-[10px] text-[var(--ink-3)] font-normal hidden sm:inline ml-0.5">({{ (currentVelocity() *
+          3.6).toFixed(0) }} km/h)</span>
+      </span>
+      <span
+        class="px-1.5 sm:px-2 py-0.5 rounded bg-[var(--well)] border border-[var(--kerb)] text-[var(--ink)] font-semibold"
+        title="Instantaneous Deceleration">
+        {{ (currentDeceleration() / 9.81).toFixed(2) }} g
+      </span>
+      <span
+        class="px-1.5 sm:px-2 py-0.5 rounded bg-[var(--well)] border border-[var(--kerb)] text-[var(--ink)] font-semibold hidden sm:inline"
+        title="Front and Rear Normal Loads">
+        <span class="text-[#E8750F]">{{ (currentFrontLoad() / 1000).toFixed(1) }}k</span>/<span
+          class="text-[#2B6CB0]">{{ (currentRearLoad() / 1000).toFixed(1) }}k N</span>
+      </span>
+      <span
+        class="px-1.5 sm:px-2 py-0.5 rounded bg-[var(--well)] border border-[var(--kerb)] font-semibold hidden md:inline"
+        [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32]' : 'text-[var(--ink)]'" title="Rotor Temperature">
+        {{ currentRotorTemp().toFixed(0) }}°C
+      </span>
+    </div>
+
+    <!-- Right: Drawer Chevron Action Button -->
+    <div class="flex items-center gap-1.5 font-bold text-[var(--ink)] hover:text-[var(--line-deep)] shrink-0">
+      <span class="text-xs">{{ isOpen() ? 'Collapse' : 'Expand' }}</span>
+      <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="isOpen()" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+      </svg>
     </div>
   </div>
 
-  <!-- 2x2 Grid of Telemetry Channels -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <!-- Chart 1: Velocity -->
-    <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
-      <div class="flex items-center justify-between text-xs px-0.5">
-        <div class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#2B6CB0]"></span>
-          <span class="font-bold text-[var(--ink)]">Forward Velocity</span>
-          <span class="text-[10px] font-mono text-[var(--ink-2)]">(m/s)</span>
-        </div>
-        <div class="font-mono font-bold text-sm text-[var(--ink)] tabular-nums">
-          {{ currentVelocity().toFixed(1) }} <span class="text-[10.5px] font-normal text-[var(--ink-2)]">m/s</span>
-          <span class="text-xs font-normal text-[var(--ink-3)] ml-1">({{ (currentVelocity() * 3.6).toFixed(0) }} km/h)</span>
-        </div>
-      </div>
-      <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
-        <canvas #canvasVelocity class="w-full h-full block"></canvas>
-      </div>
-    </div>
+  <!-- 2. Drawer Body: Responsive Telemetry Grid -->
+  <div class="border-t border-[var(--kerb)]/60 bg-[var(--bg)]/50 p-2.5 sm:p-3 flex-1 min-h-0 overflow-y-auto"
+    [class.hidden]="!isOpen()">
+    <!-- Grid: 1 col on mobile, 2 cols on laptops/desktops, 4 cols on wide screens (2xl) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
+      <!-- Chart 1: Velocity -->
+      <div class="flex flex-col gap-1 bg-white p-2.5 sm:p-3 rounded-xl border border-[var(--kerb)] shadow-2xs min-w-0">
+        <!-- Row 1: Header + Value -->
+        <div class="flex items-center justify-between gap-2 min-w-0">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-[#2B6CB0] shrink-0"></span>
+            <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Forward Velocity</span>
+            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(m/s)</span>
 
-    <!-- Chart 2: Deceleration -->
-    <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
-      <div class="flex items-center justify-between text-xs px-0.5">
-        <div class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#1F2328]"></span>
-          <span class="font-bold text-[var(--ink)]">Instantaneous Deceleration</span>
-          <span class="text-[10px] font-mono text-[var(--ink-2)]">(m/s²)</span>
-        </div>
-        <div class="font-mono font-bold text-sm text-[var(--ink)] tabular-nums">
-          {{ currentDeceleration().toFixed(2) }} <span class="text-[10.5px] font-normal text-[var(--ink-2)]">m/s²</span>
-          <span class="text-xs font-normal text-[var(--ink-3)] ml-1">({{ (currentDeceleration() / 9.81).toFixed(2) }} g)</span>
-        </div>
-      </div>
-      <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
-        <canvas #canvasDecel class="w-full h-full block"></canvas>
-      </div>
-    </div>
-
-    <!-- Chart 3: Normal Loads (Front & Rear Fz) -->
-    @if (showLoads()) {
-      <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
-        <div class="flex items-center justify-between text-xs px-0.5">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-[var(--ink)]">Normal Load Transfer (F_z)</span>
-            <span class="text-[10px] font-mono text-[var(--ink-2)]">(Front / Rear N)</span>
+            <!-- Accessible Info Tooltip Icon -->
+            <div class="relative group/info inline-flex items-center">
+              <button type="button" (click)="toggleTooltip('velocity'); $event.stopPropagation()"
+                class="text-[var(--ink-3)] hover:text-[var(--ink)] cursor-help p-0.5 rounded transition-colors focus:outline-none"
+                aria-label="How to read the Forward Velocity chart">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </button>
+              <div [class.block]="activeTooltip() === 'velocity'"
+                class="absolute left-0 top-full mt-1.5 hidden group-hover/info:block z-30 w-72 p-3 bg-[var(--ink)] text-white text-[11px] leading-relaxed rounded-xl shadow-xl pointer-events-auto border border-white/10">
+                <div class="font-bold text-[var(--line)] mb-1 flex items-center justify-between">
+                  <span>Forward Velocity (Speed)</span>
+                  <button type="button" (click)="closeTooltip(); $event.stopPropagation()"
+                    class="text-white/60 hover:text-white text-xs sm:hidden">✕</button>
+                </div>
+                <p class="text-white/90">
+                  Tracks vehicle speed down to 0 m/s. The flat initial segment is the rider's <b>reaction delay
+                    (1.0s)</b> before hydraulic clamping begins. The downward slope shows how fast the brakes bleed off
+                  momentum.
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="font-mono font-bold text-xs text-[var(--ink)] tabular-nums flex items-center gap-2">
-            <span class="text-[#E8750F]">Front: {{ (currentFrontLoad() / 1000).toFixed(2) }} kN</span>
+
+          <div class="font-mono font-bold text-xs sm:text-sm text-[var(--ink)] tabular-nums shrink-0 text-right">
+            {{ currentVelocity().toFixed(1) }} <span class="text-[10px] font-normal text-[var(--ink-2)]">m/s</span>
+            <span class="text-[11px] font-normal text-[var(--ink-3)] hidden sm:inline ml-1">({{ (currentVelocity() *
+              3.6).toFixed(0) }} km/h)</span>
+          </div>
+        </div>
+
+        <!-- Row 2: Subtitle (No collision with value) -->
+        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+          title="Forward speed over time during reaction lag and active braking">
+          Forward speed over time during reaction lag and active braking
+        </div>
+
+        <!-- Row 3: Canvas -->
+        <div
+          class="w-full h-24 sm:h-28 lg:h-32 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
+          <canvas #canvasVelocity class="w-full h-full block"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: Deceleration -->
+      <div class="flex flex-col gap-1 bg-white p-2.5 sm:p-3 rounded-xl border border-[var(--kerb)] shadow-2xs min-w-0">
+        <!-- Row 1: Header + Value -->
+        <div class="flex items-center justify-between gap-2 min-w-0">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-[#1F2328] shrink-0"></span>
+            <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Instantaneous Deceleration</span>
+            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(m/s²)</span>
+
+            <!-- Accessible Info Tooltip Icon -->
+            <div class="relative group/info inline-flex items-center">
+              <button type="button" (click)="toggleTooltip('decel'); $event.stopPropagation()"
+                class="text-[var(--ink-3)] hover:text-[var(--ink)] cursor-help p-0.5 rounded transition-colors focus:outline-none"
+                aria-label="How to read the Deceleration chart">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </button>
+              <div [class.block]="activeTooltip() === 'decel'"
+                class="absolute left-0 top-full mt-1.5 hidden group-hover/info:block z-30 w-72 p-3 bg-[var(--ink)] text-white text-[11px] leading-relaxed rounded-xl shadow-xl pointer-events-auto border border-white/10">
+                <div class="font-bold text-[var(--line)] mb-1 flex items-center justify-between">
+                  <span>Deceleration (Stopping G-Force)</span>
+                  <button type="button" (click)="closeTooltip(); $event.stopPropagation()"
+                    class="text-white/60 hover:text-white text-xs sm:hidden">✕</button>
+                </div>
+                <p class="text-white/90">
+                  The rate of speed reduction. Zero while coasting; jumps when brake pads grip the discs. Street
+                  emergency stops typically range between <b>0.50 g and 0.70 g</b>. Higher values risk tire skid or
+                  stoppie.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="font-mono font-bold text-xs sm:text-sm text-[var(--ink)] tabular-nums shrink-0 text-right">
+            {{ currentDeceleration().toFixed(2) }} <span class="text-[10px] font-normal text-[var(--ink-2)]">m/s²</span>
+            <span class="text-[11px] font-normal text-[var(--ink-3)] hidden sm:inline ml-1">({{ (currentDeceleration() /
+              9.81).toFixed(2) }} g)</span>
+          </div>
+        </div>
+
+        <!-- Row 2: Subtitle -->
+        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+          title="Braking g-force and stopping power experienced by rider">
+          Braking g-force and stopping power experienced by rider
+        </div>
+
+        <!-- Row 3: Canvas -->
+        <div
+          class="w-full h-24 sm:h-28 lg:h-32 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
+          <canvas #canvasDecel class="w-full h-full block"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 3: Normal Loads (Front & Rear Fz - Fixated) -->
+      <div class="flex flex-col gap-1 bg-white p-2.5 sm:p-3 rounded-xl border border-[var(--kerb)] shadow-2xs min-w-0">
+        <!-- Row 1: Header + Value -->
+        <div class="flex items-center justify-between gap-2 min-w-0">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-[#E8750F] shrink-0"></span>
+            <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Normal Load Transfer</span>
+            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(F_z)</span>
+
+            <!-- Accessible Info Tooltip Icon -->
+            <div class="relative group/info inline-flex items-center">
+              <button type="button" (click)="toggleTooltip('loads'); $event.stopPropagation()"
+                class="text-[var(--ink-3)] hover:text-[var(--ink)] cursor-help p-0.5 rounded transition-colors focus:outline-none"
+                aria-label="How to read the Normal Load Transfer chart">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </button>
+              <div [class.block]="activeTooltip() === 'loads'"
+                class="absolute left-0 top-full mt-1.5 hidden group-hover/info:block z-30 w-72 p-3 bg-[var(--ink)] text-white text-[11px] leading-relaxed rounded-xl shadow-xl pointer-events-auto border border-white/10">
+                <div class="font-bold text-[var(--line)] mb-1 flex items-center justify-between">
+                  <span>Weight Transfer (Tire Ground Force)</span>
+                  <button type="button" (click)="closeTooltip(); $event.stopPropagation()"
+                    class="text-white/60 hover:text-white text-xs sm:hidden">✕</button>
+                </div>
+                <p class="text-white/90">
+                  Shows ground contact force on the <b class="text-[#E8750F]">Front tire</b> vs. <b
+                    class="text-[#2B6CB0]">Rear tire</b>. Braking inertia compresses the front forks while unloading the
+                  rear. If the blue line touches the red <b>Lift-Off Limit (0 N)</b>, the rear wheel lifts off the road.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="font-mono font-bold text-xs text-[var(--ink)] tabular-nums flex items-center gap-1.5 shrink-0">
+            <span class="text-[#E8750F]">F: {{ (currentFrontLoad() / 1000).toFixed(2) }}k</span>
             <span class="text-[var(--kerb)]">|</span>
-            <span class="text-[#2B6CB0]">Rear: {{ (currentRearLoad() / 1000).toFixed(2) }} kN</span>
+            <span class="text-[#2B6CB0]">R: {{ (currentRearLoad() / 1000).toFixed(2) }}k N</span>
+            @if (currentRearLoad() <= 5) { <span
+              class="px-1.5 py-0.5 rounded bg-[#FDF0EF] text-[#D93A32] text-[9.5px] font-bold border border-[#D93A32] animate-pulse">
+              LIFT-OFF</span>
+              }
           </div>
         </div>
-        <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
+
+        <!-- Row 2: Subtitle -->
+        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+          title="Dynamic weight shift: front fork compression vs. rear wheel lift-off">
+          Dynamic weight shift: front fork compression vs. rear wheel lift-off
+        </div>
+
+        <!-- Row 3: Canvas -->
+        <div
+          class="w-full h-24 sm:h-28 lg:h-32 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
           <canvas #canvasLoads class="w-full h-full block"></canvas>
         </div>
       </div>
-    }
 
-    <!-- Chart 4: Brake Rotor Temperature -->
-    @if (showThermals()) {
-      <div class="flex flex-col gap-1.5 bg-[var(--bg)] p-3 rounded-xl border border-[var(--kerb)] shadow-2xs">
-        <div class="flex items-center justify-between text-xs px-0.5">
-          <div class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#D93A32]"></span>
-            <span class="font-bold text-[var(--ink)]">Rotor Temperature & Boil Margin</span>
-            <span class="text-[10px] font-mono text-[var(--ink-2)]">(°C)</span>
+      <!-- Chart 4: Brake Rotor Temperature (Fixated) -->
+      <div class="flex flex-col gap-1 bg-white p-2.5 sm:p-3 rounded-xl border border-[var(--kerb)] shadow-2xs min-w-0">
+        <!-- Row 1: Header + Value -->
+        <div class="flex items-center justify-between gap-2 min-w-0">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-[#D93A32] shrink-0"></span>
+            <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Rotor Temperature</span>
+            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(°C)</span>
+
+            <!-- Accessible Info Tooltip Icon -->
+            <div class="relative group/info inline-flex items-center">
+              <button type="button" (click)="toggleTooltip('thermals'); $event.stopPropagation()"
+                class="text-[var(--ink-3)] hover:text-[var(--ink)] cursor-help p-0.5 rounded transition-colors focus:outline-none"
+                aria-label="How to read the Rotor Temperature chart">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </button>
+              <div [class.block]="activeTooltip() === 'thermals'"
+                class="absolute left-0 top-full mt-1.5 hidden group-hover/info:block z-30 w-72 p-3 bg-[var(--ink)] text-white text-[11px] leading-relaxed rounded-xl shadow-xl pointer-events-auto border border-white/10">
+                <div class="font-bold text-[var(--line)] mb-1 flex items-center justify-between">
+                  <span>Brake Disc Heat & Fluid Margin</span>
+                  <button type="button" (click)="closeTooltip(); $event.stopPropagation()"
+                    class="text-white/60 hover:text-white text-xs sm:hidden">✕</button>
+                </div>
+                <p class="text-white/90">
+                  Braking converts speed into heat. If rotor heat reaches the red <b>Boil Limit (230°C)</b>, brake fluid
+                  boils into vapor bubbles causing total brake failure (vapor lock). The green margin displays safe
+                  remaining headroom.
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="font-mono font-bold text-sm tabular-nums" [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32]' : 'text-[var(--ink)]'">
-            {{ currentRotorTemp().toFixed(1) }} <span class="text-[10.5px] font-normal text-[var(--ink-2)]">°C</span>
-            <span class="text-[11px] font-normal ml-1" [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32] font-bold' : 'text-[#156939]'">
+
+          <div class="font-mono font-bold text-xs sm:text-sm tabular-nums shrink-0 text-right"
+            [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32]' : 'text-[var(--ink)]'">
+            {{ currentRotorTemp().toFixed(1) }} <span class="text-[10px] font-normal text-[var(--ink-2)]">°C</span>
+            @if (currentRotorTemp() >= 230) {
+            <span
+              class="text-[10px] font-bold text-[#D93A32] ml-1 bg-[#FDF0EF] px-1.5 py-0.5 rounded border border-[#D93A32] animate-pulse">
+              BOIL EXCEEDED
+            </span>
+            } @else {
+            <span class="text-[11px] font-normal text-[#156939] hidden sm:inline ml-1">
               ({{ (230 - currentRotorTemp()).toFixed(0) }}°C margin)
             </span>
+            }
           </div>
         </div>
-        <div class="w-full h-48 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
+
+        <!-- Row 2: Subtitle -->
+        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+          title="Brake disc friction heat and hydraulic boiling safety margin">
+          Brake disc friction heat and hydraulic boiling safety margin
+        </div>
+
+        <!-- Row 3: Canvas -->
+        <div
+          class="w-full h-24 sm:h-28 lg:h-32 rounded-lg overflow-hidden border border-[var(--kerb)] bg-[#ECEEF0] relative">
           <canvas #canvasThermals class="w-full h-full block"></canvas>
         </div>
       </div>
-    }
+    </div>
   </div>
 </div>
