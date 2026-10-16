@@ -29,6 +29,7 @@ export class Workbench {
 
   readonly currentMode = signal<'analytics' | 'simulation'>('analytics');
   readonly isMembersDrawerOpen = signal<boolean>(false);
+  readonly isSidebarOpen = signal<boolean>(false);
   readonly isTelemetryOpen = signal<boolean>(false);
 
   readonly members = [
@@ -47,6 +48,9 @@ export class Workbench {
     if (this.isMembersDrawerOpen()) {
       this.isMembersDrawerOpen.set(false);
     }
+    if (this.isSidebarOpen()) {
+      this.isSidebarOpen.set(false);
+    }
   }
 
   setMode(mode: 'analytics' | 'simulation'): void {
@@ -54,9 +58,14 @@ export class Workbench {
   }
 
   switchToSimulation(): void {
+    this.isSidebarOpen.set(false);
     this.currentMode.set('simulation');
     this.store.resetPlayback();
     this.store.triggerSimulation();
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen.set(!this.isSidebarOpen());
   }
 
   toggleMembersDrawer(): void {
