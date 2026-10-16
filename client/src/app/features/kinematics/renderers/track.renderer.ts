@@ -30,6 +30,59 @@ export class TrackRenderer {
     const topOffset = 26;
     const laneHeight = (height - topOffset) / numLanes;
 
+    // 1b. Zone shading so the stage explains itself: reaction -> braking -> impact
+    const zoneTop = topOffset;
+    const zoneH = height - topOffset;
+    const barrierPx = meterToPx(hazardDistance);
+    const onsetPx = params.reactionDistance && params.reactionDistance > 0
+      ? meterToPx(Math.min(params.reactionDistance, hazardDistance))
+      : meterToPx(0);
+    const startPx = meterToPx(0);
+    const endPx = width;
+
+    // Reaction zone (free-roll): diagonal hatch
+    if (onsetPx > startPx) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(startPx, zoneTop, onsetPx - startPx, zoneH);
+      ctx.clip();
+      ctx.fillStyle = '#F4F5F7';
+      ctx.fillRect(startPx, zoneTop, onsetPx - startPx, zoneH);
+      ctx.strokeStyle = '#E3E6EA';
+      ctx.lineWidth = 1;
+      for (let x = startPx - zoneH; x < onsetPx; x += 12) {
+        ctx.beginPath();
+        ctx.moveTo(x, zoneTop + zoneH);
+        ctx.lineTo(x + zoneH, zoneTop);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // Braking zone: soft amber
+    if (barrierPx > onsetPx) {
+      ctx.fillStyle = 'rgba(255, 200, 0, 0.08)';
+      ctx.fillRect(onsetPx, zoneTop, barrierPx - onsetPx, zoneH);
+    }
+    // Beyond the impact barrier: soft red
+    if (endPx > barrierPx) {
+      ctx.fillStyle = 'rgba(217, 58, 50, 0.06)';
+      ctx.fillRect(barrierPx, zoneTop, endPx - barrierPx, zoneH);
+    }
+    // Zone captions (only when the zone is wide enough to hold them)
+    ctx.font = '700 12px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#7A818B';
+    const captionY = zoneTop + zoneH * 0.30;
+    const caption = (label: string, x1: number, x2: number) => {
+      if (x2 - x1 >= ctx.measureText(label).width + 16) {
+        ctx.fillText(label, (x1 + x2) / 2, captionY);
+      }
+    };
+    caption('REACTION · FREE-ROLL', startPx, onsetPx);
+    caption('BRAKING ZONE', onsetPx, barrierPx);
+    ctx.fillStyle = '#B5413A';
+    caption('BEYOND BARRIER', barrierPx, endPx);
+
     // 2. Vertical distance gridlines (every 10m, big and readable)
     const tickStep = 10;
     ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -88,13 +141,17 @@ export class TrackRenderer {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = '#656C76';
-      ctx.font = '600 10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`, rxnX, topOffset + 14);
+      const onsetLabel = `BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`;
+      const onsetW = ctx.measureText(onsetLabel).width + 10;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(rxnX - onsetW / 2, topOffset + 3, onsetW, 16);
+      ctx.fillStyle = '#4A5059';
+      ctx.fillText(onsetLabel, rxnX, topOffset + 15);
     }
 
-    // 3. Hazard Barrier at hazardDistance - Red Signal Barrier
+    // 3. Impact Barrier at X_impact (hazardDistance) - Red Signal Barrier
     const barrierX = meterToPx(hazardDistance);
     if (barrierX <= width) {
       ctx.strokeStyle = '#D93A32';
@@ -110,7 +167,12 @@ export class TrackRenderer {
       ctx.fillStyle = '#D93A32';
       ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(`Hazard Barrier ${hazardDistance} m`, barrierX - 6, 32);
+      const barrierLabel = `Impact Barrier ${hazardDistance} m`;
+      const barrierW = ctx.measureText(barrierLabel).width + 10;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(barrierX - 4 - barrierW, topOffset + 20, barrierW, 16);
+      ctx.fillStyle = '#D93A32';
+      ctx.fillText(barrierLabel, barrierX - 9, topOffset + 32);
 
       // High-Visibility Red Canvas Callout if Collision Occurred
       if (params.isCollision) {

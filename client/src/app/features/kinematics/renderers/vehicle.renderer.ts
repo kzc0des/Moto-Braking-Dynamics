@@ -156,7 +156,7 @@ export class VehicleRenderer {
     const cfg = this.spriteConfigs[resolvedKey];
 
     // Responsive scaling based on lane height
-    const baseScale = Math.min(1.45, Math.max(1.05, laneHeight / 64));
+    const baseScale = Math.min(1.9, Math.max(1.05, laneHeight / 64));
     const scale = baseScale * cfg.scaleMultiplier;
 
     const drawW = cfg.frameWidth * scale;
@@ -165,6 +165,16 @@ export class VehicleRenderer {
     const anchorY = cfg.groundYOffset * scale;
 
     const groundY = laneY + Math.min(laneHeight - 10, Math.max(drawH * 0.9, laneHeight * 0.78));
+
+    // Road surface band under the wheels (fills the lower part of the lane)
+    ctx.fillStyle = '#EEF0F2';
+    ctx.fillRect(0, groundY + 1, width, Math.max(0, laneY + laneHeight - groundY - 1));
+    ctx.strokeStyle = '#C9CED4';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY + 1);
+    ctx.lineTo(width, groundY + 1);
+    ctx.stroke();
 
     // Deceleration pitch angle (fork dive transient) - zeroed when idling at rest
     const pitchAngle = params.forceIdle ? 0 : Math.min(0.12, Math.max(-0.04, (frame.deceleration / 9.81) * 0.08));

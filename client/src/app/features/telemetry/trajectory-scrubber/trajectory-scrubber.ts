@@ -23,6 +23,10 @@ export class TrajectoryScrubber {
     return `linear-gradient(to right, #FFC800 0%, #FFC800 ${pct}%, #DDE0E4 ${pct}%, #DDE0E4 100%)`;
   }
 
+  isStagedAtStart(): boolean {
+    return this.store.scrubTime() <= 0.05 && !this.store.isPlaying();
+  }
+
   isAtEnd(): boolean {
     return this.store.scrubTime() >= this.store.maxRunTime() - 0.05;
   }

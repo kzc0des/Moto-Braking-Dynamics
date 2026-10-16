@@ -13,6 +13,8 @@ export class PredictiveHorizon {
   readonly simulateTrigger = output<void>();
 
   readonly isStatementOpen = signal<boolean>(false);
+  readonly showDetails = signal<boolean>(true);
+  readonly compareTab = signal<'brakes' | 'road'>('brakes');
 
   // --- Physical Reference Constants ---
   private readonly G = 9.81;
@@ -265,7 +267,7 @@ export class PredictiveHorizon {
     ];
 
     return techs.map(t => {
-      const a = Math.max(0.5, this.G * (mu * t.eta * Math.cos(th) + Math.sin(th)));
+      const a = Math.max(0.5, this.G * (mu * t.eta * this.modulationEfficiency() * Math.cos(th) + Math.sin(th)));
       const dist = Number((rxn + (v0 * v0) / (2 * a)).toFixed(1));
       const m = Number((X - dist).toFixed(1));
       const col = m < 0;
@@ -287,7 +289,7 @@ export class PredictiveHorizon {
     const v0 = this.selectedInst().simulation.initialVelocity;
     const X = this.hazardDistance();
     const rxn = this.reactionDistance();
-    const eff = 0.85;
+    const eff = 0.85 * this.modulationEfficiency();
     const th = this.selectedInst().environment.roadGradeAngle;
     const maxScale = Math.max(X, this.stopDistance()) * 1.15;
 
@@ -308,13 +310,37 @@ export class PredictiveHorizon {
         name: s.name,
         mu: s.mu.toFixed(2),
         dist,
-        activeTag: (this.substrate() === 'asphalt' && this.contaminant() === 'wet' && s.name === 'Wet Asphalt') ? '[Active]' : '',
+        activeTag: Math.abs(s.mu - this.frictionCoeff()) < 0.011 ? '[Active]' : '',
         widthPct: Number(wPct.toFixed(1)),
         barClass: col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]',
         chipClass: col ? 'text-[#9E241E]' : 'text-[#156939]',
         chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });
+  });
+
+  // Plain-language summary for non-expert readers
+  readonly safeSpeedKmh = computed(() => {
+    const a = this.decelMs2();
+    const X = this.hazardDistance();
+    const v = a * (-this.T_REACTION + Math.sqrt(this.T_REACTION * this.T_REACTION + (2 * X) / a));
+    return Math.max(0, Math.floor(v * 3.6));
+  });
+
+  readonly plainSummary = computed(() => {
+    const m = this.margin();
+    if (m >= 0) {
+      return `You stop ${m.toFixed(1)} m before the barrier at ${this.speedKmh()} km/h.`;
+    }
+    return `At ${this.speedKmh()} km/h you stop ${Math.abs(m).toFixed(1)} m too late and hit the barrier at ${this.impactSpeedKmh()} km/h. `
+      + `Slowing to about ${this.safeSpeedKmh()} km/h would clear it.`;
+  });
+
+  readonly decelPlain = computed(() => {
+    const g = this.mfddG();
+    if (g >= 0.7) return 'Very strong braking';
+    if (g >= 0.5) return 'Strong braking, typical of a street emergency stop';
+    return 'Gentle braking: needs a long distance to stop';
   });
 
   readonly roadGradePenalty = computed(() => {

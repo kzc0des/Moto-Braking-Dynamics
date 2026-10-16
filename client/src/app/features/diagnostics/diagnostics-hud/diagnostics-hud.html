@@ -21,11 +21,11 @@
   @if (store.engineStatus() === 'connected') {
     <span class="font-bold text-[#1E7E34]">Online</span>
     @if (diagnostics.metrics(); as m) {
-      <span class="text-[10px] text-[var(--ink-2)] font-mono hidden md:inline">({{ m.solverExecutionTimeMs }}ms)</span>
+      <span class="text-[11px] text-[var(--ink-2)] font-mono hidden md:inline">({{ m.solverExecutionTimeMs }}ms)</span>
     }
   } @else {
     <span class="font-bold text-[#E8750F]">Offline</span>
-    <span class="text-[10px] text-[#7A5800] bg-[#FFF6D1] px-1 py-0.2 rounded border border-[#E8750F]/30 hidden lg:inline">Fallback</span>
+    <span class="text-[11px] text-[#7A5800] bg-[#FFF6D1] px-1 py-0.2 rounded border border-[#E8750F]/30 hidden lg:inline">Fallback</span>
   }
 </button>
 

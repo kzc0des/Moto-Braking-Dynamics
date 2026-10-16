@@ -12,7 +12,7 @@
       </span>
 
       <span
-        class="text-[10px] font-mono text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] shrink-0 hidden md:inline">
+        class="text-[11px] font-mono text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] shrink-0 hidden md:inline">
         ODE RK45
       </span>
 
@@ -22,12 +22,12 @@
     </div>
 
     <!-- Center: Quick Live Readout Pills (All 4 channels fixated) -->
-    <div class="flex items-center gap-1 sm:gap-1.5 text-[10.5px] sm:text-[11px] font-mono tabular-nums shrink-0">
+    <div class="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-[11px] font-mono tabular-nums shrink-0">
       <span
         class="px-1.5 sm:px-2 py-0.5 rounded bg-[var(--well)] border border-[var(--kerb)] text-[var(--ink)] font-semibold"
         title="Forward Velocity">
-        {{ currentVelocity().toFixed(1) }} <span class="text-[9px] text-[var(--ink-2)] font-normal">m/s</span>
-        <span class="text-[10px] text-[var(--ink-3)] font-normal hidden sm:inline ml-0.5">({{ (currentVelocity() *
+        {{ currentVelocity().toFixed(1) }} <span class="text-[11px] text-[var(--ink-2)] font-normal">m/s</span>
+        <span class="text-[11px] text-[var(--ink-3)] font-normal hidden sm:inline ml-0.5">({{ (currentVelocity() *
           3.6).toFixed(0) }} km/h)</span>
       </span>
       <span
@@ -70,7 +70,7 @@
           <div class="flex items-center gap-1.5 min-w-0">
             <span class="w-2 h-2 rounded-full bg-[#2B6CB0] shrink-0"></span>
             <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Forward Velocity</span>
-            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(m/s)</span>
+            <span class="text-[11px] font-mono text-[var(--ink-2)] shrink-0">(m/s)</span>
 
             <!-- Accessible Info Tooltip Icon -->
             <div class="relative group/info inline-flex items-center">
@@ -99,14 +99,14 @@
           </div>
 
           <div class="font-mono font-bold text-xs sm:text-sm text-[var(--ink)] tabular-nums shrink-0 text-right">
-            {{ currentVelocity().toFixed(1) }} <span class="text-[10px] font-normal text-[var(--ink-2)]">m/s</span>
+            {{ currentVelocity().toFixed(1) }} <span class="text-[11px] font-normal text-[var(--ink-2)]">m/s</span>
             <span class="text-[11px] font-normal text-[var(--ink-3)] hidden sm:inline ml-1">({{ (currentVelocity() *
               3.6).toFixed(0) }} km/h)</span>
           </div>
         </div>
 
         <!-- Row 2: Subtitle (No collision with value) -->
-        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+        <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] font-medium leading-tight"
           title="Forward speed over time during reaction lag and active braking">
           Forward speed over time during reaction lag and active braking
         </div>
@@ -125,7 +125,7 @@
           <div class="flex items-center gap-1.5 min-w-0">
             <span class="w-2 h-2 rounded-full bg-[#1F2328] shrink-0"></span>
             <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Instantaneous Deceleration</span>
-            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(m/s²)</span>
+            <span class="text-[11px] font-mono text-[var(--ink-2)] shrink-0">(m/s²)</span>
 
             <!-- Accessible Info Tooltip Icon -->
             <div class="relative group/info inline-flex items-center">
@@ -154,14 +154,14 @@
           </div>
 
           <div class="font-mono font-bold text-xs sm:text-sm text-[var(--ink)] tabular-nums shrink-0 text-right">
-            {{ currentDeceleration().toFixed(2) }} <span class="text-[10px] font-normal text-[var(--ink-2)]">m/s²</span>
+            {{ currentDeceleration().toFixed(2) }} <span class="text-[11px] font-normal text-[var(--ink-2)]">m/s²</span>
             <span class="text-[11px] font-normal text-[var(--ink-3)] hidden sm:inline ml-1">({{ (currentDeceleration() /
               9.81).toFixed(2) }} g)</span>
           </div>
         </div>
 
         <!-- Row 2: Subtitle -->
-        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+        <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] font-medium leading-tight"
           title="Braking g-force and stopping power experienced by rider">
           Braking g-force and stopping power experienced by rider
         </div>
@@ -180,7 +180,7 @@
           <div class="flex items-center gap-1.5 min-w-0">
             <span class="w-2 h-2 rounded-full bg-[#E8750F] shrink-0"></span>
             <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Normal Load Transfer</span>
-            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(F_z)</span>
+            <span class="text-[11px] font-mono text-[var(--ink-2)] shrink-0">(F_z)</span>
 
             <!-- Accessible Info Tooltip Icon -->
             <div class="relative group/info inline-flex items-center">
@@ -213,14 +213,14 @@
             <span class="text-[var(--kerb)]">|</span>
             <span class="text-[#2B6CB0]">R: {{ (currentRearLoad() / 1000).toFixed(2) }}k N</span>
             @if (currentRearLoad() <= 5) { <span
-              class="px-1.5 py-0.5 rounded bg-[#FDF0EF] text-[#D93A32] text-[9.5px] font-bold border border-[#D93A32] animate-pulse">
+              class="px-1.5 py-0.5 rounded bg-[#FDF0EF] text-[#D93A32] text-[11px] font-bold border border-[#D93A32] animate-pulse">
               LIFT-OFF</span>
               }
           </div>
         </div>
 
         <!-- Row 2: Subtitle -->
-        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+        <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] font-medium leading-tight"
           title="Dynamic weight shift: front fork compression vs. rear wheel lift-off">
           Dynamic weight shift: front fork compression vs. rear wheel lift-off
         </div>
@@ -239,7 +239,7 @@
           <div class="flex items-center gap-1.5 min-w-0">
             <span class="w-2 h-2 rounded-full bg-[#D93A32] shrink-0"></span>
             <span class="font-bold text-[var(--ink)] text-xs whitespace-nowrap">Rotor Temperature</span>
-            <span class="text-[10px] font-mono text-[var(--ink-2)] shrink-0">(°C)</span>
+            <span class="text-[11px] font-mono text-[var(--ink-2)] shrink-0">(°C)</span>
 
             <!-- Accessible Info Tooltip Icon -->
             <div class="relative group/info inline-flex items-center">
@@ -269,10 +269,10 @@
 
           <div class="font-mono font-bold text-xs sm:text-sm tabular-nums shrink-0 text-right"
             [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32]' : 'text-[var(--ink)]'">
-            {{ currentRotorTemp().toFixed(1) }} <span class="text-[10px] font-normal text-[var(--ink-2)]">°C</span>
+            {{ currentRotorTemp().toFixed(1) }} <span class="text-[11px] font-normal text-[var(--ink-2)]">°C</span>
             @if (currentRotorTemp() >= 230) {
             <span
-              class="text-[10px] font-bold text-[#D93A32] ml-1 bg-[#FDF0EF] px-1.5 py-0.5 rounded border border-[#D93A32] animate-pulse">
+              class="text-[11px] font-bold text-[#D93A32] ml-1 bg-[#FDF0EF] px-1.5 py-0.5 rounded border border-[#D93A32] animate-pulse">
               BOIL EXCEEDED
             </span>
             } @else {
@@ -284,7 +284,7 @@
         </div>
 
         <!-- Row 2: Subtitle -->
-        <div class="text-[10px] sm:text-[10.5px] text-[var(--ink-2)] font-medium leading-tight"
+        <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] font-medium leading-tight"
           title="Brake disc friction heat and hydraulic boiling safety margin">
           Brake disc friction heat and hydraulic boiling safety margin
         </div>

@@ -4,6 +4,7 @@
     type="button"
     (click)="handlePlay()"
     class="px-3.5 py-1.5 font-bold rounded-lg transition-colors cursor-pointer text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs shrink-0 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)]"
+    [ngClass]="isStagedAtStart() ? 'ring-2 ring-[var(--line-deep)]/40' : ''"
     [title]="store.isPlaying() ? 'Pause playback' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
   >
     @if (store.isPlaying()) {
@@ -21,7 +22,7 @@
       <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
         <path d="M8 5v14l11-7z" />
       </svg>
-      <span>Play</span>
+      <span>{{ isStagedAtStart() ? 'Launch Run' : 'Play' }}</span>
     }
   </button>
 
@@ -89,6 +90,6 @@
     title="Toggle automatic recomputation on parameter change"
   >
     <span class="w-1.5 h-1.5 rounded-full" [ngClass]="store.autoCompute() ? 'bg-[#1F9D55]' : 'bg-[var(--ink-3)]'"></span>
-    <span>{{ store.autoCompute() ? 'LIVE' : 'MANUAL' }}</span>
+    <span>{{ store.autoCompute() ? 'Auto-update' : 'Manual' }}</span>
   </button>
 </div>

@@ -17,6 +17,15 @@ export class FixedSidebar {
   readonly store = inject(BenchmarkStore);
   readonly garageService = inject(GarageService);
   readonly isTier2Open = signal<boolean>(false);
+  readonly openGroups = signal<Record<string, boolean>>({ kin: true, brake: true, road: true });
+
+  isOpen(key: string): boolean {
+    return !!this.openGroups()[key];
+  }
+
+  toggleGroup(key: string): void {
+    this.openGroups.update(g => ({ ...g, [key]: !g[key] }));
+  }
 
   readonly garageVehicles = computed(() => this.garageService.vehicles());
   readonly activeVehicleId = computed(() => this.garageService.activeVehicleId());
