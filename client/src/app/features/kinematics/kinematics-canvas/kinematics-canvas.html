@@ -46,7 +46,7 @@
     <!-- Vehicle Info Column (Pinned on Left) -->
     <div class="w-44 sm:w-52 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-2.5 sm:p-3 z-10 shadow-xs overflow-y-auto min-h-0 text-xs">
       <div>
-        <div class="text-[9.5px] font-bold text-[var(--ink-3)] uppercase tracking-wider mb-1">
+        <div class="text-[11px] font-bold text-[var(--ink-3)] uppercase tracking-wider mb-1">
           Live Telemetry
         </div>
 
@@ -54,28 +54,41 @@
           {{ activeInst().name }}
         </div>
 
-        <div class="font-mono text-xs font-bold text-[var(--ink)] mb-1.5">
-          {{ liveSpeedKmh() }} km/h
+        <div class="font-mono text-2xl font-bold text-[var(--ink)] leading-none mb-0.5">
+          {{ liveSpeedKmh() }} <span class="text-xs font-medium text-[var(--ink-2)]">km/h</span>
         </div>
 
-        <div class="space-y-0.5 font-mono text-[10.5px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-1.5">
+        <!-- Distance to the impact barrier -->
+        <div class="mt-2.5">
+          <div class="flex justify-between font-mono text-[11px] text-[var(--ink-2)] mb-1">
+            <span>To impact barrier</span>
+            <b class="text-[var(--ink)]">{{ distanceToBarrierM() }} m</b>
+          </div>
+          <div class="h-2 w-full rounded-full bg-[var(--well)] border border-[var(--kerb)] overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-100"
+              [style.width.%]="barrierProgressPct()"
+              [ngClass]="isCollisionReached() ? 'bg-[var(--danger)]' : 'bg-[var(--line)]'"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 font-mono text-xs text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2.5 mt-3">
           <div class="flex justify-between">
-            <span>Distance x:</span>
-            <b class="text-[var(--ink)]">{{ liveDistanceM() }}m</b>
+            <span>Distance x</span>
+            <b class="text-[var(--ink)] text-[13px]">{{ liveDistanceM() }} m</b>
           </div>
           <div class="flex justify-between">
-            <span>Decel:</span>
-            <b class="text-[var(--ink)]">{{ liveDecelG() }}g</b>
+            <span>Decel</span>
+            <b class="text-[var(--ink)] text-[13px]">{{ liveDecelG() }} g</b>
           </div>
           <div class="flex justify-between">
-            <span>Rotor Temp:</span>
-            <b class="text-[var(--ink)]">{{ liveTempC() }}°C</b>
+            <span>Rotor temp</span>
+            <b class="text-[var(--ink)] text-[13px]">{{ liveTempC() }} °C</b>
           </div>
         </div>
 
         <!-- Biomechanical Peak Inputs -->
-        <div class="space-y-0.5 font-mono text-[10px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-1.5 mt-1.5">
-          <div class="text-[8.5px] font-bold uppercase text-[var(--ink-3)] tracking-wider mb-0.5">
+        <div class="space-y-1 font-mono text-[11px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2.5 mt-3">
+          <div class="text-[11px] font-bold uppercase text-[var(--ink-3)] tracking-wider mb-0.5">
             Peak Braking Inputs
           </div>
           <div class="flex justify-between">
@@ -93,7 +106,7 @@
         </div>
       </div>
 
-      <div class="text-[10px] font-mono text-[var(--ink-3)] border-t border-[var(--kerb)] pt-1.5 mt-1.5">
+      <div class="text-[11px] font-mono text-[var(--ink-3)] border-t border-[var(--kerb)] pt-1.5 mt-1.5">
         <div class="flex items-start gap-1.5 mb-1">
           <span class="w-2 h-2 rounded-full shrink-0 mt-0.5" [ngClass]="liveStatusDotClass()"></span>
           <span class="leading-tight break-words text-[11px]" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
@@ -103,7 +116,7 @@
           <button
             type="button"
             (click)="openIncidentModal()"
-            class="w-full mt-2 py-1.5 px-2 bg-[#FDF0EF] hover:bg-[#FCE8E6] text-[#9E241E] border-2 border-[#D93A32] rounded-lg text-[10px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs leading-tight"
+            class="w-full mt-2 py-1.5 px-2 bg-[#FDF0EF] hover:bg-[#FCE8E6] text-[#9E241E] border-2 border-[#D93A32] rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs leading-tight"
           >
             <svg class="w-3.5 h-3.5 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -179,19 +192,19 @@
         <!-- Telemetry Audit Grid -->
         <div class="grid grid-cols-2 gap-2 text-xs font-mono">
           <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
-            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Impact Speed</span>
+            <span class="text-[11px] text-[var(--ink-3)] block uppercase">Impact Speed</span>
             <b class="text-base text-[#9E241E]">{{ impactSpeedKmh() }} km/h</b>
           </div>
           <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
-            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Overrun Deficit</span>
+            <span class="text-[11px] text-[var(--ink-3)] block uppercase">Overrun Deficit</span>
             <b class="text-base text-[#9E241E]">-{{ collisionDeficitM() }} m</b>
           </div>
           <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
-            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Reaction Delay</span>
+            <span class="text-[11px] text-[var(--ink-3)] block uppercase">Reaction Delay</span>
             <b class="text-sm text-[var(--ink)]">{{ reactionDistM() }} m (1.0s lag)</b>
           </div>
           <div class="bg-[var(--well)] p-2.5 rounded-lg border border-[var(--kerb)]">
-            <span class="text-[10px] text-[var(--ink-3)] block uppercase">Active Braking Needed</span>
+            <span class="text-[11px] text-[var(--ink-3)] block uppercase">Active Braking Needed</span>
             <b class="text-sm text-[var(--ink)]">{{ mechanicalBrakingDistM() }} m ({{ peakDecelG() }}g)</b>
           </div>
         </div>

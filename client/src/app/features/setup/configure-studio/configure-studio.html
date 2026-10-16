@@ -41,7 +41,7 @@
         <!-- Live Anatomy Schematic Card -->
         <div class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
           <div class="flex items-center justify-between">
-            <span class="text-[10.5px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
               Live Geometry Model
             </span>
             <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
@@ -50,11 +50,11 @@
           <!-- Live Animated Sprite Machine Viewport -->
           <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--concrete)] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden">
             <div class="w-full flex items-center justify-between z-10">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)] animate-pulse"></span>
                 {{ activeSpriteKey() }} archetype
               </span>
-              <span class="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
                 112×56 6-FPS Idle
               </span>
             </div>
@@ -114,31 +114,31 @@
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Calibrated Spec Sheet</span>
             <div class="bg-[var(--concrete)] border border-[var(--kerb)] rounded-xl p-3 grid grid-cols-2 gap-2 text-xs font-mono">
               <div>
-                <span class="text-[10px] text-[var(--ink-3)] block uppercase">Wheelbase (L)</span>
+                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Wheelbase (L)</span>
                 <span class="font-bold text-[var(--ink)]">{{ wheelbase().toFixed(2) }} m</span>
               </div>
               <div>
-                <span class="text-[10px] text-[var(--ink-3)] block uppercase">CoG Height (h)</span>
+                <span class="text-[11px] text-[var(--ink-3)] block uppercase">CoG Height (h)</span>
                 <span class="font-bold text-[var(--ink)]">{{ cogHeight().toFixed(2) }} m</span>
               </div>
               <div>
-                <span class="text-[10px] text-[var(--ink-3)] block uppercase">Displacement</span>
+                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Displacement</span>
                 <span class="font-bold text-[var(--ink)]">{{ displacementCc() }} cc</span>
               </div>
               <div>
-                <span class="text-[10px] text-[var(--ink-3)] block uppercase">Total Mass</span>
+                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Total Mass</span>
                 <span class="font-bold text-[var(--ink)]">{{ massKg() }} kg</span>
               </div>
               <div>
-                <span class="text-[10px] text-[var(--ink-3)] block uppercase">Front Assembly</span>
+                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Front Assembly</span>
                 <span class="font-bold text-[var(--ink)] truncate block">{{ frontBrake() === 'dual_disc' ? 'Dual Disc' : 'Single Disc' }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-[var(--ink-3)] block uppercase">Rear Assembly</span>
+                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Rear Assembly</span>
                 <span class="font-bold text-[var(--ink)] truncate block">{{ rearBrake() === 'drum' ? 'Mech. Drum' : 'Hyd. Disc' }}</span>
               </div>
               <div class="col-span-2 pt-1 border-t border-[var(--kerb)] flex items-center justify-between">
-                <span class="text-[10.5px] text-[var(--danger)] font-bold">Speed Cap Ceiling:</span>
+                <span class="text-[11px] text-[var(--danger)] font-bold">Speed Cap Ceiling:</span>
                 <span class="font-bold text-[var(--danger)] text-sm">{{ maxSpeedKmh() }} km/h</span>
               </div>
             </div>
@@ -167,7 +167,7 @@
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
               1. Chassis Geometry Family
             </h2>
-            <span class="text-[10px] text-[var(--ink-3)] font-mono">Governing Pitch-Plane Class</span>
+            <span class="text-[11px] text-[var(--ink-3)] font-mono">Governing Pitch-Plane Class</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -180,7 +180,7 @@
               >
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
-                  <span class="text-[9.5px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
                     {{ fam.badge }}
                   </span>
                 </div>
@@ -198,7 +198,7 @@
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
               2. Calibrated Production Presets
             </h2>
-            <span class="text-[10px] text-[var(--ink-3)] font-mono">Standard Factory Baseline</span>
+            <span class="text-[11px] text-[var(--ink-3)] font-mono">Standard Factory Baseline</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -212,7 +212,7 @@
                 <div>
                   <div class="flex items-center justify-between gap-1 mb-1.5">
                     <span class="text-xs font-bold text-[var(--ink)]">{{ preset.name }}</span>
-                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-[var(--kerb)] text-[var(--ink-2)] shrink-0 font-medium">
+                    <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white border border-[var(--kerb)] text-[var(--ink-2)] shrink-0 font-medium">
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
@@ -225,12 +225,12 @@
                     ></div>
                   </div>
 
-                  <p class="text-[10.5px] text-[var(--ink-2)] leading-relaxed m-0">
+                  <p class="text-[11px] text-[var(--ink-2)] leading-relaxed m-0">
                     {{ preset.description }}
                   </p>
                 </div>
 
-                <div class="flex items-center justify-between text-[10px] font-mono text-[var(--ink-3)] pt-1.5 border-t border-[var(--kerb)]/60">
+                <div class="flex items-center justify-between text-[11px] font-mono text-[var(--ink-3)] pt-1.5 border-t border-[var(--kerb)]/60">
                   <span>{{ preset.massKg }} kg Mass</span>
                   <span class="capitalize">{{ preset.rearControl.replace('_', ' ') }}</span>
                 </div>
@@ -261,7 +261,7 @@
                 (ngModelChange)="updateDisplacement($event)"
                 class="w-full cursor-pointer accent-[var(--line)]"
               />
-              <div class="flex justify-between font-mono text-[10px] text-[var(--ink-3)]">
+              <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
                 <span>50 cc (Moped)</span>
                 <span>400 cc</span>
                 <span>1000 cc (Superbike)</span>
@@ -289,7 +289,7 @@
                 (ngModelChange)="updateMass($event)"
                 class="w-full cursor-pointer accent-[var(--line)]"
               />
-              <div class="flex justify-between font-mono text-[10px] text-[var(--ink-3)]">
+              <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
                 <span>110 kg (Underbone)</span>
                 <span>200 kg (Roadster)</span>
                 <span>320 kg (Heavy Touring)</span>
@@ -376,7 +376,7 @@
                       </svg>
                     }
                   </div>
-                  <span class="text-[10px] font-normal text-[var(--ink-2)] leading-normal">{{ act.desc }}</span>
+                  <span class="text-[11px] font-normal text-[var(--ink-2)] leading-normal">{{ act.desc }}</span>
                 </button>
               }
             </div>

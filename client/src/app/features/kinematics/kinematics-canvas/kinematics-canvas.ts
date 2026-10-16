@@ -30,6 +30,19 @@ export class KinematicsCanvas implements OnDestroy {
     return f ? (f.velocity * 3.6).toFixed(1) : (this.activeInst().simulation.initialVelocity * 3.6).toFixed(1);
   });
 
+  readonly distanceToBarrierM = computed(() => {
+    const f = this.liveFrame();
+    const x = f ? f.distance : 0;
+    return Math.max(0, this.activeInst().simulation.hazardDistance - x).toFixed(1);
+  });
+
+  readonly barrierProgressPct = computed(() => {
+    const f = this.liveFrame();
+    const x = f ? f.distance : 0;
+    const X = this.activeInst().simulation.hazardDistance;
+    return X > 0 ? Math.min(100, Math.max(0, (x / X) * 100)) : 0;
+  });
+
   readonly liveDistanceM = computed(() => {
     const f = this.liveFrame();
     return f ? f.distance.toFixed(1) : '0.0';
