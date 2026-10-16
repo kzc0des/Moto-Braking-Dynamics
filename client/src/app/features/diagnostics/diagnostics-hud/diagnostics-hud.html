@@ -2,7 +2,7 @@
 <button
   type="button"
   (click)="diagnostics.toggleHud()"
-  class="h-8 px-3 bg-white border border-[var(--kerb)] hover:border-[var(--line)] text-[var(--ink)] rounded-lg transition-colors text-xs font-semibold flex items-center gap-2 shadow-2xs cursor-pointer"
+  class="h-9 lg:h-8 px-3 bg-white border border-[var(--kerb)] hover:border-[var(--line)] text-[var(--ink)] rounded-lg transition-colors text-xs font-semibold flex items-center gap-2 shadow-2xs cursor-pointer"
   [ngClass]="
     diagnostics.errors().length > 0
       ? 'border-[var(--danger)] text-[#9E241E] bg-[#FDF0EF]'
@@ -17,7 +17,7 @@
       ? 'bg-[#2DA44E]'
       : 'bg-[#E8750F]'
   "></span>
-  <span class="font-medium text-[var(--ink)]">Physics Engine:</span>
+  <span class="font-medium text-[var(--ink)] hidden sm:inline">Physics Engine:</span>
   @if (store.engineStatus() === 'connected') {
     <span class="font-bold text-[#1E7E34]">Online</span>
     @if (diagnostics.metrics(); as m) {
