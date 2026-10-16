@@ -242,7 +242,19 @@ class SimulationService:
         v0 = sim_config.initial_velocity
         d_rxn = round(v0 * t_rxn, 2)
         d_total = round(domain_res.stop_distance, 2)
-        d_brake = round(max(0.0, d_total - d_rxn), 2)
+        final_vel = domain_res.impact_velocity if domain_res.impact_velocity is not None else 0.0
+
+        if domain_res.terminal_outcome == TerminalOutcome.BARRIER_COLLISION:
+            # Unconstrained mechanical braking distance required to achieve zero velocity
+            delta_x_available = max(0.0, sim_config.hazard_distance - d_rxn)
+            if delta_x_available > 0.0 and v0 > final_vel:
+                a_eff = (v0**2 - final_vel**2) / (2.0 * delta_x_available)
+                d_brake = round(v0**2 / (2.0 * max(0.5, a_eff)), 2)
+            else:
+                a_eff = domain_res.peak_deceleration if domain_res.peak_deceleration > 0.5 else 5.88
+                d_brake = round(v0**2 / (2.0 * a_eff), 2)
+        else:
+            d_brake = round(max(0.0, d_total - d_rxn), 2)
 
         peak_front_mpa = round((front_lever_pct / 100.0) * 3.5, 2)
         peak_rear_mpa = round((rear_control_pct / 100.0) * 2.5, 2)
@@ -252,8 +264,6 @@ class SimulationService:
         rear_lift = bool(np.any(domain_res.normal_load_rear <= 0.01))
         front_washout = bool(domain_res.terminal_outcome == TerminalOutcome.FRONT_WHEEL_WASHOUT)
         fluid_boil = bool(domain_res.max_temperature >= front_brake.fluid_boil_temperature)
-
-        final_vel = domain_res.impact_velocity if domain_res.impact_velocity is not None else 0.0
 
         return InstanceSimulationResultSchema(
             instance_id=config.id,
