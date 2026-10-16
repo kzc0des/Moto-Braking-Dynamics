@@ -1,4 +1,4 @@
-import { Component, ElementRef, viewChild, inject, afterNextRender, signal, computed, OnDestroy, HostListener } from '@angular/core';
+import { Component, ElementRef, viewChild, inject, afterNextRender, signal, computed, effect, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { TrackRenderer } from '../renderers/track.renderer';
@@ -157,6 +157,15 @@ export class KinematicsCanvas implements OnDestroy {
     afterNextRender(() => {
       this.setupCanvas();
       this.startRenderLoop();
+    });
+
+    // Reset incident shown flag whenever staged at start line or updating instance
+    effect(() => {
+      const t = this.store.scrubTime();
+      this.activeInst();
+      if (t <= 0.05) {
+        this.hasShownIncidentModalForRun = false;
+      }
     });
   }
 

@@ -145,7 +145,7 @@
           <span class="leading-tight break-words text-[10.5px]" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
         </div>
 
-        @if (isCollisionOrCrash() && (isAtEnd() || isCollisionReached())) {
+        @if (isCollisionOrCrash()) {
           <button
             type="button"
             (click)="openIncidentModal()"
@@ -180,8 +180,12 @@
 
   <!-- FORENSIC INCIDENT WARNING MODAL -->
   @if (isIncidentModalOpen()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+      (click)="closeIncidentModal()"
+    >
       <div
+        (click)="$event.stopPropagation()"
         class="bg-white border-2 border-[#D93A32] rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-6 flex flex-col gap-4 text-[var(--ink)]"
         role="dialog"
         aria-modal="true"
