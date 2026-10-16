@@ -22,7 +22,7 @@ export const ARCHETYPE_SMALL_SCOOTER_125: BenchmarkInstanceConfig = {
     cogDistanceFront: 0.54, // b/L ≈ 0.42
     cogDistanceRear: 0.74,
     cogHeight: 0.48,
-    wheelRadius: 0.25,      // 10-12" wheels
+    wheelRadius: 0.25,      // 14" wheels (e.g., 90/80-14 on Honda Click 125, R_w ≈ 0.25m)
     wheelInertia: 0.32,
     dragCoefficient: 0.75,
     frontalArea: 0.60,
