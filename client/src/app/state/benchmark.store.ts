@@ -170,6 +170,7 @@ export class BenchmarkStore {
       const targetId = list.some(i => i.id === activeId) ? activeId : (list[0]?.id ?? 'instance-1');
       return list.map(inst => (inst.id === targetId ? { ...inst, [section]: value } : inst));
     });
+    this.resetPlayback();
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -190,6 +191,7 @@ export class BenchmarkStore {
         };
       });
     });
+    this.resetPlayback();
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -210,6 +212,7 @@ export class BenchmarkStore {
         };
       });
     });
+    this.resetPlayback();
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -230,6 +233,7 @@ export class BenchmarkStore {
         };
       });
     });
+    this.resetPlayback();
     if (this.autoCompute()) {
       this.triggerSimulation();
     }
@@ -318,6 +322,10 @@ export class BenchmarkStore {
     rotorDiameterMm: number;
     padFriction: number;
     fluidBoilTemp: number;
+    initialVelocity?: number;
+    hazardDistance?: number;
+    frontLeverPct?: number;
+    rearControlPct?: number;
   }): void {
     this.instances.update(list => {
       const targetId = list.some(i => i.id === 'instance-1') ? 'instance-1' : (list[0]?.id ?? 'instance-1');
@@ -368,10 +376,15 @@ export class BenchmarkStore {
               padFrictionNominal: custom.padFriction,
               fluidBoilTemperature: custom.fluidBoilTemp
             },
+            actuation: {
+              ...inst.actuation,
+              frontLeverPct: custom.frontLeverPct ?? inst.actuation.frontLeverPct ?? 85,
+              rearControlPct: custom.rearControlPct ?? inst.actuation.rearControlPct ?? 65
+            },
             simulation: {
               ...inst.simulation,
-              initialVelocity: 16.67,
-              hazardDistance: 35.0
+              initialVelocity: custom.initialVelocity ?? 16.67,
+              hazardDistance: custom.hazardDistance ?? 35.0
             }
           };
         }
@@ -380,6 +393,7 @@ export class BenchmarkStore {
     });
     this.selectedInstanceId.set('instance-1');
     this.isVehicleConfigured.set(true);
+    this.resetPlayback();
     this.triggerSimulation();
   }
 

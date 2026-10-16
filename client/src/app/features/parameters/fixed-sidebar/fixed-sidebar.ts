@@ -95,10 +95,15 @@ export class FixedSidebar {
     const num = Number(valKmh);
     const maxAllowed = this.maxSpeedKmh();
     const clamped = Math.min(Math.max(num, 20), maxAllowed);
+    const v0 = Number((clamped / 3.6).toFixed(2));
     this.store.updateSelectedInstance('simulation', {
       ...this.selectedInst().simulation,
-      initialVelocity: Number((clamped / 3.6).toFixed(2))
+      initialVelocity: v0
     });
+    const activeId = this.garageService.activeVehicleId();
+    if (activeId) {
+      this.garageService.updateKinematics(activeId, { initialVelocity: v0 });
+    }
   }
 
   onHazardChange(valM: number | string): void {
@@ -108,6 +113,10 @@ export class FixedSidebar {
         ...this.selectedInst().simulation,
         hazardDistance: num
       });
+      const activeId = this.garageService.activeVehicleId();
+      if (activeId) {
+        this.garageService.updateKinematics(activeId, { hazardDistance: num });
+      }
     }
   }
 
@@ -137,11 +146,19 @@ export class FixedSidebar {
   onFrontLeverChange(val: number | string): void {
     const num = Math.min(100, Math.max(0, Number(val)));
     this.store.updateActuationParam('frontLeverPct', num);
+    const activeId = this.garageService.activeVehicleId();
+    if (activeId) {
+      this.garageService.updateKinematics(activeId, { frontLeverPct: num });
+    }
   }
 
   onRearControlChange(val: number | string): void {
     const num = Math.min(100, Math.max(0, Number(val)));
     this.store.updateActuationParam('rearControlPct', num);
+    const activeId = this.garageService.activeVehicleId();
+    if (activeId) {
+      this.garageService.updateKinematics(activeId, { rearControlPct: num });
+    }
   }
 
   onGradeChange(deg: number | string): void {

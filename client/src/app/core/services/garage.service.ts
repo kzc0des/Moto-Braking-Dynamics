@@ -3,6 +3,13 @@ import { isPlatformBrowser } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
 import { VehicleSpriteKey } from '../models/benchmark.types';
 
+export interface VehicleKinematicsConfig {
+  initialVelocity: number;     // m/s (v_0)
+  hazardDistance: number;      // m (X_hazard)
+  frontLeverPct?: number;      // %
+  rearControlPct?: number;     // %
+}
+
 export interface CustomVehicleRecord {
   id: string;
   category: string;
@@ -19,6 +26,7 @@ export interface CustomVehicleRecord {
   padFriction: number;
   fluidBoilTemp: number;
   createdAt: number;
+  kinematics?: VehicleKinematicsConfig;
 }
 
 export function getMaxSpeedForCc(cc: number): number {
@@ -47,7 +55,13 @@ export const BASELINE_SCOOTER_RECORD: CustomVehicleRecord = {
   rotorDiameterMm: 220,
   padFriction: 0.35,
   fluidBoilTemp: 210,
-  createdAt: Date.now()
+  createdAt: Date.now(),
+  kinematics: {
+    initialVelocity: 16.67,
+    hazardDistance: 35.0,
+    frontLeverPct: 85,
+    rearControlPct: 65
+  }
 };
 
 @Injectable({
@@ -92,17 +106,31 @@ export class GarageService {
 
           for (const v of parsed.vehicles) {
             const isBaseline = v.id === BASELINE_SCOOTER_RECORD.id || v.id.startsWith('baseline-');
+            const defaultKin = {
+              initialVelocity: 16.67,
+              hazardDistance: 35.0,
+              frontLeverPct: 85,
+              rearControlPct: 65
+            };
+
             if (isBaseline) {
               if (seenBaseline) continue;
               seenBaseline = true;
-              cleaned.push({ ...v, id: BASELINE_SCOOTER_RECORD.id });
+              cleaned.push({
+                ...v,
+                id: BASELINE_SCOOTER_RECORD.id,
+                kinematics: v.kinematics ?? defaultKin
+              });
               seen.add(BASELINE_SCOOTER_RECORD.id);
               continue;
             }
 
             if (!seen.has(v.id)) {
               seen.add(v.id);
-              cleaned.push(v);
+              cleaned.push({
+                ...v,
+                kinematics: v.kinematics ?? defaultKin
+              });
             }
           }
 
@@ -157,7 +185,13 @@ export class GarageService {
     const newRecord: CustomVehicleRecord = {
       ...data,
       id: 'bike-' + Date.now(),
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      kinematics: data.kinematics ?? {
+        initialVelocity: 16.67,
+        hazardDistance: 35.0,
+        frontLeverPct: 85,
+        rearControlPct: 65
+      }
     };
 
     this.vehicles.update(list => [newRecord, ...list]);
@@ -169,13 +203,32 @@ export class GarageService {
 
   updateVehicle(id: string, data: Partial<Omit<CustomVehicleRecord, 'id' | 'createdAt'>>): void {
     this.vehicles.update(list =>
-      list.map(v => (v.id === id ? { ...v, ...data } : v))
+      list.map(v => (v.id === id ? { ...v, ...data, kinematics: data.kinematics ?? v.kinematics } : v))
     );
     this.persist();
 
     if (this.activeVehicleId() === id) {
       this.syncToBenchmarkStore(this.activeVehicle());
     }
+  }
+
+  updateKinematics(id: string, kin: Partial<VehicleKinematicsConfig>): void {
+    this.vehicles.update(list =>
+      list.map(v => {
+        if (v.id !== id) return v;
+        const currentKin = v.kinematics ?? {
+          initialVelocity: 16.67,
+          hazardDistance: 35.0,
+          frontLeverPct: 85,
+          rearControlPct: 65
+        };
+        return {
+          ...v,
+          kinematics: { ...currentKin, ...kin }
+        };
+      })
+    );
+    this.persist();
   }
 
   deleteVehicle(id: string): void {
@@ -211,6 +264,16 @@ export class GarageService {
   private syncToBenchmarkStore(record: CustomVehicleRecord | null): void {
     if (!record) return;
 
+    const maxSpeed = getMaxSpeedForCc(record.displacementCc);
+    const savedSpeedKmh = record.kinematics?.initialVelocity
+      ? Math.round(record.kinematics.initialVelocity * 3.6)
+      : 60;
+    const clampedSpeedKmh = Math.min(Math.max(savedSpeedKmh, 20), maxSpeed);
+    const targetVelocity = Number((clampedSpeedKmh / 3.6).toFixed(2));
+    const targetHazard = record.kinematics?.hazardDistance ?? 35.0;
+    const targetFrontLever = record.kinematics?.frontLeverPct ?? 85;
+    const targetRearControl = record.kinematics?.rearControlPct ?? 65;
+
     this.benchmarkStore.configureCustomVehicle({
       category: record.category,
       title: record.title,
@@ -224,17 +287,11 @@ export class GarageService {
       cogHeight: record.cogHeight,
       rotorDiameterMm: record.rotorDiameterMm,
       padFriction: record.padFriction,
-      fluidBoilTemp: record.fluidBoilTemp
+      fluidBoilTemp: record.fluidBoilTemp,
+      initialVelocity: targetVelocity,
+      hazardDistance: targetHazard,
+      frontLeverPct: targetFrontLever,
+      rearControlPct: targetRearControl
     });
-
-    // Check if current speed exceeds displacement cap
-    const maxSpeed = getMaxSpeedForCc(record.displacementCc);
-    const currentSpeedKmh = Math.round(this.benchmarkStore.selectedInstance().simulation.initialVelocity * 3.6);
-    if (currentSpeedKmh > maxSpeed) {
-      this.benchmarkStore.updateSelectedInstance('simulation', {
-        ...this.benchmarkStore.selectedInstance().simulation,
-        initialVelocity: Number((maxSpeed / 3.6).toFixed(2))
-      });
-    }
   }
 }
