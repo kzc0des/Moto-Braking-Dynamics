@@ -219,12 +219,17 @@
                 [ngClass]="selectedPresetKey() === preset.key ? 'border-[var(--line)] bg-[var(--line-tint)] shadow-2xs' : 'border-[var(--kerb)] bg-[var(--well)] hover:bg-[var(--concrete)] hover:border-[var(--kerb)]'"
               >
                 <div>
-                  <div class="flex items-center justify-between gap-1 mb-1.5">
+                  <div class="flex items-center justify-between gap-1 mb-1">
                     <span class="text-xs font-bold text-[var(--ink)]">{{ preset.name }}</span>
                     <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white border border-[var(--kerb)] text-[var(--ink-2)] shrink-0 font-medium">
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
+                  @if (preset.alias) {
+                    <div class="text-[11px] font-semibold text-[var(--line-deep)] bg-[var(--line-tint)]/60 px-1.5 py-0.5 rounded border border-[var(--line)]/40 mb-1.5 leading-snug">
+                      {{ preset.alias }}
+                    </div>
+                  }
 
                   <!-- Sprite Silhouette Thumbnail -->
                   <div class="w-full h-10 bg-[var(--concrete)] rounded-lg border border-[var(--kerb)]/50 flex items-center justify-center overflow-hidden mb-1.5">

@@ -474,6 +474,7 @@ export interface EmpiricalPresetDescriptor {
   padFriction: number;
   fluidBoilTemp: number;
   description: string;
+  alias?: string;
 }
 
 export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
@@ -481,6 +482,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'scooter_125',
     familyKey: 'step_through',
     name: 'Small-Wheel Scooter 125cc',
+    alias: 'e.g., Honda Click 125, Yamaha Mio, Beat',
     spriteKey: 'scooter',
     displacementCc: 125,
     massKg: 130,
@@ -499,6 +501,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'maxi_160',
     familyKey: 'step_through',
     name: 'Maxi-Scooter 160cc ABS',
+    alias: 'e.g., Yamaha Aerox 155, Honda PCX 160, NMAX 155',
     spriteKey: 'maxi',
     displacementCc: 160,
     massKg: 150,
@@ -517,6 +520,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'underbone_125',
     familyKey: 'step_through',
     name: 'Underbone Commuter 125cc',
+    alias: 'e.g., Yamaha Sniper 155, Honda Wave 110/125, Raider',
     spriteKey: 'underbone',
     displacementCc: 125,
     massKg: 115,
@@ -535,6 +539,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'naked_250',
     familyKey: 'standard',
     name: 'Standard / Naked 250cc',
+    alias: 'e.g., Yamaha MT-03, Kawasaki Z250, Honda CB300R',
     spriteKey: 'naked',
     displacementCc: 250,
     massKg: 175,
@@ -553,6 +558,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'supersport_600',
     familyKey: 'supersport',
     name: 'Supersport 600cc',
+    alias: 'e.g., Kawasaki Ninja 400/600, Yamaha YZF-R3/R6',
     spriteKey: 'supersport',
     displacementCc: 600,
     massKg: 195,
@@ -571,6 +577,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'adventure_300',
     familyKey: 'extended',
     name: 'Adventure / Trail 300cc',
+    alias: 'e.g., Honda CB500X, BMW G310GS, Versys 300',
     spriteKey: 'adventure',
     displacementCc: 300,
     massKg: 175,
@@ -589,6 +596,7 @@ export const EMPIRICAL_PRESETS: EmpiricalPresetDescriptor[] = [
     key: 'cruiser_650',
     familyKey: 'extended',
     name: 'Cruiser / Touring 650cc',
+    alias: 'e.g., Honda Rebel 500, Kawasaki Vulcan S, Super Meteor',
     spriteKey: 'cruiser',
     displacementCc: 650,
     massKg: 250,
