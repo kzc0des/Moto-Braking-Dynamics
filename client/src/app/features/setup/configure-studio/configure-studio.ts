@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.service';
 import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
-import { VehicleSpriteKey } from '../../../core/models/benchmark.types';
+import { VehicleSpriteKey, AbsConfiguration } from '../../../core/models/benchmark.types';
 
 export interface FamilyDescriptor {
   key: 'step_through' | 'standard' | 'supersport' | 'extended';
@@ -59,8 +59,7 @@ export class ConfigureStudio implements OnInit {
 
   readonly actuations = [
     { key: 'independent', label: 'Independent Controls', desc: 'Separate hand lever (front) and foot/hand control without linkage' },
-    { key: 'cbs', label: 'Combi-Brake System (CBS)', desc: 'Rear actuation proportionally applies front caliper pressure' },
-    { key: 'abs', label: 'Anti-lock Braking System (ABS)', desc: 'Hydraulic pressure modulation prevents critical wheel lock' }
+    { key: 'cbs', label: 'Combi-Brake System (CBS)', desc: 'Rear actuation proportionally applies front caliper pressure' }
   ];
 
   readonly family = signal<'step_through' | 'standard' | 'supersport' | 'extended'>('step_through');
@@ -72,6 +71,7 @@ export class ConfigureStudio implements OnInit {
   readonly frontBrake = signal<string>('single_disc');
   readonly rearBrake = signal<string>('drum');
   readonly actuation = signal<string>('cbs');
+  readonly absConfiguration = signal<AbsConfiguration>('none');
 
   // Tier 2 parameters
   readonly isTier2Open = signal<boolean>(false);
@@ -85,6 +85,22 @@ export class ConfigureStudio implements OnInit {
     const famKey = this.family();
     return EMPIRICAL_PRESETS.filter(p => p.familyKey === famKey);
   });
+
+  readonly activePreset = computed(() => {
+    const key = this.selectedPresetKey();
+    return EMPIRICAL_PRESETS.find(p => p.key === key) ?? EMPIRICAL_PRESETS[0];
+  });
+
+  readonly stockFrontBrake = computed<'single_disc' | 'dual_disc'>(() => {
+    return this.activePreset().frontBrake === 'dual_disc' ? 'dual_disc' : 'single_disc';
+  });
+
+  readonly stockRearBrake = computed<'drum' | 'disc'>(() => {
+    return this.activePreset().rearBrake === 'drum' ? 'drum' : 'disc';
+  });
+
+  readonly isRearDrum = computed(() => this.rearBrake() === 'drum');
+  readonly isMechanicalLinkageLocked = computed(() => this.absConfiguration() === 'dual_channel');
 
   readonly activeSpriteKey = computed<Exclude<VehicleSpriteKey, 'ninja'>>(() => {
     const presetKey = this.selectedPresetKey();
@@ -134,7 +150,17 @@ export class ConfigureStudio implements OnInit {
         this.massKg.set(target.massKg);
         this.frontBrake.set(target.frontBrake);
         this.rearBrake.set(target.rearBrake);
-        this.actuation.set(target.actuation);
+
+        const defaultAbs: AbsConfiguration = target.absConfiguration ?? (target.actuation === 'abs' ? (target.rearBrake === 'drum' ? 'single_channel_front' : 'dual_channel') : 'none');
+        const resolvedAbs: AbsConfiguration = target.rearBrake === 'drum' && defaultAbs === 'dual_channel' ? 'single_channel_front' : defaultAbs;
+        this.absConfiguration.set(resolvedAbs);
+
+        if (resolvedAbs === 'dual_channel') {
+          this.actuation.set('independent');
+        } else {
+          this.actuation.set(target.actuation);
+        }
+
         this.wheelbase.set(target.wheelbase);
         this.cogHeight.set(target.cogHeight);
         this.rotorDiameterMm.set(target.rotorDiameterMm);
@@ -176,10 +202,36 @@ export class ConfigureStudio implements OnInit {
     this.cogHeight.set(preset.cogHeight);
     this.frontBrake.set(preset.frontBrake);
     this.rearBrake.set(preset.rearBrake);
-    this.actuation.set(preset.actuation);
     this.rotorDiameterMm.set(preset.rotorDiameterMm);
     this.padFriction.set(preset.padFriction);
     this.fluidBoilTemp.set(preset.fluidBoilTemp);
+
+    // Align ABS secondary configuration based on preset defaults
+    if (preset.actuation === 'abs') {
+      const absCfg: AbsConfiguration = preset.rearBrake === 'drum' ? 'single_channel_front' : 'dual_channel';
+      this.absConfiguration.set(absCfg);
+      this.actuation.set('independent');
+    } else {
+      this.absConfiguration.set('none');
+      this.actuation.set(preset.actuation === 'cbs' ? 'cbs' : 'independent');
+    }
+  }
+
+  setAbsConfiguration(cfg: AbsConfiguration): void {
+    if (cfg === 'dual_channel' && this.isRearDrum()) {
+      return;
+    }
+    this.absConfiguration.set(cfg);
+    if (cfg === 'dual_channel') {
+      this.actuation.set('independent');
+    }
+  }
+
+  selectActuation(actKey: string): void {
+    if (this.isMechanicalLinkageLocked()) {
+      return;
+    }
+    this.actuation.set(actKey);
   }
 
   updateTitle(val: string): void {
@@ -238,6 +290,7 @@ export class ConfigureStudio implements OnInit {
       frontBrake: this.frontBrake(),
       rearBrake: this.rearBrake(),
       actuation: this.actuation(),
+      absConfiguration: this.absConfiguration(),
       wheelbase: this.wheelbase(),
       cogHeight: this.cogHeight(),
       rotorDiameterMm: this.rotorDiameterMm(),
