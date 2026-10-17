@@ -132,3 +132,57 @@ input[type="range"].road-slider::-moz-range-thumb {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ========================================================= */
+/* PRINT / PDF EXPORT MEDIA STYLING (GENERIC TEST REPORT)    */
+/* ========================================================= */
+@media print {
+  @page {
+    size: portrait;
+    margin: 10mm 12mm;
+  }
+
+  body, html {
+    background: #ffffff !important;
+    color: #111827 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide app navigation header, sidebar, docks, and interactive buttons */
+  header,
+  app-fixed-sidebar,
+  .report-toolbar,
+  button,
+  .analytics-scroll-canvas,
+  footer {
+    display: none !important;
+  }
+
+  /* Expand modal container for full-page printable document */
+  .report-modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .report-modal-container {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #generic-test-report {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}
+
