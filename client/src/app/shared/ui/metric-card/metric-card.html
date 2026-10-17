@@ -1,0 +1,20 @@
+<div
+  class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between"
+  [ngClass]="customClass()"
+>
+  <div>
+    @if (title() || formula()) {
+      <div class="flex items-center justify-between gap-1">
+        @if (title()) {
+          <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">{{ title() }}</span>
+        }
+        @if (formula() && showFormula()) {
+          <span class="font-mono text-[11px] sm:text-[11px] text-[var(--ink-3)]">{{ formula() }}</span>
+        }
+        <ng-content select="[card-header-extra]"></ng-content>
+      </div>
+    }
+    <ng-content></ng-content>
+  </div>
+  <ng-content select="[card-footer]"></ng-content>
+</div>
