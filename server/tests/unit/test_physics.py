@@ -18,6 +18,7 @@ from app.domain.physics.models import (
     PotholeDefect,
     SimulationConfig,
     TerminalOutcome,
+    AbsConfiguration,
 )
 from app.domain.physics.actuation import (
     ProgressiveSqueezeProfile,
@@ -36,6 +37,7 @@ from app.domain.physics.tire import (
     evaluate_emergent_slip_ratio,
     pacejka_longitudinal_force,
     evaluate_cornering_friction_budget,
+    evaluate_tire_pressure_scaling,
 )
 from app.domain.physics.brake import (
     evaluate_pad_friction,
@@ -355,4 +357,138 @@ def test_biomechanical_dual_brake_with_rear_drum():
     assert result.terminal_outcome == TerminalOutcome.SAFE_STOP
     assert result.stop_distance < 60.0
     assert len(result.time) == 150
+
+
+def test_tire_pressure_scaling_adr_0028():
+    """Verify ADR 0028 tire inflation pressure scaling on friction and Pacejka stiffness."""
+    # 1. Nominal pressure (p_r == 1.0)
+    mu_nom, stiff_nom = evaluate_tire_pressure_scaling(29.0, nominal_psi=29.0)
+    assert math.isclose(mu_nom, 1.0, abs_tol=1e-4)
+    assert math.isclose(stiff_nom, 1.0, abs_tol=1e-4)
+
+    # 2. Under-inflation (20 PSI vs 29 PSI nominal: p_r ≈ 0.6896)
+    mu_under, stiff_under = evaluate_tire_pressure_scaling(20.0, nominal_psi=29.0)
+    expected_mu_under = 1.0 - 0.25 * ((1.0 - 20.0 / 29.0) ** 2)
+    assert math.isclose(mu_under, expected_mu_under, rel_tol=1e-4)
+    assert mu_under < 1.0
+    assert stiff_under < 1.0
+
+    # 3. Over-inflation (42 PSI vs 29 PSI nominal: p_r ≈ 1.448)
+    mu_over, stiff_over = evaluate_tire_pressure_scaling(42.0, nominal_psi=29.0)
+    expected_mu_over = 1.0 - 0.35 * ((42.0 / 29.0 - 1.0) ** 1.5)
+    assert math.isclose(mu_over, expected_mu_over, rel_tol=1e-4)
+    assert mu_over < 1.0
+    assert stiff_over > 1.0
+
+    # 4. Impact on stopping distance: Under-inflated tire increases stopping distance
+    params_nom = VehicleParams(front_tire_pressure_psi=29.0, rear_tire_pressure_psi=33.0)
+    params_under = VehicleParams(front_tire_pressure_psi=18.0, rear_tire_pressure_psi=20.0)
+    actuation = ProgressiveSqueezeProfile(rise_time=0.4, target_pressure=2.0e6)
+    config = SimulationConfig(initial_velocity=16.67, hazard_distance=80.0)
+
+    # With ABS active, both avoid premature washout so stopping distance can be directly compared
+    res_nom = simulate_single_vehicle(
+        params=params_nom,
+        actuation=actuation,
+        config=config,
+        abs_configuration=AbsConfiguration.DUAL_CHANNEL,
+    )
+    res_under = simulate_single_vehicle(
+        params=params_under,
+        actuation=actuation,
+        config=config,
+        abs_configuration=AbsConfiguration.DUAL_CHANNEL,
+    )
+
+    assert res_nom.terminal_outcome == TerminalOutcome.SAFE_STOP
+    assert res_under.terminal_outcome == TerminalOutcome.SAFE_STOP
+    assert res_under.stop_distance > res_nom.stop_distance
+
+
+def test_mechanical_drum_brake_immune_to_vapor_lock_adr_0029():
+    """Verify ADR 0029 mechanical drum brake is immune to fluid boiling vapor lock."""
+    disc_brake = BrakeAssembly(
+        brake_type=BrakeType.DISC,
+        fluid_boil_temperature=260.0,
+        vapor_transition_band=20.0,
+    )
+    drum_brake = BrakeAssembly(
+        brake_type=BrakeType.DRUM,
+        fluid_boil_temperature=260.0,
+        vapor_transition_band=20.0,
+        drum_amplification=1.5,
+    )
+
+    applied_pressure = 3.0e6  # 3.0 MPa
+
+    # At normal temperature (100°C), both produce substantial retarding torque
+    torque_disc_cold = evaluate_brake_torque(disc_brake, applied_pressure, temp=100.0)
+    torque_drum_cold = evaluate_brake_torque(drum_brake, applied_pressure, temp=100.0)
+    assert torque_disc_cold > 0.0
+    assert torque_drum_cold > 0.0
+
+    # At extreme overheat (300°C, above boil point 260°C + 20°C vapor band):
+    # Hydraulic disc line pressure collapses to 0 due to vapor lock
+    p_line_disc = evaluate_hydraulic_line_pressure(disc_brake, applied_pressure, temp=300.0)
+    assert p_line_disc == 0.0
+    torque_disc_boiled = evaluate_brake_torque(disc_brake, applied_pressure, temp=300.0)
+    assert torque_disc_boiled == 0.0
+
+    # Mechanical drum brake has NO hydraulic fluid and bypasses vapor lock
+    torque_drum_hot = evaluate_brake_torque(drum_brake, applied_pressure, temp=300.0)
+    assert torque_drum_hot > 0.0
+    # Drum torque degrades only via pad friction thermal fade (μ_pad(T))
+    mu_pad_300 = evaluate_pad_friction(drum_brake, 300.0)
+    assert torque_drum_hot < torque_drum_cold
+    assert math.isclose(
+        torque_drum_hot,
+        drum_brake.drum_amplification * mu_pad_300 * applied_pressure * drum_brake.piston_area * drum_brake.effective_radius,
+        rel_tol=1e-4,
+    )
+
+
+def test_channel_abs_and_rear_lockup_adr_0027():
+    """Verify ADR 0027 Channel-specific ABS modulation and rear lockup telemetry detection."""
+    # Wet asphalt to induce slip saturation
+    env_wet = EnvironmentParams(substrate=SurfaceSubstrate.ASPHALT, contaminant=SurfaceContaminant.WET)
+
+    # Aggressive dual brake input: 95% front lever, 90% rear pedal
+    actuation = BiomechanicalDualBrakeProfile(
+        front_lever_pct=95.0,
+        rear_control_pct=90.0,
+        t_reaction=0.0,
+    )
+    config = SimulationConfig(initial_velocity=20.0, hazard_distance=100.0)
+
+    # 1. Non-ABS vehicle: aggressive front braking triggers Front-Wheel Washout
+    res_none = simulate_single_vehicle(
+        actuation=actuation,
+        env=env_wet,
+        config=config,
+        abs_configuration=AbsConfiguration.NONE,
+    )
+    assert res_none.terminal_outcome == TerminalOutcome.FRONT_WHEEL_WASHOUT
+    assert res_none.abs_intervened is False
+
+    # 2. Single-Channel ABS (Front only): Front ABS intervenes and prevents front washout
+    res_single = simulate_single_vehicle(
+        actuation=actuation,
+        env=env_wet,
+        config=config,
+        abs_configuration=AbsConfiguration.SINGLE_CHANNEL_FRONT,
+    )
+    assert res_single.terminal_outcome == TerminalOutcome.SAFE_STOP
+    assert res_single.abs_intervened is True
+    # Rear wheel lacks ABS and receives 90% pedal pressure -> rear lockup is detected
+    assert res_single.rear_lockup_occurred is True
+
+    # 3. Dual-Channel ABS: Both axles actively modulated
+    res_dual = simulate_single_vehicle(
+        actuation=actuation,
+        env=env_wet,
+        config=config,
+        abs_configuration=AbsConfiguration.DUAL_CHANNEL,
+    )
+    assert res_dual.terminal_outcome == TerminalOutcome.SAFE_STOP
+    assert res_dual.abs_intervened is True
 

@@ -296,3 +296,102 @@ def test_custom_garage_vehicle_e2e_verification():
     assert abs(mid_fz - total_weight) / total_weight < 0.05
     assert telem["normalLoadFront"][75] > telem["normalLoadRear"][75]
 
+
+def test_benchmark_simulation_with_decoupled_hardware_and_abs():
+    """Verify simulation endpoint handles ADR 0027 (ABS, decoupled brakes) and ADR 0028 (tire pressure)."""
+    payload = {
+        "instances": [
+            {
+                "id": "decoupled-test-bike",
+                "name": "Commuter with Single-Channel ABS and Rear Drum",
+                "enabled": True,
+                "colorAccent": "#38bdf8",
+                "absConfiguration": "single_channel_front",
+                "vehicle": {
+                    "mass": 150.0,
+                    "wheelbase": 1.30,
+                    "cogDistanceFront": 0.65,
+                    "cogDistanceRear": 0.65,
+                    "cogHeight": 0.58,
+                    "wheelRadius": 0.25,
+                    "wheelInertia": 0.38,
+                    "dragCoefficient": 0.60,
+                    "frontalArea": 0.65,
+                    "brakeBiasRatio": 0.35,
+                    "frontTirePressurePsi": 28.0,
+                    "rearTirePressurePsi": 32.0,
+                },
+                "frontBrake": {
+                    "brakeType": "disc",
+                    "rotorMass": 1.40,
+                    "specificHeat": 480.0,
+                    "surfaceArea": 0.040,
+                    "pistonArea": 0.0010,
+                    "effectiveRadius": 0.125,
+                    "padFrictionNominal": 0.42,
+                    "fadeTemperature": 270.0,
+                    "fadeCoefficient": 0.005,
+                    "fluidBoilTemperature": 260.0,
+                    "vaporTransitionBand": 25.0,
+                    "thermalEfficiency": 0.90,
+                    "drumAmplification": 1.0,
+                },
+                "rearBrake": {
+                    "brakeType": "drum",
+                    "rotorMass": 1.10,
+                    "specificHeat": 460.0,
+                    "surfaceArea": 0.030,
+                    "pistonArea": 0.0006,
+                    "effectiveRadius": 0.080,
+                    "padFrictionNominal": 0.36,
+                    "fadeTemperature": 220.0,
+                    "fadeCoefficient": 0.004,
+                    "fluidBoilTemperature": 230.0,
+                    "vaporTransitionBand": 35.0,
+                    "thermalEfficiency": 0.85,
+                    "drumAmplification": 1.5,
+                },
+                "actuation": {
+                    "type": "biomechanical",
+                    "frontLeverPct": 90.0,
+                    "rearControlPct": 85.0,
+                    "tReaction": 0.5,
+                    "riseTime": 0.25,
+                    "targetPressure": 3.0e6,
+                },
+                "environment": {
+                    "substrate": "asphalt",
+                    "contaminant": "wet",
+                    "roadGradeAngle": 0.0,
+                    "curveRadius": None,
+                    "potholeEnabled": False,
+                    "ambientTemperature": 25.0,
+                    "airDensity": 1.225,
+                },
+                "simulation": {
+                    "initialVelocity": 16.67,
+                    "initialRotorTemp": 25.0,
+                    "hazardDistance": 80.0,
+                    "maxSimulationTime": 10.0,
+                    "numTelemetryPoints": 150,
+                    "standstillCutoffVelocity": 0.05,
+                    "lowSpeedEpsilon": 0.10,
+                },
+            }
+        ]
+    }
+
+    response = client.post("/api/v1/simulation/benchmark", json=payload)
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data["instances"]) == 1
+    res = data["instances"][0]
+
+    assert res["terminalOutcome"] == "Safe Stop"
+    assert res["absIntervened"] is True
+    # Rear wheel lacked ABS and received 85% rear control -> rear lockup should be flagged
+    assert res["rearLockupOccurred"] is True
+    assert len(res["telemetry"]["absActiveFront"]) == 150
+    assert any(res["telemetry"]["absActiveFront"])
+

@@ -31,6 +31,8 @@ class VehicleParamsSchema(CamelBaseModel):
     drag_coefficient: float = Field(default=0.60, ge=0.1, le=2.0, description="Aerodynamic drag coefficient C_d")
     frontal_area: float = Field(default=0.70, ge=0.1, le=3.0, description="Frontal area (m²)")
     brake_bias_ratio: float = Field(default=0.30, ge=0.0, le=1.0, description="Brake bias ratio [0.0, 1.0]")
+    front_tire_pressure_psi: float = Field(default=29.0, ge=10.0, le=70.0, description="Front tire pressure in PSI")
+    rear_tire_pressure_psi: float = Field(default=33.0, ge=10.0, le=70.0, description="Rear tire pressure in PSI")
 
     @model_validator(mode="after")
     def validate_cog_envelope(self) -> "VehicleParamsSchema":
@@ -115,10 +117,25 @@ class BenchmarkInstanceConfigSchema(CamelBaseModel):
     color_accent: str = Field(default="#4ade80")
     sprite_key: str | None = Field(default=None)
     vehicle: VehicleParamsSchema
-    brake: BrakeAssemblySchema
+    brake: BrakeAssemblySchema | None = Field(default=None)
+    front_brake: BrakeAssemblySchema | None = Field(default=None)
+    rear_brake: BrakeAssemblySchema | None = Field(default=None)
+    abs_configuration: Literal["none", "single_channel_front", "dual_channel"] = Field(default="none")
     actuation: ActuationParamsSchema
     environment: EnvironmentParamsSchema
     simulation: SimulationConfigSchema
+
+    @model_validator(mode="after")
+    def validate_abs_hardware(self) -> "BenchmarkInstanceConfigSchema":
+        if not self.brake and not self.front_brake:
+            raise ValueError("Either 'brake' or 'front_brake' configuration must be provided.")
+        if self.abs_configuration == "dual_channel":
+            rear = self.rear_brake or self.brake
+            if rear and rear.brake_type == "drum":
+                raise ValueError(
+                    "Dual-Channel ABS requires hydraulic disc brake on rear assembly (cannot pulse mechanical drum)."
+                )
+        return self
 
 
 class BenchmarkApiPayload(CamelBaseModel):
@@ -140,6 +157,8 @@ class TelemetrySeriesSchema(CamelBaseModel):
     normal_load_front: list[float]
     normal_load_rear: list[float]
     rotor_temperature: list[float]
+    abs_active_front: list[bool] = Field(default_factory=list)
+    abs_active_rear: list[bool] = Field(default_factory=list)
 
 
 class InstanceSimulationResultSchema(CamelBaseModel):
@@ -161,6 +180,8 @@ class InstanceSimulationResultSchema(CamelBaseModel):
     rear_lift_off_occurred: bool
     front_washout_occurred: bool
     fluid_boil_occurred: bool
+    rear_lockup_occurred: bool = False
+    abs_intervened: bool = False
     telemetry: TelemetrySeriesSchema
 
 
