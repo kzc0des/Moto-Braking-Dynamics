@@ -46,21 +46,22 @@ def evaluate_brake_torque(
 ) -> float:
     """Calculate instantaneous retarding torque T_b generated at the wheel.
 
-    Disc: T_b = 2 * μ_pad(T) * P_line(T) * A_piston * r_eff
-    Drum: T_b = K_drum * μ_pad(T) * P_line(T) * A_piston * r_eff
+    Disc (Hydraulic): T_b = 2 * μ_pad(T) * P_line(T) * A_piston * r_eff (susceptible to vapor lock)
+    Drum (Mechanical): T_b = K_drum * μ_pad(T) * P_applied * A_piston * r_eff (immune to fluid boil)
     """
     mu_pad = evaluate_pad_friction(assembly, temp)
-    p_line = evaluate_hydraulic_line_pressure(assembly, applied_pressure, temp)
 
     if assembly.brake_type == BrakeType.DISC:
-        # Multiplier of 2 represents two pads clamping opposing faces of the rotor
+        # Hydraulic disc brake: Clamping pressure is degraded by fluid vapor lock
+        p_line = evaluate_hydraulic_line_pressure(assembly, applied_pressure, temp)
         torque = 2.0 * mu_pad * p_line * assembly.piston_area * assembly.effective_radius
     else:
-        # Drum brake self-energizing geometric amplification
+        # Mechanical drum brake: Cable/rod actuated (zero brake fluid, immune to vapor lock)
+        # Clamping torque is amplified by self-energizing shoe geometry and degraded purely by thermal shoe fade
         torque = (
             assembly.drum_amplification
             * mu_pad
-            * p_line
+            * applied_pressure
             * assembly.piston_area
             * assembly.effective_radius
         )

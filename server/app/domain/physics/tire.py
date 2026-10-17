@@ -51,6 +51,37 @@ def get_effective_friction(env: EnvironmentParams) -> float:
     return substrate_coeffs.base_friction * derating
 
 
+def evaluate_tire_pressure_scaling(
+    pressure_psi: float,
+    nominal_psi: float = 30.0,
+) -> tuple[float, float]:
+    """Calculate empirical friction scaling factor and Pacejka stiffness multiplier (ADR 0028).
+
+    p_r = P_tire / P_nominal
+    Under-inflation (p_r <= 1.0):
+        mu_scale = 1.0 - 0.25 * (1.0 - p_r) ** 2
+    Over-inflation (p_r > 1.0):
+        mu_scale = 1.0 - 0.35 * (p_r - 1.0) ** 1.5
+
+    stiffness_scale = p_r ** 0.3
+
+    Returns:
+        tuple[float, float]: (mu_scale, stiffness_scale)
+    """
+    if nominal_psi <= 0.0 or pressure_psi <= 0.0:
+        return 1.0, 1.0
+
+    p_r = max(0.2, min(2.5, pressure_psi / nominal_psi))
+    if p_r <= 1.0:
+        mu_scale = 1.0 - 0.25 * ((1.0 - p_r) ** 2)
+    else:
+        mu_scale = 1.0 - 0.35 * ((p_r - 1.0) ** 1.5)
+
+    mu_scale = float(max(0.40, min(1.05, mu_scale)))
+    stiffness_scale = float(max(0.50, min(1.50, p_r**0.3)))
+    return mu_scale, stiffness_scale
+
+
 def evaluate_emergent_slip_ratio(
     v: float,
     omega: float,

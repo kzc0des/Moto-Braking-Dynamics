@@ -19,6 +19,14 @@ class TerminalOutcome(str, Enum):
     REAR_WHEEL_LIFTOFF = "rear_wheel_liftoff"
 
 
+class AbsConfiguration(str, Enum):
+    """Active electro-hydraulic anti-lock braking architecture (ADR 0027)."""
+
+    NONE = "none"
+    SINGLE_CHANNEL_FRONT = "single_channel_front"
+    DUAL_CHANNEL = "dual_channel"
+
+
 class BrakeType(str, Enum):
     """Mechanical assembly architecture of the brake mechanism."""
 
@@ -75,6 +83,8 @@ class VehicleParams:
     drag_coefficient: float = 0.60  # Aerodynamic drag coefficient C_d
     frontal_area: float = 0.70  # Frontal cross-sectional area A (m²)
     brake_bias_ratio: float = 0.30  # Brake bias ratio γ = T_b,rear / T_b,front
+    front_tire_pressure_psi: float = 29.0  # Front pneumatic tire inflation gauge pressure (PSI)
+    rear_tire_pressure_psi: float = 33.0  # Rear pneumatic tire inflation gauge pressure (PSI)
 
     def __post_init__(self) -> None:
         if self.mass <= 0:
@@ -88,6 +98,14 @@ class VehicleParams:
         if not (0.0 <= self.brake_bias_ratio <= 1.0):
             raise PhysicalParameterError(
                 f"Brake bias ratio must be in [0.0, 1.0], got {self.brake_bias_ratio}"
+            )
+        if not (10.0 <= self.front_tire_pressure_psi <= 70.0):
+            raise PhysicalParameterError(
+                f"Front tire pressure must be in [10.0, 70.0] PSI, got {self.front_tire_pressure_psi}"
+            )
+        if not (10.0 <= self.rear_tire_pressure_psi <= 70.0):
+            raise PhysicalParameterError(
+                f"Rear tire pressure must be in [10.0, 70.0] PSI, got {self.rear_tire_pressure_psi}"
             )
 
 
@@ -203,6 +221,8 @@ class SimulationResult:
     friction_force_front: np.ndarray
     friction_force_rear: np.ndarray
     brake_torque: np.ndarray
+    abs_active_front: np.ndarray
+    abs_active_rear: np.ndarray
 
     # Terminal summary metadata
     terminal_outcome: TerminalOutcome
@@ -211,3 +231,5 @@ class SimulationResult:
     impact_velocity: float | None
     peak_deceleration: float
     max_temperature: float
+    rear_lockup_occurred: bool = False
+    abs_intervened: bool = False

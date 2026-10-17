@@ -17,6 +17,7 @@ from app.domain.physics.models import (
     SimulationResult,
     TerminalOutcome,
     VehicleState,
+    AbsConfiguration,
 )
 from app.domain.physics.actuation import BrakeActuationProfile, ProgressiveSqueezeProfile
 from app.domain.physics.tire import SUBSTRATE_MATRIX
@@ -33,6 +34,7 @@ def simulate_single_vehicle(
     actuation: BrakeActuationProfile | None = None,
     config: SimulationConfig | None = None,
     rear_brake_assembly: BrakeAssembly | None = None,
+    abs_configuration: AbsConfiguration = AbsConfiguration.NONE,
 ) -> SimulationResult:
     """Execute a single-vehicle emergency braking simulation run.
 
@@ -59,7 +61,15 @@ def simulate_single_vehicle(
     # Derivative wrapper for SciPy solve_ivp
     def rhs(t: float, y: np.ndarray) -> np.ndarray:
         return evaluate_system_derivatives(
-            t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+            t,
+            y,
+            params,
+            brake_assembly,
+            env,
+            actuation,
+            config,
+            rear_brake_assembly,
+            abs_configuration,
         )
 
     # Substrate critical slip threshold for washout
@@ -82,10 +92,25 @@ def simulate_single_vehicle(
     # 3. Event: Front-Wheel Washout (slip exceeds κ_crit or lateral deficit)
     def event_front_washout(t: float, y: np.ndarray) -> float:
         telem = compute_instantaneous_telemetry(
-            t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+            t,
+            y,
+            params,
+            brake_assembly,
+            env,
+            actuation,
+            config,
+            rear_brake_assembly,
+            abs_configuration,
         )
         if telem.lateral_washout:
             return -1.0
+        # If front ABS is active, longitudinal slip lockup is prevented
+        has_front_abs = abs_configuration in (
+            AbsConfiguration.SINGLE_CHANNEL_FRONT,
+            AbsConfiguration.DUAL_CHANNEL,
+        )
+        if has_front_abs:
+            return 1.0  # Protected from longitudinal slip washout
         # Zero-crossing from positive to negative when kappa_f exceeds kappa_crit
         return float(kappa_crit - telem.slip_ratio)
 
@@ -95,9 +120,18 @@ def simulate_single_vehicle(
     # 4. Event: Rear-Wheel Lift-off (F_z,rear <= 0)
     def event_rear_liftoff(t: float, y: np.ndarray) -> float:
         telem = compute_instantaneous_telemetry(
-            t, y, params, brake_assembly, env, actuation, config, rear_brake_assembly
+            t,
+            y,
+            params,
+            brake_assembly,
+            env,
+            actuation,
+            config,
+            rear_brake_assembly,
+            abs_configuration,
         )
         # Pitch-over occurs when normal load on rear tire drops to zero
+        return float(telem.normal_load_rear)
         return float(telem.normal_load_rear)
 
     event_rear_liftoff.terminal = True
@@ -178,12 +212,24 @@ def simulate_single_vehicle(
     fx_front_col = np.zeros(num_points, dtype=np.float64)
     fx_rear_col = np.zeros(num_points, dtype=np.float64)
     tb_front_col = np.zeros(num_points, dtype=np.float64)
+    abs_front_col = np.zeros(num_points, dtype=bool)
+    abs_rear_col = np.zeros(num_points, dtype=bool)
+    rear_lockup_detected = False
+    abs_intervened_detected = False
 
     for k in range(num_points):
         yk = y_grid[:, k]
         tk = float(t_grid[k])
         telem_k = compute_instantaneous_telemetry(
-            tk, yk, params, brake_assembly, env, actuation, config, rear_brake_assembly
+            tk,
+            yk,
+            params,
+            brake_assembly,
+            env,
+            actuation,
+            config,
+            rear_brake_assembly,
+            abs_configuration,
         )
         slip_col[k] = telem_k.slip_ratio
         fz_front_col[k] = telem_k.normal_load_front
@@ -191,6 +237,12 @@ def simulate_single_vehicle(
         fx_front_col[k] = telem_k.friction_force_front
         fx_rear_col[k] = telem_k.friction_force_rear
         tb_front_col[k] = telem_k.brake_torque_front
+        abs_front_col[k] = telem_k.abs_active_front
+        abs_rear_col[k] = telem_k.abs_active_rear
+        if telem_k.rear_lockup:
+            rear_lockup_detected = True
+        if telem_k.abs_active_front or telem_k.abs_active_rear:
+            abs_intervened_detected = True
 
     # Summary statistics
     stop_distance = float(pos_col[-1])
@@ -214,10 +266,14 @@ def simulate_single_vehicle(
         friction_force_front=fx_front_col,
         friction_force_rear=fx_rear_col,
         brake_torque=tb_front_col,
+        abs_active_front=abs_front_col,
+        abs_active_rear=abs_rear_col,
         terminal_outcome=outcome,
         stop_distance=stop_distance,
         stop_time=stop_time,
         impact_velocity=impact_velocity,
         peak_deceleration=peak_deceleration,
         max_temperature=max_temp,
+        rear_lockup_occurred=rear_lockup_detected,
+        abs_intervened=abs_intervened_detected,
     )
