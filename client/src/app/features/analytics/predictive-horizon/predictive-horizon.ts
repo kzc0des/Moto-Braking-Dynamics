@@ -1,10 +1,20 @@
 import { Component, inject, computed, signal, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BenchmarkStore } from '../../../state/benchmark.store';
+import { MetricCard } from '../../../shared/ui/metric-card/metric-card';
+import { ForecastHero } from './components/forecast-hero/forecast-hero';
+import { ComparativeMatrix } from './components/comparative-matrix/comparative-matrix';
+import { GenericTestReportModal } from './components/generic-test-report-modal/generic-test-report-modal';
 
 @Component({
   selector: 'app-predictive-horizon',
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MetricCard,
+    ForecastHero,
+    ComparativeMatrix,
+    GenericTestReportModal
+  ],
   templateUrl: './predictive-horizon.html',
   styleUrl: './predictive-horizon.css'
 })
@@ -13,8 +23,10 @@ export class PredictiveHorizon {
   readonly simulateTrigger = output<void>();
 
   readonly isStatementOpen = signal<boolean>(false);
-  readonly showDetails = signal<boolean>(true);
+  readonly showDetails = signal<boolean>(false);
   readonly compareTab = signal<'brakes' | 'road'>('brakes');
+  readonly isReportModalOpen = signal<boolean>(false);
+  readonly reportGeneratedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   // --- Physical Reference Constants ---
   private readonly G = 9.81;
@@ -448,4 +460,36 @@ export class PredictiveHorizon {
     }
     return `Barrier impact at ${this.impactSpeedKmh()} km/h caused by insufficient total stopping margin relative to initial kinetic energy (${this.kineticEnergyKj()} kJ).${tirePressureNote}`;
   });
+
+  // Report Specific Properties
+  readonly frontPsi = computed(() => this.selectedInst().vehicle.frontTirePressurePsi ?? 29.0);
+  readonly rearPsi = computed(() => this.selectedInst().vehicle.rearTirePressurePsi ?? 33.0);
+
+  readonly absStatusText = computed(() => {
+    const abs = this.selectedInst().absConfiguration ?? 'none';
+    if (abs === 'dual_channel') return 'Dual-Channel Electro-Hydraulic ABS';
+    if (abs === 'single_channel_front') return 'Single-Channel Front Wheel ABS';
+    return 'Conventional Unmodulated (Non-ABS)';
+  });
+
+  readonly frontBrakeText = computed(() => {
+    const isDual = this.selectedInst().spriteKey === 'supersport';
+    return isDual ? 'Twin Radial Hydraulic Discs' : 'Single Hydraulic Disc';
+  });
+
+  readonly rearBrakeText = computed(() => {
+    const isDrum = this.selectedInst().rearBrake?.brakeType === 'drum' || this.selectedInst().brake.brakeType === 'drum';
+    return isDrum ? 'Mechanical Cable Drum (Immune to Fluid Boil)' : 'Single Hydraulic Disc';
+  });
+
+  readonly roadConditionSummary = computed(() => {
+    const sub = this.substrate().toUpperCase();
+    const con = this.contaminant().toUpperCase();
+    const mu = this.frictionCoeff();
+    return `${sub} (${con}) · Nominal Friction μ = ${mu}`;
+  });
+
+  printReport(): void {
+    window.print();
+  }
 }

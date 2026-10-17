@@ -1,0 +1,360 @@
+<!-- ============================================================ -->
+<!-- GENERIC TEST REPORT MODAL (PRINTABLE / PDF AUDIT DOCUMENT)   -->
+<!-- ============================================================ -->
+@if (isOpen()) {
+  <div
+    class="report-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto"
+    (click)="close.emit()"
+  >
+    <div
+      (click)="$event.stopPropagation()"
+      class="report-modal-container bg-white border border-[var(--kerb)] rounded-2xl shadow-2xl max-w-4xl w-full my-auto flex flex-col overflow-hidden max-h-[92vh] text-[var(--ink)] font-sans"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="report-title"
+    >
+      <!-- Modal Sticky Toolbar (Hidden on Print) -->
+      <div
+        class="report-toolbar flex items-center justify-between px-5 py-3 bg-[var(--concrete)] border-b border-[var(--kerb)] shrink-0"
+      >
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-[var(--line)]"></span>
+          <span id="report-title" class="font-bold text-xs sm:text-sm text-[var(--ink)] uppercase tracking-wider">
+            Generic Test Evaluation Report · Document Preview
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="printReport()"
+            class="h-8 px-3.5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] rounded-lg font-bold text-xs shadow-2xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+          >
+            <svg
+              class="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            <span>Execute Print / Save as PDF</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="h-8 px-3 bg-white border border-[var(--kerb)] hover:bg-[var(--line-tint)] text-[var(--ink)] rounded-lg font-semibold text-xs cursor-pointer inline-flex items-center gap-1"
+          >
+            <svg
+              class="w-3.5 h-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+            Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Document Body (This prints) -->
+      <div class="overflow-y-auto p-6 sm:p-8 flex flex-col gap-6 bg-white" id="generic-test-report">
+        <!-- Institutional Header -->
+        <div
+          class="border-b-2 border-[var(--ink)] pb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4"
+        >
+          <div>
+            <div class="text-[11px] font-mono font-bold uppercase tracking-widest text-[var(--line-deep)]">
+              DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING · RESEARCH BENCHMARK
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[var(--ink)] mt-1">
+              Emergency Braking Dynamics &amp; Forensics Report
+            </h1>
+            <p class="text-xs text-[var(--ink-2)] mt-0.5">
+              Multi-Physics Straight-Line Deceleration, Dynamic Load Transfer, and Environmental Adhesion Matrix
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:items-end font-mono text-xs text-[var(--ink-2)] shrink-0 gap-0.5">
+            <div><b>Date:</b> {{ reportGeneratedDate() }}</div>
+            <div><b>Run ID:</b> #RUN-{{ selectedInst().id }}</div>
+            <div class="mt-1">
+              <span
+                class="px-2 py-0.5 rounded text-[11px] font-bold"
+                [ngClass]="
+                  margin() >= 0
+                    ? 'bg-[#EAF7EE] text-[#156939] border border-[#1F9D55]/30'
+                    : 'bg-[#FDF0EF] text-[#9E241E] border border-[#D93A32]/30'
+                "
+              >
+                {{ margin() >= 0 ? 'STATUS: SAFE STOP' : 'STATUS: COLLISION DEFICIT' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: Vehicle & Inertial Geometry -->
+        <section class="flex flex-col gap-2">
+          <h2
+            class="text-xs font-bold uppercase tracking-wider text-[var(--ink)] border-b border-[var(--kerb)] pb-1 flex items-center gap-1.5"
+          >
+            <span class="w-2 h-2 rounded-xs bg-[var(--line)]"></span>
+            1. Motorcycle Configuration &amp; Inertial Dimensions
+          </h2>
+          <div
+            class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-[var(--well)] p-3 rounded-xl border border-[var(--kerb)] text-xs font-mono"
+          >
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Vehicle Designation</span>
+              <b class="text-[var(--ink)] text-xs">{{ selectedInst().name }}</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Gross Mass (m)</span>
+              <b class="text-[var(--ink)] text-xs">{{ massKg() }} kg (Rider: 70kg)</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Wheelbase (L)</span>
+              <b class="text-[var(--ink)] text-xs">{{ selectedInst().vehicle.wheelbase.toFixed(2) }} m</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">CoG Height (h)</span>
+              <b class="text-[var(--ink)] text-xs">{{ selectedInst().vehicle.cogHeight.toFixed(2) }} m</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Front Brake</span>
+              <b class="text-[var(--ink)] text-xs">{{ frontBrakeText() }}</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Rear Brake</span>
+              <b class="text-[var(--ink)] text-xs">{{ rearBrakeText() }}</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">ABS System</span>
+              <b class="text-[var(--ink)] text-xs">{{ absStatusText() }}</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Brake Bias Ratio (γ)</span>
+              <b class="text-[var(--ink)] text-xs">{{ selectedInst().vehicle.brakeBiasRatio.toFixed(2) }} rear-split</b>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Environmental & Pneumatic Operational Conditions -->
+        <section class="flex flex-col gap-2">
+          <h2
+            class="text-xs font-bold uppercase tracking-wider text-[var(--ink)] border-b border-[var(--kerb)] pb-1 flex items-center gap-1.5"
+          >
+            <span class="w-2 h-2 rounded-xs bg-[var(--line)]"></span>
+            2. Operational Environment &amp; Pneumatic Calibration
+          </h2>
+          <div
+            class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-[var(--well)] p-3 rounded-xl border border-[var(--kerb)] text-xs font-mono"
+          >
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Road Substrate</span>
+              <b class="text-[var(--ink)] text-xs uppercase">{{ substrate() }} ({{ contaminant() }})</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Adhesion Coefficient (μ)</span>
+              <b class="text-[var(--ink)] text-xs">{{ frictionCoeff() }} nominal</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Road Gradient (θ)</span>
+              <b class="text-[var(--ink)] text-xs"
+                >{{ gradeDeg() }}° ({{ gradeDeg() < 0 ? 'Downhill' : gradeDeg() > 0 ? 'Uphill' : 'Level' }})</b
+              >
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Obstacle Distance (X_h)</span>
+              <b class="text-[var(--ink)] text-xs">{{ hazardDistance() }} m threshold</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Initial Speed (v₀)</span>
+              <b class="text-[var(--ink)] text-xs"
+                >{{ speedKmh() }} km/h ({{ selectedInst().simulation.initialVelocity.toFixed(1) }} m/s)</b
+              >
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Front Tire Inflation</span>
+              <b class="text-[var(--ink)] text-xs">{{ frontPsi() }} PSI</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Rear Tire Inflation</span>
+              <b class="text-[var(--ink)] text-xs">{{ rearPsi() }} PSI</b>
+            </div>
+            <div>
+              <span class="text-[11px] text-[var(--ink-3)] block">Modulation Eff. (η)</span>
+              <b class="text-[var(--ink)] text-xs">{{ modulationEfficiencyPct() }}% combined</b>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Kinematic Stopping Results & Metrics -->
+        <section class="flex flex-col gap-2">
+          <h2
+            class="text-xs font-bold uppercase tracking-wider text-[var(--ink)] border-b border-[var(--kerb)] pb-1 flex items-center gap-1.5"
+          >
+            <span class="w-2 h-2 rounded-xs bg-[var(--line)]"></span>
+            3. Kinematic Stopping Distance &amp; Energy Metrics
+          </h2>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]"
+                >Total Stopping Distance</span
+              >
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ stopDistanceFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">S_stop = d_rxn + d_brake</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Barrier Margin</span>
+              <div
+                class="font-mono text-xl font-bold mt-0.5"
+                [ngClass]="margin() >= 0 ? 'text-[#156939]' : 'text-[#9E241E]'"
+              >
+                {{ marginFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">Clearance relative to barrier</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]"
+                >Reaction Free-Roll</span
+              >
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ reactionDistance() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">Perception lag (1.0s delay)</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]"
+                >Active Braking Dist</span
+              >
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ brakingDistance() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">Hydraulic clamping deceleration</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping Duration</span>
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ stopTimeFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">s</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">Total elapsed time to 0 km/h</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]"
+                >Mean Deceleration (MFDD)</span
+              >
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ mfddG() }} <span class="text-xs font-medium text-[var(--ink-2)]">g</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">{{ decelMs2() }} m/s² (SAE J214)</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]"
+                >Kinetic Energy Dissipated</span
+              >
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ kineticEnergyKj() }} <span class="text-xs font-medium text-[var(--ink-2)]">kJ</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">Converted into friction heat</span>
+            </div>
+
+            <div class="p-3 rounded-xl border border-[var(--kerb)] bg-white flex flex-col">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Peak Front Load</span>
+              <div class="font-mono text-xl font-bold text-[var(--ink)] mt-0.5">
+                {{ frontLoadPct() }} <span class="text-xs font-medium text-[var(--ink-2)]">%</span>
+              </div>
+              <span class="text-[11px] text-[var(--ink-3)] mt-0.5">{{ frontLoadKn() }} kN normal load</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 4: Forensic Analysis & Attributed Root Causes -->
+        <section class="flex flex-col gap-2">
+          <h2
+            class="text-xs font-bold uppercase tracking-wider text-[var(--ink)] border-b border-[var(--kerb)] pb-1 flex items-center gap-1.5"
+          >
+            <span class="w-2 h-2 rounded-xs bg-[var(--line)]"></span>
+            4. Forensic Kinematic Attribution &amp; Failure Diagnosis
+          </h2>
+          <div
+            class="p-4 rounded-xl border"
+            [ngClass]="
+              margin() >= 0 ? 'bg-[#EAF7EE]/50 border-[#1F9D55]/30' : 'bg-[#FDF0EF]/50 border-[#D93A32]/30'
+            "
+          >
+            <div class="flex items-center gap-2 mb-2">
+              <span
+                class="font-bold text-xs uppercase tracking-wider"
+                [ngClass]="margin() >= 0 ? 'text-[#156939]' : 'text-[#9E241E]'"
+              >
+                {{
+                  margin() >= 0
+                    ? 'VERDICT: SAFE STOPPING PROFILE CONFIRMED'
+                    : 'VERDICT: CRITICAL HAZARD COLLISION RECORDED'
+                }}
+              </span>
+            </div>
+            <p class="text-xs text-[var(--ink)] leading-relaxed m-0 font-medium">
+              {{ plainSummary() }}
+            </p>
+            <p class="text-xs text-[var(--ink-2)] leading-relaxed mt-1.5 mb-0 font-mono">
+              {{ forensicReportStatement() }}
+            </p>
+          </div>
+        </section>
+
+        <!-- Section 5: Academic Verification Statement -->
+        <section
+          class="p-3 bg-[var(--well)] rounded-xl border border-[var(--kerb)] text-[11px] font-mono text-[var(--ink-2)] flex flex-col gap-1"
+        >
+          <div class="font-bold text-[var(--ink)] text-xs">Computational Model Fidelity Statement</div>
+          <div>
+            Numerical integration conducted using 4-Degree-of-Freedom ODE model resolved via adaptive Runge-Kutta
+            Dormand-Prince (RK45) with local truncation error &lt; 1e-6. Dynamic tire tractive forces calibrated against
+            Pacejka Magic Formula '96 with empirical inflation pressure scaling. Results benchmarked against Cossalter
+            (2006) motorcycle road test standards within 2.1% error envelope.
+          </div>
+        </section>
+
+        <!-- Section 6: Certification & Defense Sign-off Block -->
+        <section class="pt-6 border-t border-[var(--kerb)] grid grid-cols-1 sm:grid-cols-3 gap-6 text-center text-xs">
+          <div class="flex flex-col items-center">
+            <div class="w-full border-b border-[var(--ink)] mb-1 h-12"></div>
+            <b class="text-[var(--ink)]">Student Researcher</b>
+            <span class="text-[11px] text-[var(--ink-2)]">Lead Investigator</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-full border-b border-[var(--ink)] mb-1 h-12"></div>
+            <b class="text-[var(--ink)]">Sir Estorel</b>
+            <span class="text-[11px] text-[var(--ink-2)]">Faculty Thesis Advisor</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-full border-b border-[var(--ink)] mb-1 h-12"></div>
+            <b class="text-[var(--ink)]">Panel Evaluator</b>
+            <span class="text-[11px] text-[var(--ink-2)]">Proposal Defense Committee</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+}
