@@ -52,7 +52,7 @@ export class FixedSidebar {
   readonly cogHeight = computed(() => this.selectedInst().vehicle.cogHeight.toFixed(2));
   readonly rotorDiameter = computed(() => Math.round(this.selectedInst().brake.effectiveRadius * 2000));
   readonly padFriction = computed(() => this.selectedInst().brake.padFrictionNominal.toFixed(2));
-  readonly brakeBias = computed(() => Math.round(this.selectedInst().vehicle.brakeBiasRatio * 100));
+  readonly brakeBias = computed(() => Math.round((1 - this.selectedInst().vehicle.brakeBiasRatio) * 100));
 
   readonly brakeHardwareLabel = computed(() => {
     const rear = this.selectedInst().brake.brakeType === 'drum' ? 'Drum' : 'Disc';

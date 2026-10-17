@@ -239,7 +239,7 @@ export class PredictiveHorizon {
   });
 
   // Caliper torque
-  readonly frontBiasPct = computed(() => Math.round(this.selectedInst().vehicle.brakeBiasRatio * 100));
+  readonly frontBiasPct = computed(() => Math.round((1 - this.selectedInst().vehicle.brakeBiasRatio) * 100));
   readonly rearBiasPct = computed(() => 100 - this.frontBiasPct());
   readonly frontTorqueNm = computed(() => Math.round(480 * (this.frontBiasPct() / 100)));
   readonly rearTorqueNm = computed(() => Math.round(480 * (this.rearBiasPct() / 100)));
