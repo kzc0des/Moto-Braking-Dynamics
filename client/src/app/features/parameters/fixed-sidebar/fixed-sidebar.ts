@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { GarageService } from '../../../core/services/garage.service';
-import { SurfaceSubstrate, SurfaceContaminant } from '../../../core/models/benchmark.types';
+import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration } from '../../../core/models/benchmark.types';
 
 @Component({
   selector: 'app-fixed-sidebar',
@@ -17,7 +17,7 @@ export class FixedSidebar {
   readonly store = inject(BenchmarkStore);
   readonly garageService = inject(GarageService);
   readonly isTier2Open = signal<boolean>(false);
-  readonly openGroups = signal<Record<string, boolean>>({ kin: true, brake: true, road: true });
+  readonly openGroups = signal<Record<string, boolean>>({ kin: true, brake: true, tire: true, road: true });
 
   isOpen(key: string): boolean {
     return !!this.openGroups()[key];
@@ -54,10 +54,30 @@ export class FixedSidebar {
   readonly padFriction = computed(() => this.selectedInst().brake.padFrictionNominal.toFixed(2));
   readonly brakeBias = computed(() => Math.round((1 - this.selectedInst().vehicle.brakeBiasRatio) * 100));
 
+  readonly isRearDrum = computed(() => {
+    const rear = this.selectedInst().rearBrake?.brakeType ?? this.selectedInst().brake.brakeType;
+    return rear === 'drum';
+  });
+
   readonly brakeHardwareLabel = computed(() => {
-    const rear = this.selectedInst().brake.brakeType === 'drum' ? 'Drum' : 'Disc';
+    const rear = this.isRearDrum() ? 'Drum' : 'Disc';
     return `Front Disc / Rear ${rear}`;
   });
+
+  // ADR 0027 ABS Architecture
+  readonly absConfiguration = computed(() => this.selectedInst().absConfiguration ?? 'none');
+
+  readonly absOptions: { key: AbsConfiguration; label: string; desc: string }[] = [
+    { key: 'none', label: 'Conventional', desc: 'Non-ABS (Direct Pressure)' },
+    { key: 'single_channel_front', label: 'Single-Ch.', desc: 'Front Only (Rear Conventional)' },
+    { key: 'dual_channel', label: 'Dual-Ch.', desc: 'Front & Rear (Requires Disc)' }
+  ];
+
+  // ADR 0028 Tire Inflation Pressure
+  readonly frontTirePressurePsi = computed(() => this.selectedInst().vehicle.frontTirePressurePsi ?? 29.0);
+  readonly rearTirePressurePsi = computed(() => this.selectedInst().vehicle.rearTirePressurePsi ?? 33.0);
+  readonly frontTireBar = computed(() => (this.frontTirePressurePsi() * 0.0689476).toFixed(2));
+  readonly rearTireBar = computed(() => (this.rearTirePressurePsi() * 0.0689476).toFixed(2));
 
   readonly speedKmh = computed(() => Math.round(this.selectedInst().simulation.initialVelocity * 3.6));
   readonly speedMs = computed(() => this.selectedInst().simulation.initialVelocity.toFixed(1));
@@ -126,6 +146,36 @@ export class FixedSidebar {
       if (activeId) {
         this.garageService.updateKinematics(activeId, { hazardDistance: num });
       }
+    }
+  }
+
+  onAbsChange(cfg: AbsConfiguration): void {
+    if (cfg === 'dual_channel' && this.isRearDrum()) {
+      return; // Cannot enable dual-channel on mechanical drum
+    }
+    this.store.updateAbsConfiguration(cfg);
+  }
+
+  onFrontTirePressureChange(val: number | string): void {
+    const psi = Math.min(50, Math.max(15, Number(val)));
+    this.store.updateVehicleParam('frontTirePressurePsi', psi);
+  }
+
+  onRearTirePressureChange(val: number | string): void {
+    const psi = Math.min(50, Math.max(15, Number(val)));
+    this.store.updateVehicleParam('rearTirePressurePsi', psi);
+  }
+
+  setTirePreset(preset: 'soft' | 'oem' | 'high'): void {
+    if (preset === 'soft') {
+      this.store.updateVehicleParam('frontTirePressurePsi', 20.0);
+      this.store.updateVehicleParam('rearTirePressurePsi', 22.0);
+    } else if (preset === 'high') {
+      this.store.updateVehicleParam('frontTirePressurePsi', 42.0);
+      this.store.updateVehicleParam('rearTirePressurePsi', 44.0);
+    } else {
+      this.store.updateVehicleParam('frontTirePressurePsi', 29.0);
+      this.store.updateVehicleParam('rearTirePressurePsi', 33.0);
     }
   }
 

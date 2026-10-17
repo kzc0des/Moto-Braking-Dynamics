@@ -163,12 +163,39 @@
   <!-- 4. RIDER BRAKE MODULATION (BIOMECHANICAL DUAL-BRAKE) -->
   <div class="flex flex-col gap-2.5 shrink-0 bg-white p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
     <button type="button" (click)="toggleGroup('brake')" [attr.aria-expanded]="isOpen('brake')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Brake Input Modulation</span>
+      <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Brake Controls &amp; ABS</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('brake')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('brake')) {
     <div class="flex flex-col gap-2.5">
-      <span class="text-[11px] font-mono text-[var(--line-deep)] font-bold -mt-1">Dual Circuit</span>
+      <!-- ABS Architecture Selector (ADR 0027) -->
+      <div class="flex flex-col gap-1 -mt-0.5">
+        <div class="flex items-center justify-between text-[11px]">
+          <span class="font-bold text-[var(--ink)]">ABS Control Tier</span>
+          <span class="font-mono text-[var(--line-deep)] font-semibold">{{ absConfiguration() === 'none' ? 'Conventional Non-ABS' : absConfiguration() === 'single_channel_front' ? 'Single-Channel' : 'Dual-Channel' }}</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[var(--well)] border border-[var(--kerb)]">
+          @for (opt of absOptions; track opt.key) {
+            <button
+              type="button"
+              (click)="onAbsChange(opt.key)"
+              [disabled]="opt.key === 'dual_channel' && isRearDrum()"
+              class="h-6 rounded-md text-[11px] font-bold transition-all cursor-pointer truncate px-1"
+              [ngClass]="absConfiguration() === opt.key
+                ? 'bg-white border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
+                : (opt.key === 'dual_channel' && isRearDrum())
+                  ? 'opacity-40 cursor-not-allowed text-[var(--ink-3)]'
+                  : 'text-[var(--ink-2)] hover:text-[var(--ink)]'"
+              [title]="opt.key === 'dual_channel' && isRearDrum() ? 'Dual-Channel ABS requires rear hydraulic disc' : opt.desc"
+            >
+              {{ opt.label }}
+            </button>
+          }
+        </div>
+        @if (isRearDrum() && absConfiguration() === 'single_channel_front') {
+          <span class="text-[10px] text-[var(--ink-2)] italic leading-tight">Front wheel ABS modulated; rear mechanical drum subject to panic lockup.</span>
+        }
+      </div>
 
     <!-- Front Brake Lever Pull (%) -->
     <div class="flex flex-col gap-1.5">
@@ -215,6 +242,75 @@
         <span>100% (Full Effort)</span>
       </div>
     </div>
+    </div>
+    }
+  </div>
+
+  <!-- 4b. TIRE INFLATION PRESSURE (ADR 0028) -->
+  <div class="flex flex-col gap-2.5 shrink-0 bg-white p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
+    <button type="button" (click)="toggleGroup('tire')" [attr.aria-expanded]="isOpen('tire')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
+      <div class="flex items-center gap-1.5">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Tire Pneumatic Pressure</span>
+      </div>
+      <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('tire')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
+    </button>
+    @if (isOpen('tire')) {
+    <div class="flex flex-col gap-2.5">
+      <!-- Quick Presets -->
+      <div class="flex items-center justify-between gap-1">
+        <span class="text-[11px] font-medium text-[var(--ink-2)]">Presets:</span>
+        <div class="flex gap-1">
+          <button type="button" (click)="setTirePreset('soft')" class="px-1.5 py-0.5 rounded bg-[var(--well)] hover:bg-[var(--kerb)] text-[10px] font-semibold text-[var(--ink)] border border-[var(--kerb)] cursor-pointer" title="Under-inflated carcass squirm">20 Soft</button>
+          <button type="button" (click)="setTirePreset('oem')" class="px-1.5 py-0.5 rounded bg-[var(--line-tint)] hover:bg-[var(--line)] text-[10px] font-bold text-[var(--line-deep)] border border-[var(--line)] cursor-pointer" title="OEM Recommended Pressure">29/33 OEM</button>
+          <button type="button" (click)="setTirePreset('high')" class="px-1.5 py-0.5 rounded bg-[var(--well)] hover:bg-[var(--kerb)] text-[10px] font-semibold text-[var(--ink)] border border-[var(--kerb)] cursor-pointer" title="Over-inflated crowned tread">42 High</button>
+        </div>
+      </div>
+
+      <!-- Front Tire Pressure -->
+      <div class="flex flex-col gap-1">
+        <div class="flex items-baseline justify-between text-xs">
+          <span class="font-medium text-[var(--ink)]">Front Tire</span>
+          <span class="font-mono text-xs font-bold text-[var(--ink)]">
+            {{ frontTirePressurePsi() }} PSI <span class="text-[11px] text-[var(--ink-2)] font-normal">({{ frontTireBar() }} bar)</span>
+          </span>
+        </div>
+        <input
+          type="range"
+          min="15"
+          max="50"
+          step="1"
+          [ngModel]="frontTirePressurePsi()"
+          (ngModelChange)="onFrontTirePressureChange($event)"
+          class="w-full cursor-pointer accent-[var(--line)]"
+        />
+        <div class="flex justify-between font-mono text-[10px] text-[var(--ink-3)]">
+          <span>15 PSI (Soft)</span>
+          <span>50 PSI (Stiff)</span>
+        </div>
+      </div>
+
+      <!-- Rear Tire Pressure -->
+      <div class="flex flex-col gap-1 border-t border-[var(--kerb)]/60 pt-2">
+        <div class="flex items-baseline justify-between text-xs">
+          <span class="font-medium text-[var(--ink)]">Rear Tire</span>
+          <span class="font-mono text-xs font-bold text-[var(--ink)]">
+            {{ rearTirePressurePsi() }} PSI <span class="text-[11px] text-[var(--ink-2)] font-normal">({{ rearTireBar() }} bar)</span>
+          </span>
+        </div>
+        <input
+          type="range"
+          min="15"
+          max="50"
+          step="1"
+          [ngModel]="rearTirePressurePsi()"
+          (ngModelChange)="onRearTirePressureChange($event)"
+          class="w-full cursor-pointer accent-[var(--line-deep)]"
+        />
+        <div class="flex justify-between font-mono text-[10px] text-[var(--ink-3)]">
+          <span>15 PSI</span>
+          <span>50 PSI</span>
+        </div>
+      </div>
     </div>
     }
   </div>
@@ -318,8 +414,14 @@
           <span class="font-mono font-semibold text-[var(--ink)]">{{ padFriction() }}</span>
         </div>
         <div class="flex justify-between">
+          <span class="text-[var(--ink-2)]">Rear assembly</span>
+          <span class="font-mono font-semibold text-[var(--ink)]">{{ isRearDrum() ? 'Mechanical Drum (Cable)' : 'Hydraulic Disc' }}</span>
+        </div>
+        <div class="flex justify-between">
           <span class="text-[var(--ink-2)]">Fluid boiling point</span>
-          <span class="font-mono font-semibold text-[var(--ink)]">230 °C (DOT 4)</span>
+          <span class="font-mono font-semibold text-[var(--ink)]">
+            {{ isRearDrum() ? '260 °C (Front disc only, rear immune)' : '260 °C (DOT 4)' }}
+          </span>
         </div>
         <div class="flex justify-between">
           <span class="text-[var(--ink-2)]">Brake bias (front/rear)</span>

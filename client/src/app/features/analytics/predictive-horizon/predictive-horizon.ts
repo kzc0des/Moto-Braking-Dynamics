@@ -251,6 +251,32 @@ export class PredictiveHorizon {
     return `${c.toUpperCase()} ${s.toUpperCase()}`;
   });
 
+  readonly isRearDrum = computed(() => {
+    const rear = this.selectedInst().rearBrake?.brakeType ?? this.selectedInst().brake.brakeType;
+    return rear === 'drum';
+  });
+
+  readonly isDualFront = computed(() => {
+    const front = this.selectedInst().frontBrake;
+    return (front?.pistonArea ?? 0.0014) > 0.0020;
+  });
+
+  readonly frontBrakeLabel = computed(() => {
+    return this.isDualFront() ? 'Twin Front Discs' : 'Single Front Disc';
+  });
+
+  readonly rearBrakeLabel = computed(() => {
+    return this.isRearDrum() ? 'Rear Mechanical Drum' : 'Rear Hydraulic Disc';
+  });
+
+  readonly activeBrakeSummary = computed(() => {
+    const front = this.frontBrakeLabel();
+    const rear = this.rearBrakeLabel();
+    const abs = this.selectedInst().absConfiguration ?? 'none';
+    const absText = abs === 'dual_channel' ? 'Dual-Ch. ABS' : (abs === 'single_channel_front' ? 'Single-Ch. ABS' : 'Non-ABS');
+    return `${front} + ${rear} (${absText})`;
+  });
+
   readonly techRows = computed(() => {
     const v0 = this.selectedInst().simulation.initialVelocity;
     const X = this.hazardDistance();
@@ -258,12 +284,35 @@ export class PredictiveHorizon {
     const mu = this.frictionCoeff();
     const th = this.selectedInst().environment.roadGradeAngle;
     const maxScale = Math.max(X, this.stopDistance()) * 1.15;
+    const abs = this.selectedInst().absConfiguration ?? 'none';
+    const rearDrum = this.isRearDrum();
+    const frontLabel = this.frontBrakeLabel();
 
     const techs = [
-      { name: 'Mechanical Drum', eta: 0.70 },
-      { name: 'Conventional Disc', eta: 0.85 },
-      { name: 'CBS (Combi-Brake)', eta: 0.92 },
-      { name: 'ABS (Anti-lock)', eta: 0.97 }
+      {
+        key: 'drum',
+        name: 'Rear Mechanical Drum',
+        axleSpec: `${frontLabel} + Rear Drum (Cable/Rod)`,
+        eta: 0.70
+      },
+      {
+        key: 'disc',
+        name: 'Rear Hydraulic Disc',
+        axleSpec: `${frontLabel} + Rear Disc (Non-ABS)`,
+        eta: 0.85
+      },
+      {
+        key: 'single_abs',
+        name: 'Single-Channel ABS',
+        axleSpec: 'Front Wheel Modulated · Rear Unmodulated',
+        eta: 0.92
+      },
+      {
+        key: 'dual_abs',
+        name: 'Dual-Channel ABS',
+        axleSpec: 'Front & Rear Axles Modulated (Dual Disc)',
+        eta: 0.97
+      }
     ];
 
     return techs.map(t => {
@@ -273,10 +322,19 @@ export class PredictiveHorizon {
       const col = m < 0;
       const wPct = Math.min(100, (dist / maxScale) * 100);
 
+      let isActive = false;
+      if (abs === 'dual_channel' && t.key === 'dual_abs') isActive = true;
+      else if (abs === 'single_channel_front' && t.key === 'single_abs') isActive = true;
+      else if (abs === 'none' && rearDrum && t.key === 'drum') isActive = true;
+      else if (abs === 'none' && !rearDrum && t.key === 'disc') isActive = true;
+
       return {
+        key: t.key,
         name: t.name,
+        axleSpec: t.axleSpec,
         dist,
-        activeTag: t.name === 'Conventional Disc' ? '[Active]' : '',
+        isActive,
+        activeTag: isActive ? '[Active]' : '',
         widthPct: Number(wPct.toFixed(1)),
         barClass: col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]',
         chipClass: col ? 'text-[#9E241E]' : 'text-[#156939]',
@@ -369,13 +427,25 @@ export class PredictiveHorizon {
     const m = this.margin();
     const temp = this.peakTemp();
     const slip = Number(this.peakSlip());
+    const frontPsi = this.selectedInst().vehicle.frontTirePressurePsi ?? 29.0;
+    const abs = this.selectedInst().absConfiguration ?? 'none';
+
+    // Check tire pressure influence (ADR 0028)
+    let tirePressureNote = '';
+    if (frontPsi < 24.0) {
+      tirePressureNote = ` Noticeable under-inflation (${frontPsi} PSI) caused carcass squirm and lateral softening, extending stopping distance by ~8%.`;
+    } else if (frontPsi > 38.0) {
+      tirePressureNote = ` Noticeable over-inflation (${frontPsi} PSI) caused contact patch crowning, reducing microscopic road keying and peak adhesion.`;
+    }
 
     if (m >= 0) {
-      return `Safe stopping achieved with +${m.toFixed(1)}m clearance. Rotor temperature (${temp}°C) remains well below fluid boil limit (230°C), maintaining full hydraulic clamping integrity.`;
+      const absNote = abs === 'dual_channel' ? ' Dual-channel ABS maintained optimal slip envelope throughout.' : abs === 'single_channel_front' ? ' Front-channel ABS prevented low-side washout.' : '';
+      return `Safe stopping achieved with +${m.toFixed(1)}m clearance. Rotor temperature (${temp}°C) remains within thermal limits.${tirePressureNote}${absNote}`;
     }
     if (slip > this.criticalSlip()) {
-      return `Barrier impact at ${this.impactSpeedKmh()} km/h. Rotor temperature (${temp}°C) remains safe; stopping failure is physically attributed to tire longitudinal slip exceeding critical threshold (κ = ${slip} > 0.18) on contaminated surface.`;
+      const absRemedy = abs === 'none' ? ' Upgrading to Single- or Dual-Channel ABS would actively pulse clamping pressure to prevent this skid.' : '';
+      return `Barrier impact at ${this.impactSpeedKmh()} km/h. Stopping failure is physically attributed to tire longitudinal slip exceeding critical threshold (κ = ${slip} > 0.18) on contaminated surface.${absRemedy}${tirePressureNote}`;
     }
-    return `Barrier impact at ${this.impactSpeedKmh()} km/h caused by insufficient total stopping margin relative to initial kinetic energy (${this.kineticEnergyKj()} kJ).`;
+    return `Barrier impact at ${this.impactSpeedKmh()} km/h caused by insufficient total stopping margin relative to initial kinetic energy (${this.kineticEnergyKj()} kJ).${tirePressureNote}`;
   });
 }

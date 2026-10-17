@@ -80,6 +80,17 @@ export class TelemetryPanel implements OnDestroy {
     return frame ? frame.rotorTemperature : 20;
   }
 
+  isAbsActive(): boolean {
+    const frame = this.store.scrubFrames()[this.store.selectedInstanceId()];
+    return !!(frame?.absActiveFront || frame?.absActiveRear);
+  }
+
+  isRearLockup(): boolean {
+    const frame = this.store.scrubFrames()[this.store.selectedInstanceId()];
+    if (!frame) return false;
+    return frame.slipRatioRear > 0.85;
+  }
+
   private setupCanvases(): void {
     this.resizeObserver = new ResizeObserver(() => {
       this.drawAll();

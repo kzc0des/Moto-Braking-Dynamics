@@ -46,6 +46,16 @@
         [ngClass]="currentRotorTemp() >= 230 ? 'text-[#D93A32]' : 'text-[var(--ink)]'" title="Rotor Temperature">
         {{ currentRotorTemp().toFixed(0) }}°C
       </span>
+      @if (isAbsActive()) {
+        <span class="px-1.5 sm:px-2 py-0.5 rounded bg-[var(--line-tint)] border border-[var(--line)] text-[var(--line-deep)] font-bold animate-pulse" title="ABS Hydraulic Modulation Active">
+          ABS ACTIVE
+        </span>
+      }
+      @if (isRearLockup()) {
+        <span class="px-1.5 sm:px-2 py-0.5 rounded bg-[#FDF0EF] border border-[#D93A32] text-[#9E241E] font-bold animate-pulse" title="Rear Wheel Locked (Fishtailing Risk)">
+          REAR SKID
+        </span>
+      }
     </div>
 
     <!-- Right: Drawer Chevron Action Button -->
