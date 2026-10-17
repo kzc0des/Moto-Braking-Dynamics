@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BenchmarkStore } from '../../state/benchmark.store';
-import { VehicleSpriteKey } from '../models/benchmark.types';
+import { VehicleSpriteKey, AbsConfiguration } from '../models/benchmark.types';
 
 export interface VehicleKinematicsConfig {
   initialVelocity: number;     // m/s (v_0)
@@ -20,6 +20,7 @@ export interface CustomVehicleRecord {
   frontBrake: string;
   rearBrake: string;
   actuation: string;
+  absConfiguration?: AbsConfiguration;
   wheelbase: number;
   cogHeight: number;
   rotorDiameterMm: number;
@@ -50,6 +51,7 @@ export const BASELINE_SCOOTER_RECORD: CustomVehicleRecord = {
   frontBrake: 'single_disc',
   rearBrake: 'drum',
   actuation: 'cbs',
+  absConfiguration: 'none',
   wheelbase: 1.28,
   cogHeight: 0.48,
   rotorDiameterMm: 220,
@@ -283,6 +285,7 @@ export class GarageService {
       frontBrake: record.frontBrake,
       rearBrake: record.rearBrake,
       actuation: record.actuation,
+      absConfiguration: record.absConfiguration ?? (record.actuation === 'abs' ? (record.rearBrake === 'drum' ? 'single_channel_front' : 'dual_channel') : 'none'),
       wheelbase: record.wheelbase,
       cogHeight: record.cogHeight,
       rotorDiameterMm: record.rotorDiameterMm,

@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed, effect, PLATFORM_ID } from '@angu
 import { isPlatformBrowser } from '@angular/common';
 import { Subject, of } from 'rxjs';
 import { debounceTime, switchMap, catchError, tap } from 'rxjs/operators';
-import { BenchmarkInstanceConfig, VehicleSpriteKey } from '../core/models/benchmark.types';
+import { BenchmarkInstanceConfig, VehicleSpriteKey, AbsConfiguration, BrakeType } from '../core/models/benchmark.types';
 import { DEFAULT_SUPERBIKE, DEFAULT_CRUISER, DEFAULT_SCOOTER } from '../core/models/archetype-defaults';
 import { InstanceSimulationResult, InterpolatedScrubFrame, BenchmarkResponse, TerminalOutcome } from '../core/models/telemetry.types';
 import { SimulationApiService } from '../core/api/simulation-api.service';
@@ -239,6 +239,18 @@ export class BenchmarkStore {
     }
   }
 
+  updateAbsConfiguration(config: AbsConfiguration): void {
+    const activeId = this.selectedInstanceId();
+    this.instances.update(list => {
+      const targetId = list.some(i => i.id === activeId) ? activeId : (list[0]?.id ?? 'instance-1');
+      return list.map(inst => (inst.id === targetId ? { ...inst, absConfiguration: config } : inst));
+    });
+    this.resetPlayback();
+    if (this.autoCompute()) {
+      this.triggerSimulation();
+    }
+  }
+
   setScrubTime(t: number): void {
     const clamped = Math.max(0, Math.min(t, this.maxRunTime()));
     this.scrubTime.set(clamped);
@@ -326,6 +338,7 @@ export class BenchmarkStore {
     hazardDistance?: number;
     frontLeverPct?: number;
     rearControlPct?: number;
+    absConfiguration?: AbsConfiguration;
   }): void {
     this.instances.update(list => {
       const targetId = list.some(i => i.id === 'instance-1') ? 'instance-1' : (list[0]?.id ?? 'instance-1');
@@ -354,11 +367,50 @@ export class BenchmarkStore {
           const cogFront = Number((custom.wheelbase * biasRatio).toFixed(2));
           const cogRear = Number((custom.wheelbase * (1.0 - biasRatio)).toFixed(2));
 
+          const isDualFront = custom.frontBrake === 'dual_disc';
+          const isRearDrum = custom.rearBrake === 'drum';
+          const effectiveAbs: AbsConfiguration = custom.absConfiguration ?? (custom.actuation === 'abs' ? (isRearDrum ? 'single_channel_front' : 'dual_channel') : 'none');
+
+          const frontBrakeAssembly = {
+            brakeType: 'disc' as const,
+            rotorMass: isDualFront ? 2.4 : (custom.rotorDiameterMm > 280 ? 1.6 : 1.2),
+            specificHeat: 460.0,
+            surfaceArea: isDualFront ? 0.08 : 0.045,
+            pistonArea: isDualFront ? 0.0028 : 0.0014,
+            effectiveRadius: Number((custom.rotorDiameterMm / 2000).toFixed(3)),
+            padFrictionNominal: custom.padFriction,
+            fadeTemperature: 240.0,
+            fadeCoefficient: 0.006,
+            fluidBoilTemperature: custom.fluidBoilTemp,
+            vaporTransitionBand: 20.0,
+            thermalEfficiency: 0.90,
+            drumAmplification: 1.0
+          };
+
+          const rearBrakeAssembly = {
+            brakeType: (isRearDrum ? 'drum' : 'disc') as BrakeType,
+            rotorMass: isRearDrum ? 1.1 : 1.1,
+            specificHeat: isRearDrum ? 480.0 : 460.0,
+            surfaceArea: isRearDrum ? 0.035 : 0.035,
+            pistonArea: 0.0010,
+            effectiveRadius: isRearDrum ? 0.105 : 0.110,
+            padFrictionNominal: isRearDrum ? 0.35 : custom.padFriction,
+            fadeTemperature: isRearDrum ? 210.0 : 230.0,
+            fadeCoefficient: isRearDrum ? 0.008 : 0.006,
+            fluidBoilTemperature: isRearDrum ? 200.0 : custom.fluidBoilTemp,
+            vaporTransitionBand: 20.0,
+            thermalEfficiency: isRearDrum ? 0.85 : 0.90,
+            drumAmplification: isRearDrum ? 1.8 : 1.0
+          };
+
           return {
             ...inst,
             name: custom.title || `${custom.displacementCc}cc Custom ${custom.category}`,
             enabled: true,
             spriteKey: spriteKey,
+            absConfiguration: effectiveAbs,
+            frontBrake: frontBrakeAssembly,
+            rearBrake: rearBrakeAssembly,
             vehicle: {
               ...inst.vehicle,
               mass: custom.massKg,
@@ -366,16 +418,9 @@ export class BenchmarkStore {
               cogHeight: custom.cogHeight,
               cogDistanceFront: cogFront,
               cogDistanceRear: cogRear,
-              brakeBiasRatio: custom.rearBrake === 'drum' ? 0.35 : 0.30
+              brakeBiasRatio: isRearDrum ? 0.35 : 0.30
             },
-            brake: {
-              ...inst.brake,
-              brakeType: custom.rearBrake === 'drum' ? 'drum' : 'disc',
-              rotorMass: custom.rotorDiameterMm > 280 ? 1.6 : 1.2,
-              effectiveRadius: Number((custom.rotorDiameterMm / 2000).toFixed(3)),
-              padFrictionNominal: custom.padFriction,
-              fluidBoilTemperature: custom.fluidBoilTemp
-            },
+            brake: frontBrakeAssembly,
             actuation: {
               ...inst.actuation,
               frontLeverPct: custom.frontLeverPct ?? inst.actuation.frontLeverPct ?? 85,
@@ -467,6 +512,8 @@ export class BenchmarkStore {
       normalLoadFront: lerp(telem.normalLoadFront),
       normalLoadRear: lerp(telem.normalLoadRear),
       rotorTemperature: lerp(telem.rotorTemperature),
+      absActiveFront: telem.absActiveFront ? telem.absActiveFront[i1] : false,
+      absActiveRear: telem.absActiveRear ? telem.absActiveRear[i1] : false,
       terminalOutcome,
       isBrakingActive: t >= 1.0
     };

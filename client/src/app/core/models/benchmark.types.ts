@@ -14,6 +14,8 @@ export interface VehicleParams {
   dragCoefficient: number;     // C_d
   frontalArea: number;         // m² (A)
   brakeBiasRatio: number;      // γ in [0.0, 1.0]
+  frontTirePressurePsi?: number; // PSI (ADR 0028, default 29.0)
+  rearTirePressurePsi?: number;  // PSI (ADR 0028, default 33.0)
 }
 
 export interface BrakeAssembly {
@@ -69,14 +71,19 @@ export interface SimulationConfig {
 
 export type VehicleSpriteKey = 'scooter' | 'maxi' | 'underbone' | 'naked' | 'supersport' | 'adventure' | 'cruiser' | 'ninja';
 
+export type AbsConfiguration = 'none' | 'single_channel_front' | 'dual_channel';
+
 export interface BenchmarkInstanceConfig {
   id: string;                  // 'instance-1' | 'instance-2' | 'instance-3'
   name: string;                // e.g. "Superbike 1000cc"
   enabled: boolean;
   colorAccent: string;         // Hex code, e.g. #4ade80, #cbd5e1, #38bdf8
   spriteKey?: VehicleSpriteKey;
+  absConfiguration?: AbsConfiguration; // ADR 0027
   vehicle: VehicleParams;
   brake: BrakeAssembly;
+  frontBrake?: BrakeAssembly;  // ADR 0027 / 0029
+  rearBrake?: BrakeAssembly;   // ADR 0027 / 0029
   actuation: ActuationParams;
   environment: EnvironmentParams;
   simulation: SimulationConfig;

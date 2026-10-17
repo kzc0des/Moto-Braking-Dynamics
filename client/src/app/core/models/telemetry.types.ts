@@ -15,6 +15,8 @@ export interface TelemetrySeries {
   normalLoadFront: number[];   // N (F_z front)
   normalLoadRear: number[];    // N (F_z rear)
   rotorTemperature: number[];  // °C
+  absActiveFront?: boolean[];  // ADR 0027 ABS intervention flag
+  absActiveRear?: boolean[];   // ADR 0027 ABS intervention flag
 }
 
 export interface InstanceSimulationResult {
@@ -34,6 +36,8 @@ export interface InstanceSimulationResult {
   rearLiftOffOccurred: boolean;
   frontWashoutOccurred: boolean;
   fluidBoilOccurred: boolean;
+  rearLockupOccurred?: boolean; // ADR 0027 rear wheel lockup indicator
+  absIntervened?: boolean;     // ADR 0027 active ABS modulation indicator
   telemetry: TelemetrySeries;
 }
 
@@ -58,4 +62,6 @@ export interface InterpolatedScrubFrame {
   isBrakingActive?: boolean;   // true if t >= t_rxn
   frontLeverPct?: number;
   rearControlPct?: number;
+  absActiveFront?: boolean;
+  absActiveRear?: boolean;
 }
