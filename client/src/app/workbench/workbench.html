@@ -1,6 +1,6 @@
 <div class="bg-[var(--bg)] text-[var(--ink)] flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
   <!-- Top Application Header -->
-  <header class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 sm:px-6 py-2 bg-[var(--chrome)] border-b border-[var(--chrome-edge)] shrink-0 lg:h-14 lg:flex-nowrap">
+  <header class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 sm:px-6 py-2 bg-[var(--chrome)] border-b border-[var(--chrome-edge)] shrink-0 lg:h-14 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-x-4">
     <!-- Left: Brand / Topic Title -->
     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
       <!-- Mobile/tablet: open the controls sidebar as a drawer -->
@@ -67,14 +67,17 @@
     </div>
 
     <!-- Right: Action CTA & Team Members Trigger -->
-    <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+    <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 lg:justify-self-end">
       <!-- Physics Engine Diagnostics Indicator Pill -->
       <app-diagnostics-hud />
 
-      @if (currentMode() === 'analytics') {
-        <button
+      <!-- Always in the layout so the tabs in the middle never shift; only hidden from view in simulation mode. -->
+      <button
           type="button"
           (click)="switchToSimulation()"
+          [ngClass]="currentMode() === 'analytics' ? '' : 'max-lg:hidden lg:invisible'"
+          [attr.aria-hidden]="currentMode() !== 'analytics'"
+          [attr.tabindex]="currentMode() === 'analytics' ? null : -1"
           class="h-9 lg:h-8 px-3 sm:px-3.5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-lg text-xs font-bold transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
         >
           <span class="sm:hidden">Simulate</span><span class="hidden sm:inline">Simulate Run on Track</span>
@@ -82,7 +85,6 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
         </button>
-      }
 
       <button
         type="button"
