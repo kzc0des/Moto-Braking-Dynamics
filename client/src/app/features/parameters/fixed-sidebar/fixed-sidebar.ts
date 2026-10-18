@@ -159,6 +159,12 @@ export class FixedSidebar {
       return; // Cannot enable dual-channel on mechanical drum
     }
     this.store.updateAbsConfiguration(cfg);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { abs: cfg },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   onFrontTirePressureChange(val: number | string): void {

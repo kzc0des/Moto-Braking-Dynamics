@@ -1,7 +1,8 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.service';
 import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
 import { VehicleSpriteKey, AbsConfiguration } from '../../../core/models/benchmark.types';
@@ -21,7 +22,7 @@ export interface FamilyDescriptor {
   templateUrl: './configure-studio.html',
   styleUrl: './configure-studio.css'
 })
-export class ConfigureStudio implements OnInit {
+export class ConfigureStudio implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   readonly garageService = inject(GarageService);
@@ -145,11 +146,18 @@ export class ConfigureStudio implements OnInit {
     };
   });
 
+  private querySub?: Subscription;
+
   ngOnInit(): void {
     const mode = this.route.snapshot.queryParamMap.get('mode');
     const bikeId = this.route.snapshot.queryParamMap.get('bikeId') || this.route.snapshot.queryParamMap.get('id');
     const typeParam = this.route.snapshot.queryParamMap.get('type');
     const modelParam = this.route.snapshot.queryParamMap.get('model');
+    const absParam = this.route.snapshot.queryParamMap.get('abs');
+    const actParam = this.route.snapshot.queryParamMap.get('actuation');
+
+    const parsedAbs = this.parseAbsParam(absParam);
+    const parsedAct = this.parseActuationParam(actParam);
 
     if (mode === 'edit' || (bikeId && mode !== 'new')) {
       const target = bikeId ? this.garageService.getVehicleById(bikeId) : this.garageService.activeVehicle();
@@ -166,13 +174,16 @@ export class ConfigureStudio implements OnInit {
       this.rearBrake.set(target.rearBrake);
 
       const defaultAbs: AbsConfiguration = target.absConfiguration ?? (target.actuation === 'abs' ? (target.rearBrake === 'drum' ? 'single_channel_front' : 'dual_channel') : 'none');
-      const resolvedAbs: AbsConfiguration = target.rearBrake === 'drum' && defaultAbs === 'dual_channel' ? 'single_channel_front' : defaultAbs;
+      let resolvedAbs: AbsConfiguration = parsedAbs ?? defaultAbs;
+      if (target.rearBrake === 'drum' && resolvedAbs === 'dual_channel') {
+        resolvedAbs = 'single_channel_front';
+      }
       this.absConfiguration.set(resolvedAbs);
 
       if (resolvedAbs === 'dual_channel') {
         this.actuation.set('independent');
       } else {
-        this.actuation.set(target.actuation);
+        this.actuation.set(parsedAct ?? target.actuation);
       }
 
       this.wheelbase.set(target.wheelbase);
@@ -203,35 +214,88 @@ export class ConfigureStudio implements OnInit {
         this.family.set(parsedFamily);
       }
 
+      let matchedPreset: EmpiricalPresetDescriptor | undefined;
       if (modelParam) {
         const normalized = modelParam.replace(/-/g, '_').toLowerCase();
-        const found = EMPIRICAL_PRESETS.find(
+        matchedPreset = EMPIRICAL_PRESETS.find(
           p => p.key.toLowerCase() === normalized || p.key.toLowerCase().replace(/_/g, '-') === modelParam.toLowerCase()
         );
-        if (found) {
-          this.family.set(found.familyKey);
-          this.applyPreset(found, false);
-        } else if (parsedFamily) {
-          const presets = EMPIRICAL_PRESETS.filter(p => p.familyKey === parsedFamily);
-          if (presets.length > 0) {
-            this.applyPreset(presets[0], false);
-          }
-        }
-      } else if (parsedFamily) {
+      }
+
+      if (!matchedPreset && parsedFamily) {
         const presets = EMPIRICAL_PRESETS.filter(p => p.familyKey === parsedFamily);
         if (presets.length > 0) {
-          this.applyPreset(presets[0], false);
+          matchedPreset = presets[0];
         }
-      } else {
-        // Default to step_through preset
-        const defaultPreset = EMPIRICAL_PRESETS[0];
-        if (defaultPreset) {
-          this.applyPreset(defaultPreset, false);
+      }
+
+      if (!matchedPreset) {
+        matchedPreset = EMPIRICAL_PRESETS[0];
+      }
+
+      if (matchedPreset) {
+        this.family.set(matchedPreset.familyKey);
+        this.applyPreset(matchedPreset, false);
+      }
+
+      // If abs or actuation was explicitly supplied in URL query params, hydrate them
+      if (parsedAbs) {
+        if (this.isRearDrum() && parsedAbs === 'dual_channel') {
+          this.absConfiguration.set('single_channel_front');
+        } else {
+          this.absConfiguration.set(parsedAbs);
         }
+      }
+
+      if (this.isMechanicalLinkageLocked()) {
+        this.actuation.set('independent');
+      } else if (parsedAct) {
+        this.actuation.set(parsedAct);
       }
 
       this.syncQueryParams();
     }
+
+    // Subscribe to queryParam updates to support browser Back / Forward history
+    this.querySub = this.route.queryParamMap.subscribe(params => {
+      const qAbs = this.parseAbsParam(params.get('abs'));
+      const qAct = this.parseActuationParam(params.get('actuation'));
+
+      if (qAbs && qAbs !== this.absConfiguration()) {
+        if (!(qAbs === 'dual_channel' && this.isRearDrum())) {
+          this.absConfiguration.set(qAbs);
+        }
+      }
+
+      if (this.isMechanicalLinkageLocked()) {
+        if (this.actuation() !== 'independent') {
+          this.actuation.set('independent');
+        }
+      } else if (qAct && qAct !== this.actuation()) {
+        this.actuation.set(qAct);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.querySub?.unsubscribe();
+  }
+
+  private parseAbsParam(val: string | null): AbsConfiguration | null {
+    if (!val) return null;
+    const s = val.toLowerCase();
+    if (s === 'none' || s === 'non-abs' || s === 'conventional') return 'none';
+    if (s === 'single_channel_front' || s === 'single_channel' || s === 'single' || s === 'single-channel') return 'single_channel_front';
+    if (s === 'dual_channel' || s === 'dual' || s === 'dual-channel') return 'dual_channel';
+    return null;
+  }
+
+  private parseActuationParam(val: string | null): string | null {
+    if (!val) return null;
+    const s = val.toLowerCase();
+    if (s === 'independent') return 'independent';
+    if (s === 'cbs' || s === 'linked_cbs' || s === 'linked') return 'cbs';
+    return null;
   }
 
   private getFamilySlug(fam: 'step_through' | 'standard' | 'supersport' | 'extended'): string {
@@ -258,7 +322,12 @@ export class ConfigureStudio implements OnInit {
       if (id) {
         this.router.navigate([], {
           relativeTo: this.route,
-          queryParams: { mode: 'edit', bikeId: id },
+          queryParams: {
+            mode: 'edit',
+            bikeId: id,
+            abs: this.absConfiguration(),
+            actuation: this.actuation()
+          },
           replaceUrl: true
         });
       }
@@ -268,7 +337,9 @@ export class ConfigureStudio implements OnInit {
         queryParams: {
           mode: 'new',
           type: this.getFamilySlug(this.family()),
-          model: this.selectedPresetKey().replace(/_/g, '-')
+          model: this.selectedPresetKey().replace(/_/g, '-'),
+          abs: this.absConfiguration(),
+          actuation: this.actuation()
         },
         replaceUrl: true
       });
@@ -321,6 +392,7 @@ export class ConfigureStudio implements OnInit {
     if (cfg === 'dual_channel') {
       this.actuation.set('independent');
     }
+    this.syncQueryParams();
   }
 
   selectActuation(actKey: string): void {
@@ -328,6 +400,7 @@ export class ConfigureStudio implements OnInit {
       return;
     }
     this.actuation.set(actKey);
+    this.syncQueryParams();
   }
 
   updateTitle(val: string): void {

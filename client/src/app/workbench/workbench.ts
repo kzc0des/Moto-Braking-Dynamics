@@ -12,7 +12,7 @@ import { KinematicsCanvas } from '../features/kinematics/kinematics-canvas/kinem
 import { TelemetryPanel } from '../features/telemetry/telemetry-panel/telemetry-panel';
 import { TrajectoryScrubber } from '../features/telemetry/trajectory-scrubber/trajectory-scrubber';
 import { DiagnosticsHud } from '../features/diagnostics/diagnostics-hud/diagnostics-hud';
-import { SurfaceSubstrate, SurfaceContaminant } from '../core/models/benchmark.types';
+import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration } from '../core/models/benchmark.types';
 
 @Component({
   selector: 'app-workbench',
@@ -114,6 +114,14 @@ export class Workbench implements OnInit, OnDestroy {
           }
         }
       }
+
+      // ABS state hydration
+      const abs = params.get('abs');
+      if (abs === 'none' || abs === 'single_channel_front' || abs === 'dual_channel') {
+        if (this.store.selectedInstance().absConfiguration !== abs) {
+          this.store.updateAbsConfiguration(abs as AbsConfiguration);
+        }
+      }
     });
     this.routeSub.add(qParamsSub);
 
@@ -122,11 +130,13 @@ export class Workbench implements OnInit, OnDestroy {
     const currentSub = this.store.selectedInstance().environment.substrate;
     const currentCon = this.store.selectedInstance().environment.contaminant;
     const currentGrade = Math.round((this.store.selectedInstance().environment.roadGradeAngle * 180) / Math.PI);
+    const currentAbs = this.store.selectedInstance().absConfiguration ?? 'none';
 
     const initialMissingParams: Record<string, any> = {};
     if (!snapshotParams.has('substrate')) initialMissingParams['substrate'] = currentSub;
     if (!snapshotParams.has('contaminant')) initialMissingParams['contaminant'] = currentCon;
     if (!snapshotParams.has('grade')) initialMissingParams['grade'] = currentGrade;
+    if (!snapshotParams.has('abs')) initialMissingParams['abs'] = currentAbs;
 
     if (Object.keys(initialMissingParams).length > 0) {
       this.router.navigate([], {
@@ -161,12 +171,13 @@ export class Workbench implements OnInit, OnDestroy {
     const currentParams = this.route.snapshot.queryParams;
 
     // Filter query parameters strictly to prevent tangling across tabs:
-    // Shared parameters: substrate, contaminant, grade, panel
+    // Shared parameters: substrate, contaminant, grade, panel, abs
     const targetParams: Record<string, any> = {};
     if (currentParams['substrate']) targetParams['substrate'] = currentParams['substrate'];
     if (currentParams['contaminant']) targetParams['contaminant'] = currentParams['contaminant'];
     if (currentParams['grade'] !== undefined) targetParams['grade'] = currentParams['grade'];
     if (currentParams['panel']) targetParams['panel'] = currentParams['panel'];
+    if (currentParams['abs']) targetParams['abs'] = currentParams['abs'];
 
     // Analytics-only parameters (whatif, details, report) are ONLY included when navigating to analytics
     if (mode === 'analytics') {
