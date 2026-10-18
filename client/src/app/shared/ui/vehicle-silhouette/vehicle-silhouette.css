@@ -6,3 +6,27 @@
 .shadow {
   fill: rgba(0, 0, 0, 0.45);
 }
+
+/* Scene mode: the riding environment behind the bike, cropped to the road and toned down for the dark UI. */
+:host(.with-scene) {
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center 62%;
+}
+
+:host(.with-scene)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(11 13 16 / 0.35), rgb(11 13 16 / 0.1) 45%, rgb(11 13 16 / 0.55));
+  pointer-events: none;
+}
+
+:host(.with-scene) svg {
+  position: relative;
+}
+
+:host(.with-scene) .shadow {
+  fill: rgba(0, 0, 0, 0.6);
+}
