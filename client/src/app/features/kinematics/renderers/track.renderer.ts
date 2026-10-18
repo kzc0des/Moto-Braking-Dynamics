@@ -23,8 +23,8 @@ export class TrackRenderer {
 
     const meterToPx = (m: number) => paddingLeft + (m / maxDistance) * trackWidth;
 
-    // 1. Clean track background (--panel / #FFFFFF)
-    ctx.fillStyle = '#FFFFFF';
+    // 1. Clean track background (--panel / #171B21)
+    ctx.fillStyle = '#171B21';
     ctx.fillRect(0, 0, width, height);
 
     const topOffset = 26;
@@ -46,9 +46,9 @@ export class TrackRenderer {
       ctx.beginPath();
       ctx.rect(startPx, zoneTop, onsetPx - startPx, zoneH);
       ctx.clip();
-      ctx.fillStyle = '#F4F5F7';
+      ctx.fillStyle = '#14181D';
       ctx.fillRect(startPx, zoneTop, onsetPx - startPx, zoneH);
-      ctx.strokeStyle = '#E3E6EA';
+      ctx.strokeStyle = '#232830';
       ctx.lineWidth = 1;
       for (let x = startPx - zoneH; x < onsetPx; x += 12) {
         ctx.beginPath();
@@ -60,18 +60,18 @@ export class TrackRenderer {
     }
     // Braking zone: soft amber
     if (barrierPx > onsetPx) {
-      ctx.fillStyle = 'rgba(255, 200, 0, 0.08)';
+      ctx.fillStyle = 'rgba(255, 200, 0, 0.10)';
       ctx.fillRect(onsetPx, zoneTop, barrierPx - onsetPx, zoneH);
     }
     // Beyond the impact barrier: soft red
     if (endPx > barrierPx) {
-      ctx.fillStyle = 'rgba(217, 58, 50, 0.06)';
+      ctx.fillStyle = 'rgba(224, 86, 78, 0.06)';
       ctx.fillRect(barrierPx, zoneTop, endPx - barrierPx, zoneH);
     }
     // Zone captions (only when the zone is wide enough to hold them)
     ctx.font = '700 12px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#7A818B';
+    ctx.fillStyle = '#858D98';
     const captionY = zoneTop + zoneH * 0.30;
     const caption = (label: string, x1: number, x2: number) => {
       if (x2 - x1 >= ctx.measureText(label).width + 16) {
@@ -80,7 +80,7 @@ export class TrackRenderer {
     };
     caption('REACTION · FREE-ROLL', startPx, onsetPx);
     caption('BRAKING ZONE', onsetPx, barrierPx);
-    ctx.fillStyle = '#B5413A';
+    ctx.fillStyle = '#D98F8A';
     caption('BEYOND BARRIER', barrierPx, endPx);
 
     // 2. Vertical distance gridlines (every 10m, big and readable)
@@ -93,7 +93,7 @@ export class TrackRenderer {
       // Vertical line across all lanes
       if (m === 0) {
         // High-contrast starting line
-        ctx.strokeStyle = '#1F2328';
+        ctx.strokeStyle = '#ECEFF3';
         ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.moveTo(x, topOffset);
@@ -108,13 +108,13 @@ export class TrackRenderer {
         ctx.lineTo(x - 3, height);
         ctx.stroke();
 
-        ctx.fillStyle = '#1F2328';
+        ctx.fillStyle = '#ECEFF3';
         ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('START 0 m', x, 18);
         continue;
       } else {
-        ctx.strokeStyle = '#DDE0E4';
+        ctx.strokeStyle = '#2A3039';
         ctx.lineWidth = 1;
       }
 
@@ -124,7 +124,7 @@ export class TrackRenderer {
       ctx.stroke();
 
       // Top distance tick labels: "10 m", "20 m", ...
-      ctx.fillStyle = '#656C76';
+      ctx.fillStyle = '#A9B0BA';
       ctx.textAlign = 'center';
       ctx.fillText(`${m} m`, x, 18);
     }
@@ -132,7 +132,7 @@ export class TrackRenderer {
     // 2b. Reaction Distance / Brake Onset Demarcation Line (Neutral Cool Slate)
     if (params.reactionDistance && params.reactionDistance > 0 && params.reactionDistance < maxDistance) {
       const rxnX = meterToPx(params.reactionDistance);
-      ctx.strokeStyle = '#656C76';
+      ctx.strokeStyle = '#A9B0BA';
       ctx.lineWidth = 1.6;
       ctx.setLineDash([4, 3]);
       ctx.beginPath();
@@ -145,16 +145,16 @@ export class TrackRenderer {
       ctx.textAlign = 'center';
       const onsetLabel = `BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`;
       const onsetW = ctx.measureText(onsetLabel).width + 10;
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = '#171B21';
       ctx.fillRect(rxnX - onsetW / 2, topOffset + 3, onsetW, 16);
-      ctx.fillStyle = '#4A5059';
+      ctx.fillStyle = '#C7CCD4';
       ctx.fillText(onsetLabel, rxnX, topOffset + 15);
     }
 
     // 3. Impact Barrier at X_impact (hazardDistance) - Red Signal Barrier
     const barrierX = meterToPx(hazardDistance);
     if (barrierX <= width) {
-      ctx.strokeStyle = '#D93A32';
+      ctx.strokeStyle = '#E0564E';
       ctx.lineWidth = 2.2;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -164,14 +164,14 @@ export class TrackRenderer {
       ctx.setLineDash([]);
 
       // "Barrier 32.5 m" label
-      ctx.fillStyle = '#D93A32';
+      ctx.fillStyle = '#E0564E';
       ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'right';
       const barrierLabel = `Impact Barrier ${hazardDistance} m`;
       const barrierW = ctx.measureText(barrierLabel).width + 10;
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = '#171B21';
       ctx.fillRect(barrierX - 4 - barrierW, topOffset + 20, barrierW, 16);
-      ctx.fillStyle = '#D93A32';
+      ctx.fillStyle = '#E0564E';
       ctx.fillText(barrierLabel, barrierX - 9, topOffset + 32);
 
       // High-Visibility Red Canvas Callout if Collision Occurred
@@ -184,15 +184,15 @@ export class TrackRenderer {
         const pillX = barrierX - pillW / 2;
         const pillY = topOffset + 18;
 
-        ctx.fillStyle = '#FDF0EF';
-        ctx.strokeStyle = '#D93A32';
+        ctx.fillStyle = '#2D1514';
+        ctx.strokeStyle = '#E0564E';
         ctx.lineWidth = 1.8;
         ctx.beginPath();
         ctx.roundRect(pillX, pillY, pillW, pillH, 6);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#9E241E';
+        ctx.fillStyle = '#D98F8A';
         ctx.textAlign = 'center';
         ctx.fillText(impactLabel, barrierX, pillY + 15);
       }
@@ -220,13 +220,13 @@ export class TrackRenderer {
         const holeW = Math.max(12, holeX2 - holeX1);
         const groundY = laneY + laneHeight - 20;
 
-        ctx.fillStyle = '#FDF0EF';
-        ctx.strokeStyle = '#D93A32';
+        ctx.fillStyle = '#2D1514';
+        ctx.strokeStyle = '#E0564E';
         ctx.lineWidth = 1.5;
         ctx.fillRect(holeX1, groundY, holeW, 8);
         ctx.strokeRect(holeX1, groundY, holeW, 8);
 
-        ctx.fillStyle = '#D93A32';
+        ctx.fillStyle = '#E0564E';
         ctx.font = '600 10px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('POTHOLE', holeX1 + holeW / 2, groundY - 4);

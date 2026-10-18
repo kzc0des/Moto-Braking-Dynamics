@@ -42,7 +42,7 @@
       type="button"
       (click)="togglePothole()"
       class="px-3 py-1 text-xs font-semibold rounded-md border transition-colors cursor-pointer"
-      [ngClass]="env().potholeEnabled ? 'bg-[#FDF0EF] text-[#9E241E] border-[#D93A32]/40 font-bold' : 'bg-white text-[var(--ink-2)] border-[var(--kerb)]'"
+      [ngClass]="env().potholeEnabled ? 'bg-[var(--danger-tint)] text-[var(--danger-ink)] border-[var(--danger)]/40 font-bold' : 'bg-[var(--surface)] text-[var(--ink-2)] border-[var(--kerb)]'"
     >
       {{ env().potholeEnabled ? 'ACTIVE' : 'OFF' }}
     </button>

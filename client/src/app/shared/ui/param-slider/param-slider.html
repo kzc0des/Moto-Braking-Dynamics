@@ -14,7 +14,7 @@
         [step]="step()"
         [ngModel]="value()"
         (ngModelChange)="onInputChange($event)"
-        class="w-20 px-2 py-1 text-right text-xs sm:text-sm bg-white border rounded-md text-[var(--ink)] tabular-nums focus:outline-none focus:border-[var(--line)]"
+        class="w-20 px-2 py-1 text-right text-xs sm:text-sm bg-[var(--surface)] border rounded-md text-[var(--ink)] tabular-nums focus:outline-none focus:border-[var(--line)]"
         [ngClass]="isOutOfBounds() ? 'border-[var(--danger)] text-[var(--danger)]' : 'border-[var(--kerb)]'"
       />
       <span class="text-xs text-[var(--ink-2)] min-w-7">{{ unit() }}</span>

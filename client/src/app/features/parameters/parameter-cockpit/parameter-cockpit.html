@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-3 p-4 bg-white border border-[var(--kerb)] rounded-xl shadow-xs select-none">
+<div class="flex flex-col gap-3 p-4 bg-[var(--surface)] border border-[var(--kerb)] rounded-xl shadow-xs select-none">
   <!-- Benchmark Instance Selector Badges -->
   <div class="flex items-center gap-2.5 border-b border-[var(--kerb)] pb-3 overflow-x-auto no-scrollbar">
     @for (inst of store.instances(); track inst.id) {
@@ -8,7 +8,7 @@
         [ngClass]="
           store.selectedInstanceId() === inst.id
             ? 'bg-[var(--line-tint)] border-[var(--line)] shadow-2xs font-bold text-[var(--ink)]'
-            : 'bg-white border-[var(--kerb)] hover:border-[var(--ink-2)] font-medium text-[var(--ink-2)]'
+            : 'bg-[var(--surface)] border-[var(--kerb)] hover:border-[var(--ink-2)] font-medium text-[var(--ink-2)]'
         "
         (click)="store.setSelectedInstanceId(inst.id)"
       >

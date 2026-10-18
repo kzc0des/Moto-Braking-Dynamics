@@ -1,38 +1,17 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable } from '@angular/core';
 
-export type AppTheme = 'dark' | 'light';
-
+/**
+ * The whole site uses the dark "night road" theme. There is no light/dark switch,
+ * so this service only makes sure the document is flagged as dark.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  readonly currentTheme = signal<AppTheme>('light');
-
   constructor() {
-    // Check localStorage or default to light
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('moto_theme') as AppTheme | null;
-      if (saved === 'light' || saved === 'dark') {
-        this.currentTheme.set(saved);
-      } else {
-        this.currentTheme.set('light');
-      }
-
-      effect(() => {
-        const theme = this.currentTheme();
-        localStorage.setItem('moto_theme', theme);
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-          document.documentElement.classList.remove('light');
-        } else {
-          document.documentElement.classList.add('light');
-          document.documentElement.classList.remove('dark');
-        }
-      });
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     }
-  }
-
-  toggleTheme(): void {
-    this.currentTheme.update(t => t === 'dark' ? 'light' : 'dark');
   }
 }

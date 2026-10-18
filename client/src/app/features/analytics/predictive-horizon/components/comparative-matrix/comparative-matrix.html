@@ -1,6 +1,6 @@
 <!-- COMPARISON: one panel, two what-if tabs -->
 <div
-  class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col gap-2 shrink-0"
+  class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col gap-2 shrink-0"
 >
   <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--kerb)]/60 pb-2">
     <div class="inline-flex p-0.5 gap-0.5 rounded-lg bg-[var(--well)] border border-[var(--kerb)]" role="tablist">
@@ -12,7 +12,7 @@
         class="h-8 px-3 rounded-md text-xs font-bold cursor-pointer transition-all"
         [ngClass]="
           compareTab() === 'brakes'
-            ? 'bg-white border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
+            ? 'bg-[var(--surface)] border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
             : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
         "
       >
@@ -26,7 +26,7 @@
         class="h-8 px-3 rounded-md text-xs font-bold cursor-pointer transition-all"
         [ngClass]="
           compareTab() === 'road'
-            ? 'bg-white border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
+            ? 'bg-[var(--surface)] border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
             : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
         "
       >

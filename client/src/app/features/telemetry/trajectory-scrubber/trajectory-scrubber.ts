@@ -20,7 +20,7 @@ export class TrajectoryScrubber {
 
   trackBackground(): string {
     const pct = this.progressPercent().toFixed(1);
-    return `linear-gradient(to right, #FFC800 0%, #FFC800 ${pct}%, #DDE0E4 ${pct}%, #DDE0E4 100%)`;
+    return `linear-gradient(to right, #FFC800 0%, #FFC800 ${pct}%, #2A3039 ${pct}%, #2A3039 100%)`;
   }
 
   isStagedAtStart(): boolean {
