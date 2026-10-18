@@ -1,5 +1,6 @@
-import { Component, inject, computed, signal, output } from '@angular/core';
+import { Component, inject, computed, signal, output, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { MetricCard } from '../../../shared/ui/metric-card/metric-card';
 import { ForecastHero } from './components/forecast-hero/forecast-hero';
@@ -18,7 +19,9 @@ import { GenericTestReportModal } from './components/generic-test-report-modal/g
   templateUrl: './predictive-horizon.html',
   styleUrl: './predictive-horizon.css'
 })
-export class PredictiveHorizon {
+export class PredictiveHorizon implements OnInit {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly store = inject(BenchmarkStore);
   readonly simulateTrigger = output<void>();
 
@@ -27,6 +30,69 @@ export class PredictiveHorizon {
   readonly compareTab = signal<'brakes' | 'road'>('brakes');
   readonly isReportModalOpen = signal<boolean>(false);
   readonly reportGeneratedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+  ngOnInit(): void {
+    const whatif = this.route.snapshot.queryParamMap.get('whatif');
+    if (whatif === 'brakes' || whatif === 'road') {
+      this.compareTab.set(whatif);
+    }
+    const details = this.route.snapshot.queryParamMap.get('details');
+    if (details === 'engineering') {
+      this.showDetails.set(true);
+    }
+    const report = this.route.snapshot.queryParamMap.get('report');
+    if (report === 'true') {
+      this.isReportModalOpen.set(true);
+    }
+  }
+
+  onCompareTabChange(tab: 'brakes' | 'road'): void {
+    this.compareTab.set(tab);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { whatif: tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  toggleDetails(): void {
+    const next = !this.showDetails();
+    this.showDetails.set(next);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { details: next ? 'engineering' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  openReportModal(): void {
+    this.isReportModalOpen.set(true);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { report: 'true' },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  closeReportModal(): void {
+    this.isReportModalOpen.set(false);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { report: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  @HostListener('window:keydown.escape')
+  onEscape(): void {
+    if (this.isReportModalOpen()) {
+      this.closeReportModal();
+    }
+  }
 
   // --- Physical Reference Constants ---
   private readonly G = 9.81;

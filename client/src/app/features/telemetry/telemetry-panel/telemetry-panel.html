@@ -1,4 +1,4 @@
-<div class="bg-[var(--surface)] flex flex-col select-none h-full min-h-0">
+<div class="bg-[var(--surface)] flex flex-col h-full min-h-0">
   <!-- 1. Drawer Header / Clickable Handle Bar -->
   <div (click)="toggleOpen()"
     class="px-3 sm:px-4 h-10 bg-[var(--surface)] hover:bg-[var(--well)]/40 border-t border-[var(--kerb)] transition-colors cursor-pointer flex items-center justify-between gap-2 shrink-0 select-none"
@@ -69,7 +69,7 @@
   </div>
 
   <!-- 2. Drawer Body: Responsive Telemetry Grid -->
-  <div class="border-t border-[var(--kerb)]/60 bg-[var(--bg)]/50 p-2.5 sm:p-3 flex-1 min-h-0 overflow-y-auto"
+  <div class="border-t border-[var(--kerb)]/60 bg-[var(--bg)]/50 p-2.5 sm:p-3 flex-1 min-h-0 overflow-y-auto select-text"
     [class.hidden]="!isOpen()">
     <!-- Grid: 1 col on mobile, 2 cols on laptops/desktops, 4 cols on wide screens (2xl) -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">

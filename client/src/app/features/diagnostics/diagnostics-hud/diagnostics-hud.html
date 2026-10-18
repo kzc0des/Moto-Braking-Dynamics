@@ -1,8 +1,8 @@
 <!-- Top Header Pill Button -->
 <button
   type="button"
-  (click)="diagnostics.toggleHud()"
-  class="h-9 lg:h-8 px-3 bg-[var(--surface)] border border-[var(--kerb)] hover:border-[var(--line)] text-[var(--ink)] rounded-lg transition-colors text-xs font-semibold flex items-center gap-2 shadow-2xs cursor-pointer"
+  (click)="toggleHud()"
+  class="h-9 lg:h-8 px-3 bg-[var(--surface)] border border-[var(--kerb)] hover:border-[var(--line)] text-[var(--ink)] rounded-lg transition-colors text-xs font-semibold flex items-center gap-2 shadow-2xs cursor-pointer select-none"
   [ngClass]="
     diagnostics.errors().length > 0
       ? 'border-[var(--danger)] text-[var(--danger-ink)] bg-[var(--danger-tint)]'
@@ -33,18 +33,18 @@
 @if (diagnostics.isHudOpen()) {
   <!-- Backdrop Overlay -->
   <div
-    (click)="diagnostics.toggleHud()"
+    (click)="closeHud()"
     class="fixed inset-0 bg-black/30 z-50 backdrop-blur-2xs transition-opacity"
   ></div>
 }
 
 <div
-  class="fixed inset-y-0 right-0 z-55 w-full sm:w-[480px] bg-[var(--surface)] border-l border-[var(--kerb)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out font-sans select-none"
+  class="fixed inset-y-0 right-0 z-55 w-full sm:w-[480px] bg-[var(--surface)] border-l border-[var(--kerb)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out font-sans"
   [class.translate-x-0]="diagnostics.isHudOpen()"
   [class.translate-x-full]="!diagnostics.isHudOpen()"
 >
   <!-- Drawer Header -->
-  <div class="flex items-center justify-between px-5 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)]">
+  <div class="flex items-center justify-between px-5 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)] select-none">
     <div class="flex items-center gap-2.5">
       <span class="w-6 h-6 rounded-md bg-[var(--line-tint)] border border-[var(--line)] flex items-center justify-center text-[var(--line-deep)] shrink-0">
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -62,7 +62,7 @@
     </div>
     <button
       type="button"
-      (click)="diagnostics.toggleHud()"
+      (click)="closeHud()"
       class="px-2.5 py-1 bg-[var(--surface)] border border-[var(--kerb)] hover:border-[var(--line)] hover:bg-[var(--line-tint)] text-[var(--ink)] rounded-lg text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5"
     >
       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,7 +76,7 @@
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3.5 bg-[var(--concrete)]">
     <!-- Engine Status Banner -->
     @if (store.engineStatus() === 'connected') {
-      <div class="p-3 bg-[var(--ok-tint)] border border-[var(--ok)]/40 rounded-xl flex items-start gap-2.5 shadow-2xs">
+      <div class="p-3 bg-[var(--ok-tint)] border border-[var(--ok)]/40 rounded-xl flex items-start gap-2.5 shadow-2xs select-text">
         <span class="w-2.5 h-2.5 rounded-full bg-[var(--ok)] shrink-0 mt-0.5 animate-pulse"></span>
         <div class="leading-snug">
           <div class="font-bold text-[var(--ok-ink)] text-xs">Python Backend Solver Active</div>
@@ -86,7 +86,7 @@
         </div>
       </div>
     } @else {
-      <div class="p-3 bg-[var(--line-tint)] border border-[var(--warn)]/60 rounded-xl flex items-start gap-2.5 shadow-2xs">
+      <div class="p-3 bg-[var(--line-tint)] border border-[var(--warn)]/60 rounded-xl flex items-start gap-2.5 shadow-2xs select-text">
         <span class="w-2.5 h-2.5 rounded-full bg-[var(--warn)] shrink-0 mt-0.5"></span>
         <div class="leading-snug">
           <div class="font-bold text-[var(--line-deep)] text-xs">Backend Offline — Approximate Client Fallback</div>
@@ -99,16 +99,16 @@
 
     <!-- Performance & Latency Metrics -->
     @if (diagnostics.metrics(); as m) {
-      <div class="grid grid-cols-2 gap-2 text-xs">
+      <div class="grid grid-cols-2 gap-2 text-xs select-text">
         <div class="p-3 bg-[var(--surface)] border border-[var(--kerb)] rounded-xl shadow-2xs">
           <div class="text-[var(--ink-2)] text-[11px] font-medium">Solver Execution:</div>
-          <div class="text-[var(--ink)] font-bold text-sm mt-0.5">
+          <div class="text-[var(--ink)] font-bold text-sm mt-0.5 font-mono">
             {{ store.engineStatus() === 'connected' ? m.solverExecutionTimeMs + ' ms' : 'N/A (Offline)' }}
           </div>
         </div>
         <div class="p-3 bg-[var(--surface)] border border-[var(--kerb)] rounded-xl shadow-2xs">
           <div class="text-[var(--ink-2)] text-[11px] font-medium">Roundtrip Latency:</div>
-          <div class="text-[var(--ink)] font-bold text-sm mt-0.5">
+          <div class="text-[var(--ink)] font-bold text-sm mt-0.5 font-mono">
             {{ store.engineStatus() === 'connected' ? m.roundtripLatencyMs + ' ms' : '0 ms' }}
           </div>
         </div>
@@ -117,7 +117,7 @@
 
     <!-- Active Physical Safeguard Warnings -->
     @if (store.activeWarnings().length > 0) {
-      <div class="p-3 bg-[var(--line-tint)] border border-[var(--warn)]/40 rounded-xl shadow-2xs">
+      <div class="p-3 bg-[var(--line-tint)] border border-[var(--warn)]/40 rounded-xl shadow-2xs select-text">
         <span class="text-[var(--line-deep)] font-bold text-xs uppercase tracking-wider">Physical Safeguard Warnings</span>
         <ul class="list-disc list-inside mt-1.5 text-xs text-[var(--line-deep)] space-y-1">
           @for (warn of store.activeWarnings(); track warn) {
@@ -129,7 +129,7 @@
 
     <!-- HTTP / Runtime Errors -->
     @if (diagnostics.errors().length > 0) {
-      <div class="p-3 bg-[var(--danger-tint)] border border-[var(--danger)]/40 rounded-xl flex flex-col gap-1.5 shadow-2xs">
+      <div class="p-3 bg-[var(--danger-tint)] border border-[var(--danger)]/40 rounded-xl flex flex-col gap-1.5 shadow-2xs select-text">
         <div class="flex items-center justify-between">
           <span class="text-[var(--danger-ink)] font-bold text-xs uppercase tracking-wider">Connection & Runtime Errors</span>
           <button
@@ -141,7 +141,7 @@
           </button>
         </div>
         @for (err of diagnostics.errors(); track err.timestamp) {
-          <div class="text-xs text-[var(--danger-ink)] border-t border-[var(--danger)]/20 pt-1 font-mono">
+          <div class="text-xs text-[var(--danger-ink)] border-t border-[var(--danger)]/20 pt-1 font-mono select-text">
             <span class="text-[var(--ink-2)]">[{{ err.timestamp }}]</span> {{ err.message }}
           </div>
         }
@@ -149,28 +149,28 @@
     }
 
     <!-- Simulation State & Raw Inspection -->
-    <div class="p-3 bg-[var(--surface)] border border-[var(--kerb)] rounded-xl shadow-2xs flex flex-col gap-2 font-mono text-xs">
+    <div class="p-3 bg-[var(--surface)] border border-[var(--kerb)] rounded-xl shadow-2xs flex flex-col gap-2 font-mono text-xs select-text">
       <div class="font-bold text-[var(--ink)] font-sans text-xs uppercase tracking-wider">State Inspection</div>
       <div class="text-[var(--ink-2)]">
         Evaluation: Active Garage Vehicle | Scrub: {{ store.scrubTime().toFixed(2) }}s
       </div>
       <details class="text-xs">
         <summary class="text-[var(--ink)] hover:text-[var(--line-deep)] cursor-pointer hover:underline font-sans font-medium">View Raw Request Payload</summary>
-        <pre class="mt-1.5 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded-lg text-[var(--ink)] overflow-x-auto max-h-40 text-[11px] leading-tight">{{ diagnostics.rawRequestPayload() | json }}</pre>
+        <pre class="mt-1.5 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded-lg text-[var(--ink)] overflow-x-auto max-h-40 text-[11px] leading-tight select-text user-select-text">{{ diagnostics.rawRequestPayload() | json }}</pre>
       </details>
       <details class="text-xs">
         <summary class="text-[var(--ink)] hover:text-[var(--line-deep)] cursor-pointer hover:underline font-sans font-medium">View Raw Solver Response</summary>
-        <pre class="mt-1.5 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded-lg text-[var(--ink)] overflow-x-auto max-h-40 text-[11px] leading-tight">{{ diagnostics.rawResponsePayload() | json }}</pre>
+        <pre class="mt-1.5 p-2 bg-[var(--well)] border border-[var(--kerb)] rounded-lg text-[var(--ink)] overflow-x-auto max-h-40 text-[11px] leading-tight select-text user-select-text">{{ diagnostics.rawResponsePayload() | json }}</pre>
       </details>
     </div>
   </div>
 
   <!-- Drawer Footer -->
-  <div class="px-5 py-3 bg-[var(--concrete)] border-t border-[var(--kerb)] flex items-center justify-between text-xs">
+  <div class="px-5 py-3 bg-[var(--concrete)] border-t border-[var(--kerb)] flex items-center justify-between text-xs select-none">
     <div class="text-[var(--ink-2)] text-[11px]">Engine: FastAPI + SciPy RK45</div>
     <button
       type="button"
-      (click)="diagnostics.toggleHud()"
+      (click)="closeHud()"
       class="px-5 py-1.5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-lg font-bold transition-colors text-xs shadow-2xs cursor-pointer"
     >
       Close

@@ -19,7 +19,8 @@ export class SetupHub implements OnInit {
 
   ngOnInit(): void {
     if (!this.isRevisit && this.garageService.hasVehicles()) {
-      this.router.navigate(['/workbench']);
+      const activeId = this.garageService.activeVehicleId() || this.garageService.vehicles()[0].id;
+      this.router.navigate(['/workbench', activeId, 'analytics']);
     }
   }
 
@@ -28,7 +29,7 @@ export class SetupHub implements OnInit {
   }
 
   loadBaselineAndProceed(): void {
-    this.garageService.loadBaselineScooter();
-    this.router.navigate(['/workbench']);
+    const record = this.garageService.loadBaselineScooter();
+    this.router.navigate(['/workbench', record.id, 'analytics']);
   }
 }

@@ -1,4 +1,4 @@
-<div class="bg-[var(--bg)] text-[var(--ink)] flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
+<div class="bg-[var(--bg)] text-[var(--ink)] flex flex-col font-sans h-[100dvh] max-h-[100dvh] overflow-hidden">
   <!-- Top Application Header -->
   <header class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 sm:px-6 py-2 bg-[var(--chrome)] border-b border-[var(--chrome-edge)] shrink-0 lg:h-14 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-x-4">
     <!-- Left: Brand / Topic Title -->
@@ -166,18 +166,18 @@
   @if (isMembersDrawerOpen()) {
     <!-- Backdrop Overlay -->
     <div
-      (click)="isMembersDrawerOpen.set(false)"
+      (click)="closeMembersDrawer()"
       class="fixed inset-0 bg-black/30 z-50 backdrop-blur-2xs transition-opacity"
     ></div>
   }
 
   <div
-    class="fixed inset-y-0 left-0 z-55 w-full sm:w-[460px] bg-[var(--surface)] border-r border-[var(--kerb)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out select-none"
+    class="fixed inset-y-0 left-0 z-55 w-full sm:w-[460px] bg-[var(--surface)] border-r border-[var(--kerb)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out"
     [class.translate-x-0]="isMembersDrawerOpen()"
     [class.-translate-x-full]="!isMembersDrawerOpen()"
   >
     <!-- Drawer Header -->
-    <div class="flex items-center justify-between px-5 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)]">
+    <div class="flex items-center justify-between px-5 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)] select-none">
       <div class="flex items-center gap-2.5">
         <span class="w-6 h-6 rounded-md bg-[var(--line-tint)] border border-[var(--line)] flex items-center justify-center text-[var(--line-deep)] shrink-0">
           <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -191,7 +191,7 @@
       </div>
       <button
         type="button"
-        (click)="isMembersDrawerOpen.set(false)"
+        (click)="closeMembersDrawer()"
         class="px-2.5 py-1 bg-[var(--surface)] border border-[var(--kerb)] hover:border-[var(--line)] hover:bg-[var(--line-tint)] text-[var(--ink)] rounded-lg text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5"
       >
         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -202,7 +202,7 @@
     </div>
 
     <!-- Research Topic Callout -->
-    <div class="p-4 bg-[var(--surface)] border-b border-[var(--kerb)] flex flex-col gap-1.5">
+    <div class="p-4 bg-[var(--surface)] border-b border-[var(--kerb)] flex flex-col gap-1.5 select-text">
       <div class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)]">Research Investigation</div>
       <div class="text-xs text-[var(--ink)] font-semibold leading-snug">
         Multi-Physics Emergency Braking Dynamics, Thermal Fade, and Environmental Surface Modeling in Two-Wheeled Vehicles
@@ -214,18 +214,18 @@
 
     <!-- Members Scrollable List -->
     <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5 bg-[var(--concrete)]">
-      <div class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)] px-1 flex items-center justify-between">
+      <div class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)] px-1 flex items-center justify-between select-none">
         <span>Contributors</span>
         <span class="font-mono text-xs text-[var(--ink-3)]">{{ members.length }} Members</span>
       </div>
 
       @for (member of members; track member.name; let idx = $index) {
         <div
-          class="p-3 bg-[var(--surface)] border rounded-xl flex items-center gap-3 transition-colors shadow-2xs"
+          class="p-3 bg-[var(--surface)] border rounded-xl flex items-center gap-3 transition-colors shadow-2xs select-text"
           [ngClass]="member.isLead ? 'border-[var(--line)] bg-[var(--line-tint)]/30' : 'border-[var(--kerb)]'"
         >
           <div
-            class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 tracking-wide"
+            class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 tracking-wide select-none"
             [ngClass]="member.isLead ? 'bg-[var(--line)] text-[var(--on-line)] shadow-xs' : 'bg-[var(--well)] text-[var(--ink)]'"
           >
             {{ member.initials }}
@@ -237,7 +237,7 @@
                 {{ member.name }}
               </span>
               @if (member.isLead) {
-                <span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)] shrink-0">
+                <span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)] shrink-0 select-none">
                   Author / Lead
                 </span>
               }
@@ -247,7 +247,7 @@
             </div>
           </div>
 
-          <span class="text-xs font-mono text-[var(--ink-3)] tabular-nums shrink-0">
+          <span class="text-xs font-mono text-[var(--ink-3)] tabular-nums shrink-0 select-none">
             #{{ idx + 1 }}
           </span>
         </div>
@@ -255,11 +255,11 @@
     </div>
 
     <!-- Drawer Footer -->
-    <div class="px-5 py-3 bg-[var(--concrete)] border-t border-[var(--kerb)] flex items-center justify-between text-xs">
+    <div class="px-5 py-3 bg-[var(--concrete)] border-t border-[var(--kerb)] flex items-center justify-between text-xs select-none">
       <div class="text-[var(--ink-2)] text-[11px] font-medium">Academic Year 2026</div>
       <button
         type="button"
-        (click)="isMembersDrawerOpen.set(false)"
+        (click)="closeMembersDrawer()"
         class="px-5 py-1.5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-lg font-bold transition-colors text-xs shadow-2xs cursor-pointer"
       >
         Done
