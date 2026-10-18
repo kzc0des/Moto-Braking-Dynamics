@@ -57,7 +57,20 @@
               {{ activeSpriteKey() }} archetype
             </span>
 
-            <app-vehicle-silhouette [kind]="activeSpriteKey()" class="studio-preview-bike h-32 w-full" />
+            <button
+              type="button"
+              (click)="openPhoto()"
+              [attr.aria-label]="'Enlarge picture of ' + activePreset().name"
+              class="studio-preview-bike group relative h-32 w-full rounded-lg cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--line)]"
+            >
+              <app-vehicle-silhouette [kind]="activeSpriteKey()" class="h-full w-full transition-transform duration-200 group-hover:scale-[1.04]" />
+              <span class="absolute top-0 right-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[var(--surface)]/90 border border-[var(--kerb)] text-[10px] font-semibold text-[var(--ink-2)] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /><path d="M11 8v6M8 11h6" />
+                </svg>
+                Enlarge
+              </span>
+            </button>
 
             <div class="text-[11px] leading-snug text-center">
               <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
@@ -767,4 +780,48 @@
       </div>
     </div>
   </main>
+
+  <!-- Enlarged model picture (opened from the Live Geometry Model preview) -->
+  <dialog
+    #photoDialog
+    (click)="onPhotoDialogClick($event)"
+    aria-labelledby="photo-dialog-title"
+    class="photo-dialog m-auto p-0 w-[min(880px,92vw)] rounded-2xl border border-[var(--kerb)] bg-[var(--surface)] text-[var(--ink)] shadow-2xl backdrop:bg-black/75"
+  >
+    <div class="p-5 flex flex-col gap-4">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-3)]">{{ activeSpriteKey() }} archetype</span>
+          <h2 id="photo-dialog-title" class="text-lg font-bold tracking-tight m-0">{{ activePreset().name }}</h2>
+        </div>
+        <button
+          type="button"
+          (click)="closePhoto()"
+          aria-label="Close picture"
+          class="h-9 w-9 shrink-0 inline-flex items-center justify-center rounded-lg border border-[var(--kerb)] bg-[var(--well)] hover:bg-[var(--kerb)] text-[var(--ink)] cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="rounded-xl border border-[var(--kerb)] bg-[var(--concrete)] p-4">
+        <app-vehicle-silhouette [kind]="activeSpriteKey()" class="w-full aspect-[2/1]" />
+      </div>
+
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div class="leading-snug">
+          <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
+          <span class="text-[13px] font-semibold text-[var(--ink)]">{{ activePreset().models.join(' · ') }}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5 font-mono text-[11px] text-[var(--ink)]">
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">{{ displacementCc() }} cc</span>
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">{{ massKg() }} kg</span>
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">L = {{ wheelbase().toFixed(2) }} m</span>
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">h = {{ cogHeight().toFixed(2) }} m</span>
+        </div>
+      </div>
+    </div>
+  </dialog>
 </div>

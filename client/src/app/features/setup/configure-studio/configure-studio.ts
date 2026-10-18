@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, inject, signal, computed, viewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -475,6 +475,24 @@ export class ConfigureStudio implements OnInit, OnDestroy {
 
   updateFluidBoilTemp(val: number | string): void {
     this.fluidBoilTemp.set(Number(val));
+  }
+
+  private readonly photoDialog = viewChild.required<ElementRef<HTMLDialogElement>>('photoDialog');
+
+  /** Opens the enlarged picture of the selected model (native modal dialog: focus trap + Esc built in). */
+  openPhoto(): void {
+    this.photoDialog().nativeElement.showModal();
+  }
+
+  closePhoto(): void {
+    this.photoDialog().nativeElement.close();
+  }
+
+  /** A click that lands on the dialog element itself (not its content) is a backdrop click. */
+  onPhotoDialogClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closePhoto();
+    }
   }
 
   goBack(): void {
