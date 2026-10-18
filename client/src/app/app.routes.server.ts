@@ -2,11 +2,7 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: 'workbench/:bikeId/analytics',
-    renderMode: RenderMode.Client
-  },
-  {
-    path: 'workbench/:bikeId/simulation',
+    path: 'workbench/:bikeId/:tab',
     renderMode: RenderMode.Client
   },
   {

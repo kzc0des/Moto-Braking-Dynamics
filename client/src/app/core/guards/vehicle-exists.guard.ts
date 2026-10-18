@@ -20,6 +20,14 @@ export const vehicleExistsGuard: CanActivateFn = (route) => {
         queryParams: { reason: 'vehicle', id: bikeId }
       });
     }
+    // Validate tab if specified in route path
+    const tab = route.paramMap.get('tab');
+    if (tab && tab !== 'analytics' && tab !== 'simulation') {
+      return router.createUrlTree(['/not-found'], {
+        queryParams: { reason: 'route' }
+      });
+    }
+
     // Synchronize active vehicle in garage store if not already active
     if (garage.activeVehicleId() !== bikeId) {
       garage.setActiveVehicle(bikeId);

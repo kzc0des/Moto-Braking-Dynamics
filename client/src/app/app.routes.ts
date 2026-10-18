@@ -21,16 +21,9 @@ export const routes: Routes = [
     component: ConfigureStudio
   },
   {
-    path: 'workbench/:bikeId/analytics',
+    path: 'workbench/:bikeId/:tab',
     component: Workbench,
-    canActivate: [vehicleSetupGuard, vehicleExistsGuard],
-    data: { mode: 'analytics' }
-  },
-  {
-    path: 'workbench/:bikeId/simulation',
-    component: Workbench,
-    canActivate: [vehicleSetupGuard, vehicleExistsGuard],
-    data: { mode: 'simulation' }
+    canActivate: [vehicleSetupGuard, vehicleExistsGuard]
   },
   {
     path: 'workbench/:bikeId',

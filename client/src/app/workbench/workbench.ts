@@ -55,32 +55,38 @@ export class Workbench implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    // 1. Initial mode from route data
-    const initialMode = this.route.snapshot.data['mode'];
-    if (initialMode === 'simulation' || initialMode === 'analytics') {
-      this.currentMode.set(initialMode);
+    // 1. Initial tab & bikeId from route params
+    const initialTab = this.route.snapshot.paramMap.get('tab') || this.route.snapshot.data['mode'];
+    if (initialTab === 'simulation' || initialTab === 'analytics') {
+      this.currentMode.set(initialTab);
     }
 
-    // 2. React to route data changes (e.g., when navigating between tabs)
-    this.routeSub = this.route.data.subscribe(data => {
-      if (data['mode'] === 'simulation' || data['mode'] === 'analytics') {
-        this.currentMode.set(data['mode']);
+    // 2. React to route param changes (tab and bikeId switching without component remounting)
+    const paramSub = this.route.paramMap.subscribe(params => {
+      const tab = params.get('tab');
+      if (tab === 'simulation' || tab === 'analytics') {
+        this.currentMode.set(tab);
+      }
+      const bikeId = params.get('bikeId');
+      if (bikeId && this.garageService.activeVehicleId() !== bikeId) {
+        this.garageService.setActiveVehicle(bikeId);
       }
     });
+    this.routeSub = paramSub;
 
     // 3. React to query parameter updates
     const qParamsSub = this.route.queryParamMap.subscribe(params => {
-      // Panel state sync
+      // Panel state sync with guards to prevent redundant signal sets
       const panel = params.get('panel');
       if (panel === 'diagnostics') {
-        this.diagnostics.isHudOpen.set(true);
-        this.isMembersDrawerOpen.set(false);
+        if (!this.diagnostics.isHudOpen()) this.diagnostics.isHudOpen.set(true);
+        if (this.isMembersDrawerOpen()) this.isMembersDrawerOpen.set(false);
       } else if (panel === 'team') {
-        this.isMembersDrawerOpen.set(true);
-        this.diagnostics.isHudOpen.set(false);
+        if (!this.isMembersDrawerOpen()) this.isMembersDrawerOpen.set(true);
+        if (this.diagnostics.isHudOpen()) this.diagnostics.isHudOpen.set(false);
       } else {
-        this.isMembersDrawerOpen.set(false);
-        this.diagnostics.isHudOpen.set(false);
+        if (this.isMembersDrawerOpen()) this.isMembersDrawerOpen.set(false);
+        if (this.diagnostics.isHudOpen()) this.diagnostics.isHudOpen.set(false);
       }
 
       // Environment state hydration
@@ -148,6 +154,8 @@ export class Workbench implements OnInit, OnDestroy {
 
   setMode(mode: 'analytics' | 'simulation'): void {
     if (this.currentMode() === mode) return;
+
+    this.currentMode.set(mode);
 
     const bikeId = this.garageService.activeVehicleId() || this.store.selectedInstance().id;
     const currentParams = this.route.snapshot.queryParams;
