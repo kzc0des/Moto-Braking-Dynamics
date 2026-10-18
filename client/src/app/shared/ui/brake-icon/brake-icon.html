@@ -1,0 +1,46 @@
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="block w-full h-full">
+  @switch (kind()) {
+    @case ('single_disc') {
+      <!-- Drilled front rotor with the caliper clamping its upper edge -->
+      <circle cx="11" cy="13" r="8.5" />
+      <circle cx="11" cy="13" r="2.4" />
+      <g fill="currentColor" stroke="none">
+        <circle cx="16.4" cy="13" r="0.9" />
+        <circle cx="13.7" cy="17.68" r="0.9" />
+        <circle cx="8.3" cy="17.68" r="0.9" />
+        <circle cx="5.6" cy="13" r="0.9" />
+        <circle cx="8.3" cy="8.32" r="0.9" />
+        <circle cx="13.7" cy="8.32" r="0.9" />
+      </g>
+      <rect x="14.6" y="2.2" width="5.2" height="7.6" rx="1.6" transform="rotate(38 17.2 6)" fill="currentColor" fill-opacity="0.35" />
+    }
+    @case ('dual_disc') {
+      <!-- Front view: tyre in the middle, a rotor and caliper on each side -->
+      <rect x="9.5" y="2.5" width="5" height="19" rx="2.5" />
+      <path d="M5.5 6.5v11M18.5 6.5v11" stroke-width="2.4" />
+      <path d="M5.5 12h4M14.5 12h4" />
+      <rect x="3.6" y="4.5" width="3.8" height="5.5" rx="1" fill="currentColor" fill-opacity="0.35" />
+      <rect x="16.6" y="4.5" width="3.8" height="5.5" rx="1" fill="currentColor" fill-opacity="0.35" />
+    }
+    @case ('drum') {
+      <!-- Closed drum housing with two shoes, the cam and its lever -->
+      <circle cx="12" cy="13" r="8.5" stroke-width="2.4" fill="currentColor" fill-opacity="0.15" />
+      <path d="M8.3 9.2a5.2 5.2 0 0 0 0 7.6M15.7 9.2a5.2 5.2 0 0 1 0 7.6" stroke-width="2" />
+      <rect x="10.4" y="6.4" width="3.2" height="2.4" rx="0.6" fill="currentColor" stroke="none" />
+      <path d="M12 5.2 18.5 1.8" stroke-width="1.8" />
+      <circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none" />
+    }
+    @case ('rear_disc') {
+      <!-- Smaller rear rotor with the caliper on its lower edge -->
+      <circle cx="13" cy="11" r="7.5" />
+      <circle cx="13" cy="11" r="2.2" />
+      <g fill="currentColor" stroke="none">
+        <circle cx="16.32" cy="14.32" r="1" />
+        <circle cx="9.68" cy="14.32" r="1" />
+        <circle cx="9.68" cy="7.68" r="1" />
+        <circle cx="16.32" cy="7.68" r="1" />
+      </g>
+      <rect x="3.6" y="13.6" width="5.2" height="7.2" rx="1.6" transform="rotate(40 6.2 17.2)" fill="currentColor" fill-opacity="0.35" />
+    }
+  }
+</svg>
