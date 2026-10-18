@@ -29,11 +29,14 @@
           {{ mfddG() }} <span class="text-sm font-medium text-[var(--ink-2)]">g</span>
           <span class="text-xs font-normal text-[var(--ink-2)] ml-1">({{ decelMs2() }} m/s²)</span>
         </div>
-        <div
-          class="font-mono text-[11px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block"
-          [style.display]="showDetails() ? null : 'none'"
-        >
-          MFDD = (v_b² − v_e²) / [2(s_e − s_b)]
+        <div class="collapsible" [class.open]="showDetails()" [attr.aria-hidden]="!showDetails()">
+          <div class="collapsible-inner">
+            <div
+              class="font-mono text-[11px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block"
+            >
+              MFDD = (v_b² − v_e²) / [2(s_e − s_b)]
+            </div>
+          </div>
         </div>
         <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] mt-1">{{ decelPlain() }}</div>
 
@@ -57,11 +60,14 @@
           {{ (+peakSlip() * 100).toFixed(0) }}% <span class="text-sm font-medium text-[var(--ink-2)]">tire slip</span>
           <span class="text-xs font-normal text-[var(--ink-2)] ml-1">(limit {{ (criticalSlip() * 100).toFixed(0) }}%)</span>
         </div>
-        <div
-          class="font-mono text-[11px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block"
-          [style.display]="showDetails() ? null : 'none'"
-        >
-          κ = (v − ω·R_w) / max(v, ε)
+        <div class="collapsible" [class.open]="showDetails()" [attr.aria-hidden]="!showDetails()">
+          <div class="collapsible-inner">
+            <div
+              class="font-mono text-[11px] text-[var(--ink-2)] bg-[var(--well)] px-1.5 py-0.5 rounded border border-[var(--kerb)] mt-1.5 inline-block"
+            >
+              κ = (v − ω·R_w) / max(v, ε)
+            </div>
+          </div>
         </div>
         <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] mt-1">
           Road grip level: <b class="font-mono text-[var(--ink)]">{{ frictionCoeff() }}</b>
@@ -120,6 +126,7 @@
       type="button"
       (click)="showDetails.set(!showDetails())"
       [attr.aria-expanded]="showDetails()"
+      aria-controls="engineering-details"
       class="shrink-0 h-10 px-4 rounded-xl border border-[var(--kerb)] bg-white hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs"
     >
       <span>{{ showDetails() ? 'Hide engineering details' : 'Show engineering details' }}</span>
@@ -137,7 +144,15 @@
       </svg>
     </button>
 
-    @if (showDetails()) {
+    <div
+      id="engineering-details"
+      class="collapsible transition-[margin] duration-200"
+      [class.open]="showDetails()"
+      [class.-mt-2.5]="!showDetails()"
+      [attr.aria-hidden]="!showDetails()"
+      [attr.inert]="showDetails() ? null : ''"
+    >
+      <div class="collapsible-inner flex flex-col gap-2.5">
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
         <!-- Card 3: Dynamic Normal Load Transfer -->
         <app-metric-card
@@ -334,7 +349,8 @@
         </div>
         <span class="font-mono text-[11px] text-[var(--ink-2)]">θ = {{ gradeDeg() }}°</span>
       </div>
-    }
+      </div>
+    </div>
   </div>
 
   <!-- ZONE 4: PINNED MISSION CONTROL DOCK BAR -->

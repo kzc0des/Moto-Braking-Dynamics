@@ -9,7 +9,7 @@
           <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">{{ title() }}</span>
         }
         @if (formula() && showFormula()) {
-          <span class="font-mono text-[11px] sm:text-[11px] text-[var(--ink-3)]">{{ formula() }}</span>
+          <span class="formula-tag font-mono text-[11px] text-[var(--ink-3)]">{{ formula() }}</span>
         }
         <ng-content select="[card-header-extra]"></ng-content>
       </div>
