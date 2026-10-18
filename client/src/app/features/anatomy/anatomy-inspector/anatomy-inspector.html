@@ -2,7 +2,7 @@
   <!-- Minimized State -->
   <div
     (click)="toggleMinimize.emit()"
-    class="h-full min-h-[300px] w-full bg-white border border-[var(--kerb)] rounded-xl flex flex-col items-center justify-between py-3 px-1 cursor-pointer hover:border-[var(--line)] transition-colors shadow-xs select-none"
+    class="h-full min-h-[300px] w-full bg-[var(--surface)] border border-[var(--kerb)] rounded-xl flex flex-col items-center justify-between py-3 px-1 cursor-pointer hover:border-[var(--line)] transition-colors shadow-xs select-none"
     title="Click to expand Anatomy Inspector"
   >
     <button
@@ -19,13 +19,13 @@
   </div>
 } @else {
   <!-- Expanded State Matching Screenshot -->
-  <div class="bg-white border border-[var(--kerb)] rounded-xl shadow-xs p-4 flex flex-col gap-3.5 h-full select-none">
+  <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl shadow-xs p-4 flex flex-col gap-3.5 h-full select-none">
     <!-- Header: "Anatomy inspector" + Status Pill -->
     <div class="flex items-center justify-between pb-1 border-b border-[var(--kerb)]/60">
       <div class="font-bold text-[var(--ink)] text-base">Anatomy inspector</div>
 
       <div class="flex items-center gap-2">
-        <span class="border border-[#1F9D55]/40 text-[#156939] bg-[#EAF7EE] text-xs font-semibold px-2.5 py-0.5 rounded-md">
+        <span class="border border-[var(--ok)]/40 text-[var(--ok-ink)] bg-[var(--ok-tint)] text-xs font-semibold px-2.5 py-0.5 rounded-md">
           {{ getStatusLabel() }}
         </span>
 
@@ -53,43 +53,43 @@
       <!-- 2D Motorcycle Skeleton Anatomy Schematic -->
       <div class="relative w-full h-36 flex items-center justify-center overflow-hidden">
         <svg viewBox="0 0 320 140" class="w-full h-full">
-          <!-- Rear Wheel (Asphalt #1F2328) -->
-          <circle cx="70" cy="85" r="22" stroke="#1F2328" stroke-width="2.5" fill="none" />
-          <circle cx="70" cy="85" r="4" fill="#1F2328" />
+          <!-- Rear Wheel (Asphalt var(--ink)) -->
+          <circle cx="70" cy="85" r="22" stroke="var(--ink)" stroke-width="2.5" fill="none" />
+          <circle cx="70" cy="85" r="4" fill="var(--ink)" />
 
-          <!-- Front Wheel (Asphalt #3B4048) -->
-          <circle cx="250" cy="85" r="22" stroke="#3B4048" stroke-width="2.5" fill="none" />
-          <circle cx="250" cy="85" r="4" fill="#3B4048" />
+          <!-- Front Wheel (Asphalt var(--asphalt-7)) -->
+          <circle cx="250" cy="85" r="22" stroke="var(--asphalt-7)" stroke-width="2.5" fill="none" />
+          <circle cx="250" cy="85" r="4" fill="var(--asphalt-7)" />
 
           <!-- Chassis Frame Lines -->
           <!-- Swingarm -->
-          <line x1="70" y1="85" x2="145" y2="70" stroke="#1F2328" stroke-width="2.5" />
+          <line x1="70" y1="85" x2="145" y2="70" stroke="var(--ink)" stroke-width="2.5" />
           <!-- Steering neck -->
-          <line x1="145" y1="70" x2="225" y2="40" stroke="#1F2328" stroke-width="2.5" />
+          <line x1="145" y1="70" x2="225" y2="40" stroke="var(--ink)" stroke-width="2.5" />
           <!-- Front fork -->
-          <line x1="225" y1="40" x2="250" y2="85" stroke="#2B6CB0" stroke-width="2.5" />
+          <line x1="225" y1="40" x2="250" y2="85" stroke="var(--info)" stroke-width="2.5" />
           <!-- Upper frame truss -->
-          <line x1="145" y1="70" x2="185" y2="35" stroke="#656C76" stroke-width="1.5" />
-          <line x1="185" y1="35" x2="225" y2="40" stroke="#656C76" stroke-width="1.5" />
-          <line x1="70" y1="85" x2="225" y2="40" stroke="#DDE0E4" stroke-width="1" stroke-dasharray="2,2" />
+          <line x1="145" y1="70" x2="185" y2="35" stroke="var(--ink-2)" stroke-width="1.5" />
+          <line x1="185" y1="35" x2="225" y2="40" stroke="var(--ink-2)" stroke-width="1.5" />
+          <line x1="70" y1="85" x2="225" y2="40" stroke="var(--kerb)" stroke-width="1" stroke-dasharray="2,2" />
 
           <!-- Center of Gravity (CoG) Pavement Yellow Crosshair Target -->
           <g transform="translate(170, 52)">
-            <circle cx="0" cy="0" r="8" stroke="#FFC800" stroke-width="2" fill="none" />
-            <line x1="-10" y1="0" x2="10" y2="0" stroke="#FFC800" stroke-width="2" />
-            <line x1="0" y1="-10" x2="0" y2="10" stroke="#FFC800" stroke-width="2" />
-            <circle cx="0" cy="0" r="2.5" fill="#1F2328" />
+            <circle cx="0" cy="0" r="8" stroke="var(--line)" stroke-width="2" fill="none" />
+            <line x1="-10" y1="0" x2="10" y2="0" stroke="var(--line)" stroke-width="2" />
+            <line x1="0" y1="-10" x2="0" y2="10" stroke="var(--line)" stroke-width="2" />
+            <circle cx="0" cy="0" r="2.5" fill="var(--ink)" />
           </g>
 
           <!-- Dimension Guidelines below -->
-          <line x1="70" y1="120" x2="250" y2="120" stroke="#DDE0E4" stroke-width="1" />
-          <line x1="70" y1="116" x2="70" y2="124" stroke="#A3A9B1" stroke-width="1" />
-          <line x1="250" y1="116" x2="250" y2="124" stroke="#A3A9B1" stroke-width="1" />
+          <line x1="70" y1="120" x2="250" y2="120" stroke="var(--kerb)" stroke-width="1" />
+          <line x1="70" y1="116" x2="70" y2="124" stroke="var(--ink-3)" stroke-width="1" />
+          <line x1="250" y1="116" x2="250" y2="124" stroke="var(--ink-3)" stroke-width="1" />
 
-          <text x="70" y="134" fill="#656C76" font-size="11" font-family="system-ui, sans-serif">
+          <text x="70" y="134" fill="var(--ink-2)" font-size="11" font-family="system-ui, sans-serif">
             Wheelbase {{ inst().vehicle.wheelbase }} m
           </text>
-          <text x="250" y="134" fill="#656C76" font-size="11" font-family="system-ui, sans-serif" text-anchor="end">
+          <text x="250" y="134" fill="var(--ink-2)" font-size="11" font-family="system-ui, sans-serif" text-anchor="end">
             CoG h {{ inst().vehicle.cogHeight }} m
           </text>
         </svg>

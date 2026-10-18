@@ -1,6 +1,6 @@
 <!-- ZONE 1: PRIMARY FORECAST HERO BANNER -->
 <section
-  class="bg-white border border-[var(--kerb)] rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col gap-2.5 shrink-0"
+  class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col gap-2.5 shrink-0"
 >
   <div class="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 sm:gap-5">
     <!-- Verdict & Primary Numeric Stats -->
@@ -23,7 +23,7 @@
         <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping margin</span>
         <div
           class="font-mono text-lg sm:text-2xl font-bold"
-          [ngClass]="margin() >= 0 ? 'text-[#156939]' : 'text-[#9E241E]'"
+          [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
         >
           {{ marginFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
         </div>
@@ -58,7 +58,7 @@
         <div
           class="absolute inset-y-0 left-0 rounded-l-md transition-all duration-150"
           [style.width.%]="tape().phase1Pct"
-          style="background: repeating-linear-gradient(45deg, #DDE0E4 0, #DDE0E4 6px, #ECEEF0 6px, #ECEEF0 12px);"
+          style="background: repeating-linear-gradient(45deg, var(--kerb) 0, var(--kerb) 6px, var(--well) 6px, var(--well) 12px);"
         ></div>
 
         <!-- Phase 2: Active Braking Deceleration Fill -->
@@ -82,8 +82,8 @@
       >
         <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
           <span
-            class="w-2.5 h-2.5 rounded-xs border border-[#DDE0E4] shrink-0"
-            style="background: repeating-linear-gradient(45deg, #DDE0E4 0, #DDE0E4 3px, #ECEEF0 3px, #ECEEF0 6px);"
+            class="w-2.5 h-2.5 rounded-xs border border-[var(--kerb)] shrink-0"
+            style="background: repeating-linear-gradient(45deg, var(--kerb) 0, var(--kerb) 3px, var(--well) 3px, var(--well) 6px);"
           ></span>
           Reaction delay · free-roll <i>d</i><sub>rxn</sub>:
           <b class="font-mono text-[var(--ink)]">{{ reactionDistance() }} m</b>
@@ -92,7 +92,7 @@
         <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
           <span
             class="w-2.5 h-2.5 rounded-xs shrink-0"
-            [ngClass]="margin() >= 0 ? 'bg-[#1F9D55]' : 'bg-[#D93A32]'"
+            [ngClass]="margin() >= 0 ? 'bg-[var(--ok)]' : 'bg-[var(--danger)]'"
           ></span>
           Active braking <i>d</i><sub>brake</sub>:
           <b class="font-mono text-[var(--ink)]">{{ brakingDistance() }} m</b>
@@ -100,7 +100,7 @@
 
         <span
           class="font-mono font-semibold whitespace-nowrap"
-          [ngClass]="margin() >= 0 ? 'text-[#156939]' : 'text-[#9E241E]'"
+          [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
         >
           {{ tape().note }}
         </span>
@@ -111,11 +111,11 @@
   <!-- Plain-language verdict -->
   <p
     class="text-sm sm:text-[15px] font-medium leading-snug border-t border-[var(--kerb)]/60 pt-2.5"
-    [ngClass]="margin() >= 0 ? 'text-[#156939]' : 'text-[#9E241E]'"
+    [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
   >
     {{ plainSummary() }}
     @if (rearLoadPct() <= 10) {
-      <span class="block text-[#9E241E] font-semibold text-xs mt-1"
+      <span class="block text-[var(--danger-ink)] font-semibold text-xs mt-1"
         >Warning: the rear wheel is close to lifting off the ground.</span
       >
     }

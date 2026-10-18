@@ -17,13 +17,13 @@ export class LedSlipBar {
 
     return Array.from({ length: 10 }, (_, i) => {
       const active = i < activeCount;
-      let color = 'bg-[#1F9D55]';
+      let color = 'bg-[var(--ok)]';
       if (i >= 2 && i < 6) {
         // around 15-20% critical slip
-        color = 'bg-[#E8750F]';
+        color = 'bg-[var(--warn)]';
       } else if (i >= 6) {
         // unstable / impending lockup
-        color = 'bg-[#D93A32]';
+        color = 'bg-[var(--danger)]';
       }
       return { active, color };
     });

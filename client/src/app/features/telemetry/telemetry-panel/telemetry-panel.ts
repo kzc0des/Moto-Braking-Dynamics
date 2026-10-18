@@ -141,7 +141,7 @@ export class TelemetryPanel implements OnDestroy {
 
     const telem = activeRes.telemetry;
 
-    // 1. Velocity Canvas (--info / #2B6CB0)
+    // 1. Velocity Canvas (--info / #5AA2F0)
     const cVel = this.canvasVelocityRef()?.nativeElement;
     if (cVel) {
       const dim = this.ensureCanvasSize(cVel);
@@ -155,7 +155,7 @@ export class TelemetryPanel implements OnDestroy {
             width: dim.width,
             height: dim.height,
             curves: [
-              { name: 'Velocity', color: '#2B6CB0', times: telem.time, values: telem.velocity, unit: ' m/s' }
+              { name: 'Velocity', color: '#5AA2F0', times: telem.time, values: telem.velocity, unit: ' m/s' }
             ],
             maxTime: maxT,
             scrubTime: scrubT,
@@ -166,7 +166,7 @@ export class TelemetryPanel implements OnDestroy {
       }
     }
 
-    // 2. Deceleration Canvas (Asphalt ink #1F2328)
+    // 2. Deceleration Canvas (Asphalt ink #ECEFF3)
     const cDec = this.canvasDecelRef()?.nativeElement;
     if (cDec) {
       const dim = this.ensureCanvasSize(cDec);
@@ -180,7 +180,7 @@ export class TelemetryPanel implements OnDestroy {
             width: dim.width,
             height: dim.height,
             curves: [
-              { name: 'Decel', color: '#1F2328', times: telem.time, values: telem.deceleration, unit: ' m/s²' }
+              { name: 'Decel', color: '#ECEFF3', times: telem.time, values: telem.deceleration, unit: ' m/s²' }
             ],
             maxTime: maxT,
             scrubTime: scrubT,
@@ -205,11 +205,11 @@ export class TelemetryPanel implements OnDestroy {
             width: dim.width,
             height: dim.height,
             curves: [
-              { name: 'Front Fz', color: '#E8750F', times: telem.time, values: telem.normalLoadFront, unit: ' N' },
-              { name: 'Rear Fz', color: '#2B6CB0', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
+              { name: 'Front Fz', color: '#F58A2D', times: telem.time, values: telem.normalLoadFront, unit: ' N' },
+              { name: 'Rear Fz', color: '#5AA2F0', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
             ],
             thresholds: [
-              { value: 0, label: 'Lift-Off Limit (0 N)', color: '#D93A32', dashed: true }
+              { value: 0, label: 'Lift-Off Limit (0 N)', color: '#F2544B', dashed: true }
             ],
             maxTime: maxT,
             scrubTime: scrubT,
@@ -234,10 +234,10 @@ export class TelemetryPanel implements OnDestroy {
             width: dim.width,
             height: dim.height,
             curves: [
-              { name: 'Rotor Temp', color: '#D93A32', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
+              { name: 'Rotor Temp', color: '#F2544B', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
             ],
             thresholds: [
-              { value: 230, label: 'Boil Limit (230°C)', color: '#D93A32', dashed: true }
+              { value: 230, label: 'Boil Limit (230°C)', color: '#F2544B', dashed: true }
             ],
             maxTime: maxT,
             scrubTime: scrubT,

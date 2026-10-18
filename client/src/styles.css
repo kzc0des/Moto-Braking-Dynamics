@@ -1,37 +1,78 @@
 @import "tailwindcss";
 
 :root {
-  /* surfaces (white, light only) */
-  --bg:        #FFFFFF;  /* page */
-  --concrete:  #F4F5F6;  /* panels, sidebar */
-  --well:      #ECEEF0;  /* tracks, input wells */
-  --kerb:      #DDE0E4;  /* borders, gridlines */
+  /* Night-road dark theme. The whole site is dark; there is no light/dark switch. */
+  color-scheme: dark;
 
-  /* asphalt greys */
-  --ink:       #1F2328;  /* main text, dark button */
-  --asphalt-7: #3B4048;
-  --ink-2:     #656C76;  /* labels, secondary text */
-  --ink-3:     #6F7681;  /* ticks, disabled */
+  /* surfaces: deep asphalt, from the page down to inset wells */
+  --bg:        #0B0D10;  /* page */
+  --concrete:  #12151A;  /* panels, sidebar */
+  --surface:   #171B21;  /* cards and raised panels */
+  --well:      #0E1115;  /* tracks, input wells (inset) */
+  --kerb:      #2A3039;  /* borders, gridlines */
+  --tooltip:   #262C35;  /* floating help bubbles */
 
-  /* pavement line yellow (accent) */
+  /* text */
+  --ink:       #ECEFF3;  /* main text */
+  --asphalt-7: #5B636E;
+  --ink-2:     #A9B0BA;  /* labels, secondary text */
+  --ink-3:     #858D98;  /* ticks, disabled */
+  --on-ink:    #0B0D10;  /* text on a light "ink" fill */
+
+  /* pavement line yellow (accent): the road-marking color */
   --line:        #FFC800;  /* primary button, active state, key line */
-  --line-hover:  #E6B400;
-  --line-tint:   #FFF6D1;  /* selected rows, soft chips */
-  --line-deep:   #7A5800;  /* yellow text */
+  --line-hover:  #FFD84D;
+  --line-tint:   #2A2308;  /* selected cards, soft chips (yellow glow on asphalt) */
+  --line-deep:   #FFD24A;  /* yellow text on dark */
+  --on-line:     #15120A;  /* text on a yellow fill */
 
   /* road signals */
-  --danger:    #D93A32;  /* collision, brake-light red */
-  --warn:      #E8750F;  /* caution, traffic-cone orange */
-  --ok:        #1F9D55;  /* safe stop */
-  --info:      #2B6CB0;  /* data series, guide-sign blue */
+  --danger:      #F2544B;  /* collision, brake-light red */
+  --danger-tint: #2D1514;
+  --danger-ink:  #FF8F88;
+  --warn:        #F58A2D;  /* caution, traffic-cone orange */
+  --ok:          #2FBF71;  /* safe stop */
+  --ok-tint:     #112A1D;
+  --ok-ink:      #62DC9B;
+  --info:        #5AA2F0;  /* data series, guide-sign blue */
 
   /* compatibility aliases */
   --panel:     var(--concrete);
   --border:    var(--kerb);
   --coral:     var(--danger);
-  --coral-deep:#B52A23;
-  --coral-tint:#FDEBE8;
+  --coral-deep:#FF8F88;
+  --coral-tint:var(--danger-tint);
   --caution:   var(--warn);
+}
+
+/* The printable test report is a paper document: it keeps the original
+   black-on-white palette even though the site itself is dark. */
+.light-paper {
+  color-scheme: light;
+  --bg:        #FFFFFF;
+  --concrete:  #F4F5F6;
+  --surface:   #FFFFFF;
+  --well:      #ECEEF0;
+  --kerb:      #DDE0E4;
+  --tooltip:   #1F2328;
+  --ink:       #1F2328;
+  --asphalt-7: #3B4048;
+  --ink-2:     #656C76;
+  --ink-3:     #6F7681;
+  --on-ink:    #FFFFFF;
+  --line:        #FFC800;
+  --line-hover:  #E6B400;
+  --line-tint:   #FFF6D1;
+  --line-deep:   #7A5800;
+  --on-line:     #1F2328;
+  --danger:      #D93A32;
+  --danger-tint: #FDF0EF;
+  --danger-ink:  #9E241E;
+  --warn:        #E8750F;
+  --ok:          #1F9D55;
+  --ok-tint:     #EAF7EE;
+  --ok-ink:      #156939;
+  --info:        #2B6CB0;
 }
 
 @theme {
@@ -40,6 +81,7 @@
 
   --color-bg: var(--bg);
   --color-concrete: var(--concrete);
+  --color-surface: var(--surface);
   --color-well: var(--well);
   --color-kerb: var(--kerb);
   --color-panel: var(--concrete);
@@ -131,6 +173,37 @@ input[type="range"].road-slider::-moz-range-thumb {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@media print {
+  /* Printed pages are always black on white, whatever the on-screen theme is. */
+  :root {
+    color-scheme: light;
+    --bg:        #FFFFFF;
+    --concrete:  #F4F5F6;
+    --surface:   #FFFFFF;
+    --well:      #ECEEF0;
+    --kerb:      #DDE0E4;
+    --tooltip:   #1F2328;
+    --ink:       #1F2328;
+    --asphalt-7: #3B4048;
+    --ink-2:     #656C76;
+    --ink-3:     #6F7681;
+    --on-ink:    #FFFFFF;
+    --line:        #FFC800;
+    --line-hover:  #E6B400;
+    --line-tint:   #FFF6D1;
+    --line-deep:   #7A5800;
+    --on-line:     #1F2328;
+    --danger:      #D93A32;
+    --danger-tint: #FDF0EF;
+    --danger-ink:  #9E241E;
+    --warn:        #E8750F;
+    --ok:          #1F9D55;
+    --ok-tint:     #EAF7EE;
+    --ok-ink:      #156939;
+    --info:        #2B6CB0;
+  }
 }
 
 /* ========================================================= */

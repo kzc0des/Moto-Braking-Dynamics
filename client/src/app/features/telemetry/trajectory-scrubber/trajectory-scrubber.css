@@ -3,7 +3,7 @@
 }
 
 .road-slider {
-  background: var(--track-bg, #DDE0E4);
+  background: var(--track-bg, var(--kerb));
   border-radius: 9999px;
   appearance: none;
 }
@@ -13,7 +13,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #1F2328;
+  background: var(--surface);
   border: 2px solid #FFC800;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);

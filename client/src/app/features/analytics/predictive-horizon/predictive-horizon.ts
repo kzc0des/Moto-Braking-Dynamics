@@ -164,12 +164,12 @@ export class PredictiveHorizon {
     if (m >= 0) {
       return {
         text: `PASSED: SAFE STOP (+${m.toFixed(1)}m MARGIN)`,
-        badgeClass: 'bg-[#EAF7EE] border-2 border-[#1F9D55]/60 text-[#156939] font-bold shadow-xs'
+        badgeClass: 'bg-[var(--ok-tint)] border-2 border-[var(--ok)]/60 text-[var(--ok-ink)] font-bold shadow-xs'
       };
     }
     return {
       text: `FAILED: BARRIER COLLISION (${this.impactSpeedKmh()} KM/H IMPACT)`,
-      badgeClass: 'bg-[#FDF0EF] border-2 border-[#D93A32] text-[#9E241E] font-bold shadow-xs'
+      badgeClass: 'bg-[var(--danger-tint)] border-2 border-[var(--danger)] text-[var(--danger-ink)] font-bold shadow-xs'
     };
   });
 
@@ -184,7 +184,7 @@ export class PredictiveHorizon {
     const p2Pct = (this.brakingDistance() / maxScale) * 100;
 
     const col = this.margin() < 0;
-    const fillClass = col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]';
+    const fillClass = col ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]';
     const note = col
       ? `COLLISION DEFICIT: ${Math.abs(this.margin()).toFixed(1)} m OVERRUN`
       : `SAFETY CLEARANCE: +${this.margin().toFixed(1)} m BUFFER`;
@@ -210,12 +210,12 @@ export class PredictiveHorizon {
     if (slip > this.criticalSlip()) {
       return {
         text: 'SKID OVERRUN (ABS TRIGGER REQUIRED)',
-        badgeClass: 'bg-[#FFF6D1] border-[#E8750F]/40 text-[#7A5800]'
+        badgeClass: 'bg-[var(--line-tint)] border-[var(--warn)]/40 text-[var(--line-deep)]'
       };
     }
     return {
       text: 'OPTIMAL TRACTION ENVELOPE',
-      badgeClass: 'bg-[#EAF7EE] border-[#1F9D55]/40 text-[#156939]'
+      badgeClass: 'bg-[var(--ok-tint)] border-[var(--ok)]/40 text-[var(--ok-ink)]'
     };
   });
 
@@ -359,8 +359,8 @@ export class PredictiveHorizon {
         isActive,
         activeTag: isActive ? '[Active]' : '',
         widthPct: Number(wPct.toFixed(1)),
-        barClass: col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]',
-        chipClass: col ? 'text-[#9E241E]' : 'text-[#156939]',
+        barClass: col ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]',
+        chipClass: col ? 'text-[var(--danger-ink)]' : 'text-[var(--ok-ink)]',
         chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });
@@ -393,8 +393,8 @@ export class PredictiveHorizon {
         dist,
         activeTag: Math.abs(s.mu - this.frictionCoeff()) < 0.011 ? '[Active]' : '',
         widthPct: Number(wPct.toFixed(1)),
-        barClass: col ? 'bg-[#D93A32]' : 'bg-[#1F9D55]',
-        chipClass: col ? 'text-[#9E241E]' : 'text-[#156939]',
+        barClass: col ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]',
+        chipClass: col ? 'text-[var(--danger-ink)]' : 'text-[var(--ok-ink)]',
         chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });
@@ -429,20 +429,20 @@ export class PredictiveHorizon {
     if (deg === 0) {
       return {
         text: 'Level Road (0° incline): Zero grade stopping distance penalty applied.',
-        badgeClass: 'bg-white border-[#DDE0E4] text-[#656C76]'
+        badgeClass: 'bg-[var(--surface)] border-[var(--kerb)] text-[#656C76]'
       };
     }
     if (deg < 0) {
       const addedM = Math.abs(deg) * 0.85;
       return {
         text: `Downhill Slope Penalty: ${deg}° grade adds +${addedM.toFixed(1)}m to required stopping distance.`,
-        badgeClass: 'bg-[#FDF0EF] border-[#D93A32]/40 text-[#9E241E]'
+        badgeClass: 'bg-[var(--danger-tint)] border-[var(--danger)]/40 text-[var(--danger-ink)]'
       };
     }
     const savedM = deg * 0.7;
     return {
       text: `Uphill Slope Benefit: +${deg}° grade reduces required stopping distance by -${savedM.toFixed(1)}m.`,
-      badgeClass: 'bg-[#EAF7EE] border-[#1F9D55]/40 text-[#156939]'
+      badgeClass: 'bg-[var(--ok-tint)] border-[var(--ok)]/40 text-[var(--ok-ink)]'
     };
   });
 

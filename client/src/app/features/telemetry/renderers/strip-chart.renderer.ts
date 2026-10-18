@@ -39,12 +39,12 @@ export class StripChartRenderer {
 
     if (plotW <= 0 || plotH <= 0) return;
 
-    // 1. Chart Well Background (--well / #ECEEF0)
-    ctx.fillStyle = '#ECEEF0';
+    // 1. Chart Well Background (--well / #0E1115)
+    ctx.fillStyle = '#0E1115';
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Chart Plot Border (--kerb / #DDE0E4)
-    ctx.strokeStyle = '#DDE0E4';
+    // 2. Chart Plot Border (--kerb / #2A3039)
+    ctx.strokeStyle = '#2A3039';
     ctx.lineWidth = 1;
     ctx.strokeRect(padLeft, padTop, plotW, plotH);
 
@@ -72,8 +72,8 @@ export class StripChartRenderer {
     const timeToX = (t: number) => padLeft + (t / maxTime) * plotW;
     const valToY = (v: number) => padTop + plotH - ((v - minY) / yRange) * plotH;
 
-    // 3. Horizontal Gridlines & Y-axis Reference Labels (--kerb / #DDE0E4)
-    ctx.strokeStyle = '#DDE0E4';
+    // 3. Horizontal Gridlines & Y-axis Reference Labels (--kerb / #2A3039)
+    ctx.strokeStyle = '#2A3039';
     ctx.lineWidth = 1;
     const gridDivs = 3;
     for (let i = 1; i < gridDivs; i++) {
@@ -85,14 +85,14 @@ export class StripChartRenderer {
     }
 
     // Y-axis Bounds Annotation
-    ctx.fillStyle = '#8C959F';
+    ctx.fillStyle = '#858D98';
     ctx.font = '500 9.5px monospace';
     ctx.textAlign = 'right';
     ctx.fillText(maxY >= 1000 ? `${(maxY / 1000).toFixed(1)}k` : `${Math.round(maxY)}`, padLeft - 4, padTop + 10);
     ctx.fillText(`${Math.round(minY)}`, padLeft - 4, padTop + plotH);
 
     // 4. Bottom Time Axis Ticks & Labels
-    ctx.fillStyle = '#656C76';
+    ctx.fillStyle = '#A9B0BA';
     ctx.font = '500 10.5px system-ui, sans-serif';
     ctx.textAlign = 'center';
 
@@ -102,7 +102,7 @@ export class StripChartRenderer {
       if (x > padLeft + plotW) break;
 
       // Vertical tick stub
-      ctx.strokeStyle = '#DDE0E4';
+      ctx.strokeStyle = '#2A3039';
       ctx.beginPath();
       ctx.moveTo(x, padTop + plotH);
       ctx.lineTo(x, padTop + plotH + 4);
@@ -134,7 +134,7 @@ export class StripChartRenderer {
             const labelY = Math.max(padTop + 11, Math.min(padTop + plotH - 3, y - 4));
 
             // Background pill to prevent dashed grid/threshold lines from striking through warning labels
-            ctx.fillStyle = '#ECEEF0';
+            ctx.fillStyle = '#0E1115';
             ctx.fillRect(labelX - labelW - 3, labelY - 9, labelW + 5, 12);
 
             ctx.fillStyle = th.color;
@@ -168,7 +168,7 @@ export class StripChartRenderer {
     // 7. Synchronized Scrub Needle
     if (scrubTime >= 0 && scrubTime <= maxTime) {
       const scrubX = timeToX(scrubTime);
-      ctx.strokeStyle = '#1F2328';
+      ctx.strokeStyle = '#ECEFF3';
       ctx.lineWidth = 1.2;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();

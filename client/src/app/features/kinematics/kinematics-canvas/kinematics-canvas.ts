@@ -142,7 +142,7 @@ export class KinematicsCanvas implements OnDestroy {
   readonly liveStatusTextClass = computed(() => {
     if (this.isCollisionReached()) return 'text-[var(--danger)] font-bold';
     const f = this.liveFrame();
-    if (f && f.velocity <= 0.08) return 'text-[#156939] font-bold';
+    if (f && f.velocity <= 0.08) return 'text-[var(--ok-ink)] font-bold';
     return 'text-[var(--ink)] font-semibold';
   });
 

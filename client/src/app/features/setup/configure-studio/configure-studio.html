@@ -26,7 +26,7 @@
     <button
       type="button"
       (click)="saveAndLaunch()"
-      class="py-2 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+      class="py-2 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer"
     >
       <span>{{ isEditMode() ? 'Save Changes & Launch' : 'Save Configuration & Launch' }}</span>
       <span class="text-sm">→</span>
@@ -42,7 +42,7 @@
       <!-- ======================================================== -->
       <aside class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 flex flex-col gap-5">
         <!-- Live Anatomy Schematic Card -->
-        <div class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
+        <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
               Live Geometry Model
@@ -60,7 +60,7 @@
                 {{ activeSpriteKey() }} archetype
               </span>
               @if (showTechnical()) {
-                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
+                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
                   112×56 6-FPS Idle
                 </span>
               }
@@ -93,7 +93,7 @@
               <!-- Rider Seat Bar -->
               <line [attr.x1]="svgCoords().seatA" y1="46" [attr.x2]="svgCoords().seatB" y2="46" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round" />
               <!-- Dynamic Center of Gravity Indicator -->
-              <circle [attr.cx]="svgCoords().cx" [attr.cy]="svgCoords().cy" r="6.5" fill="#FFFFFF" stroke="var(--line-deep)" stroke-width="2.5" />
+              <circle [attr.cx]="svgCoords().cx" [attr.cy]="svgCoords().cy" r="6.5" fill="var(--surface)" stroke="var(--line-deep)" stroke-width="2.5" />
               <line [attr.x1]="svgCoords().cx" [attr.y1]="svgCoords().cyTop" [attr.x2]="svgCoords().cx" [attr.y2]="svgCoords().cyBot" stroke="var(--line-deep)" stroke-width="1.5" />
               <!-- Wheelbase Dimension Leader Line -->
               <line [attr.x1]="svgCoords().rx" y1="102" [attr.x2]="svgCoords().fx" y2="102" stroke="var(--ink-3)" stroke-width="1" />
@@ -164,7 +164,7 @@
           <button
             type="button"
             (click)="saveAndLaunch()"
-            class="w-full py-3 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)] rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-1"
+            class="w-full py-3 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-1"
           >
             <span>{{ isEditMode() ? 'Confirm Changes & Launch' : 'Save & Open Workbench' }}</span>
             <span class="text-sm">→</span>
@@ -186,7 +186,7 @@
             type="button"
             (click)="showTechnical.set(!showTechnical())"
             [attr.aria-pressed]="showTechnical()"
-            class="h-9 px-3.5 rounded-lg border border-[var(--kerb)] bg-white hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] inline-flex items-center gap-2 cursor-pointer shadow-2xs shrink-0"
+            class="h-9 px-3.5 rounded-lg border border-[var(--kerb)] bg-[var(--surface)] hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] inline-flex items-center gap-2 cursor-pointer shadow-2xs shrink-0"
           >
             <span class="w-2 h-2 rounded-full" [ngClass]="showTechnical() ? 'bg-[var(--ok)]' : 'bg-[var(--ink-3)]'"></span>
             <span>{{ showTechnical() ? 'Hide technical details' : 'Show technical details' }}</span>
@@ -194,7 +194,7 @@
         </div>
 
         <!-- Stage 1: Core Geometry Families -->
-        <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+        <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
               1. Choose a bike type
@@ -218,7 +218,7 @@
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
                   @if (showTechnical()) {
-                    <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
+                    <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-[var(--surface)]/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
                       {{ fam.badge }}
                     </span>
                   }
@@ -237,7 +237,7 @@
         </section>
 
         <!-- Stage 2: Calibrated Production Presets -->
-        <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+        <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
               2. Or pick a ready-made model
@@ -261,7 +261,7 @@
                 <div>
                   <div class="flex items-center justify-between gap-1 mb-1">
                     <span class="text-xs font-bold text-[var(--ink)]">{{ preset.name }}</span>
-                    <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white border border-[var(--kerb)] text-[var(--ink-2)] shrink-0 font-medium">
+                    <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)] border border-[var(--kerb)] text-[var(--ink-2)] shrink-0 font-medium">
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
@@ -296,7 +296,7 @@
         </section>
 
         <!-- Stage 3: Powertrain & Curb Mass -->
-        <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
+        <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
               3. Engine size &amp; weight
@@ -384,7 +384,7 @@
         </section>
 
         <!-- Stage 4: Caliper Hardware & Electronic Control -->
-        <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
+        <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
               4. Brakes
@@ -417,7 +417,7 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Single Hydraulic Disc</span>
                     @if (stockFrontBrake() === 'single_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
@@ -444,7 +444,7 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Dual Hydraulic Disc</span>
                     @if (stockFrontBrake() === 'dual_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
@@ -482,7 +482,7 @@
                     @if (absConfiguration() === 'dual_channel') {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Incompatible with Dual ABS</span>
                     } @else if (stockRearBrake() === 'drum') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
@@ -509,7 +509,7 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Hydraulic Disc</span>
                     @if (stockRearBrake() === 'disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
@@ -549,7 +549,7 @@
               >
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px]">Non-ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
                     Conventional
                   </span>
                 </div>
@@ -573,7 +573,7 @@
               >
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px]">Single-Channel ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
                     Front Only
                   </span>
                 </div>
@@ -600,7 +600,7 @@
               >
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px]">Dual-Channel ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
                     Front & Rear
                   </span>
                 </div>
@@ -671,7 +671,7 @@
                   <div class="flex items-center justify-between w-full">
                     <span>{{ act.label }}</span>
                     @if (actuation() === act.key) {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">
                         {{ isMechanicalLinkageLocked() ? 'Enforced' : 'Active' }}
                       </span>
                     } @else if (isMechanicalLinkageLocked()) {
@@ -690,7 +690,7 @@
         </section>
 
         <!-- Stage 5: Tier 2 Advanced Tuning Accordion -->
-        <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs">
+        <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs">
           <button
             type="button"
             (click)="isTier2Open.set(!isTier2Open())"

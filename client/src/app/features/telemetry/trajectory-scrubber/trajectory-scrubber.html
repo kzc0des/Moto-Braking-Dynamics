@@ -1,9 +1,9 @@
-<div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1 bg-white select-none overflow-x-auto min-w-0 shrink-0 h-10">
+<div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1 bg-[var(--surface)] select-none overflow-x-auto min-w-0 shrink-0 h-10">
   <!-- 1. Play / Pause / Replay Button -->
   <button
     type="button"
     (click)="handlePlay()"
-    class="px-3.5 py-1.5 font-bold rounded-lg transition-colors cursor-pointer text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs shrink-0 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--ink)]"
+    class="px-3.5 py-1.5 font-bold rounded-lg transition-colors cursor-pointer text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs shrink-0 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)]"
     [ngClass]="isStagedAtStart() ? 'ring-2 ring-[var(--line-deep)]/40' : ''"
     [title]="store.isPlaying() ? 'Pause playback' : (isAtEnd() ? 'Replay simulation from start' : 'Play simulation trajectory')"
   >
@@ -30,7 +30,7 @@
   <button
     type="button"
     (click)="store.resetPlayback()"
-    class="px-2.5 py-1.5 bg-white hover:bg-[var(--concrete)] text-[var(--ink)] font-semibold rounded-lg border border-[var(--kerb)] flex items-center gap-1.5 transition-colors cursor-pointer text-xs shrink-0 shadow-2xs"
+    class="px-2.5 py-1.5 bg-[var(--surface)] hover:bg-[var(--concrete)] text-[var(--ink)] font-semibold rounded-lg border border-[var(--kerb)] flex items-center gap-1.5 transition-colors cursor-pointer text-xs shrink-0 shadow-2xs"
     title="Reset playback to start line (t = 0.00s)"
   >
     <svg class="w-3 h-3 stroke-current shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -69,7 +69,7 @@
         class="px-2 py-1 text-xs rounded-md transition-colors cursor-pointer font-medium"
         [ngClass]="
           store.playbackSpeed() === speed
-            ? 'bg-white text-[var(--ink)] font-bold shadow-2xs border border-[var(--kerb)]'
+            ? 'bg-[var(--surface)] text-[var(--ink)] font-bold shadow-2xs border border-[var(--kerb)]'
             : 'text-[var(--ink-2)] hover:text-[var(--ink)]'"
       >
         {{ speed === 1.0 ? '1x' : (speed === 2.0 ? '2x' : '0.5x') }}
@@ -84,12 +84,12 @@
     class="px-2.5 py-1.5 text-xs rounded-lg border font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
     [ngClass]="
       store.autoCompute()
-        ? 'bg-[#EAF7EE] text-[#156939] border-[#1F9D55]/40 shadow-2xs'
-        : 'bg-white text-[var(--ink-2)] border-[var(--kerb)] hover:text-[var(--ink)]'
+        ? 'bg-[var(--ok-tint)] text-[var(--ok-ink)] border-[var(--ok)]/40 shadow-2xs'
+        : 'bg-[var(--surface)] text-[var(--ink-2)] border-[var(--kerb)] hover:text-[var(--ink)]'
     "
     title="Toggle automatic recomputation on parameter change"
   >
-    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="store.autoCompute() ? 'bg-[#1F9D55]' : 'bg-[var(--ink-3)]'"></span>
+    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="store.autoCompute() ? 'bg-[var(--ok)]' : 'bg-[var(--ink-3)]'"></span>
     <span>{{ store.autoCompute() ? 'Auto-update' : 'Manual' }}</span>
   </button>
 </div>

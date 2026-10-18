@@ -167,9 +167,9 @@ export class VehicleRenderer {
     const groundY = laneY + Math.min(laneHeight - 10, Math.max(drawH * 0.9, laneHeight * 0.78));
 
     // Road surface band under the wheels (fills the lower part of the lane)
-    ctx.fillStyle = '#EEF0F2';
+    ctx.fillStyle = '#1C2027';
     ctx.fillRect(0, groundY + 1, width, Math.max(0, laneY + laneHeight - groundY - 1));
-    ctx.strokeStyle = '#C9CED4';
+    ctx.strokeStyle = '#3A414B';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(0, groundY + 1);
@@ -184,7 +184,7 @@ export class VehicleRenderer {
     const frontWheelX = posX + (cfg.wheelFront[0] - cfg.wheelRear[0]) * scale;
 
     // Soft ground tire contact shadows under both wheels
-    ctx.fillStyle = 'rgba(34, 32, 30, 0.16)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
     ctx.beginPath();
     ctx.ellipse(rearWheelX, groundY + 1, 14 * scale, 3 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -198,12 +198,12 @@ export class VehicleRenderer {
     const isSlippingRear = Math.abs(frame.slipRatioRear) > 0.14;
 
     if (isSlippingRear) {
-      ctx.fillStyle = 'rgba(46, 44, 51, 0.45)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
       ctx.fillRect(rearWheelX - 18 * scale, groundY - 1, 22 * scale, 2.5);
     }
 
     if (isSlippingFront) {
-      ctx.fillStyle = 'rgba(46, 44, 51, 0.45)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
       ctx.fillRect(frontWheelX - 16 * scale, groundY - 1, 20 * scale, 2.5);
     }
 
