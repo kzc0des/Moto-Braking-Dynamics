@@ -1,7 +1,7 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { GarageService } from '../../../core/services/garage.service';
 import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration } from '../../../core/models/benchmark.types';
@@ -14,6 +14,7 @@ import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration } from '../../..
 })
 export class FixedSidebar {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly store = inject(BenchmarkStore);
   readonly garageService = inject(GarageService);
   readonly isTier2Open = signal<boolean>(false);
@@ -109,11 +110,15 @@ export class FixedSidebar {
 
   onSelectVehicle(id: string): void {
     this.garageService.setActiveVehicle(id);
+    const mode = this.route.snapshot.data['mode'] || (this.router.url.includes('/simulation') ? 'simulation' : 'analytics');
+    this.router.navigate(['/workbench', id, mode], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   editConfiguration(): void {
     const activeId = this.garageService.activeVehicleId();
-    this.router.navigate(['/configure'], { queryParams: { mode: 'edit', id: activeId } });
+    this.router.navigate(['/configure'], { queryParams: { mode: 'edit', bikeId: activeId } });
   }
 
   createAnotherMotorcycle(): void {
@@ -181,10 +186,22 @@ export class FixedSidebar {
 
   onSubstrateChange(sub: SurfaceSubstrate): void {
     this.store.updateEnvironmentParam('substrate', sub);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { substrate: sub },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   onContaminantChange(con: SurfaceContaminant): void {
     this.store.updateEnvironmentParam('contaminant', con);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { contaminant: con },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   readonly frontLeverPct = computed(() => this.selectedInst().actuation.frontLeverPct ?? 85);
@@ -224,5 +241,11 @@ export class FixedSidebar {
     const num = Number(deg);
     const rad = Number((num * Math.PI / 180).toFixed(4));
     this.store.updateEnvironmentParam('roadGradeAngle', rad);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { grade: num },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 }

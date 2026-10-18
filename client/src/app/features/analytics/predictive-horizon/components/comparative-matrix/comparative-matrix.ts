@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface TechRow {
@@ -38,5 +38,5 @@ export class ComparativeMatrix {
   readonly surfRows = input.required<SurfRow[]>();
   readonly barrierPct = input.required<number>();
 
-  readonly compareTab = signal<'brakes' | 'road'>('brakes');
+  readonly compareTab = model<'brakes' | 'road'>('brakes');
 }

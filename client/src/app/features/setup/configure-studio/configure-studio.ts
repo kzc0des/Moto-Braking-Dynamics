@@ -147,49 +147,131 @@ export class ConfigureStudio implements OnInit {
 
   ngOnInit(): void {
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    const id = this.route.snapshot.queryParamMap.get('id');
+    const bikeId = this.route.snapshot.queryParamMap.get('bikeId') || this.route.snapshot.queryParamMap.get('id');
+    const typeParam = this.route.snapshot.queryParamMap.get('type');
+    const modelParam = this.route.snapshot.queryParamMap.get('model');
 
-    if (mode === 'edit' || (id && mode !== 'new')) {
-      const target = id ? this.garageService.getVehicleById(id) : this.garageService.activeVehicle();
-      if (target) {
-        this.editingVehicleId.set(target.id);
-        this.title.set(target.title);
-        this.displacementCc.set(target.displacementCc);
-        this.massKg.set(target.massKg);
-        this.frontBrake.set(target.frontBrake);
-        this.rearBrake.set(target.rearBrake);
-
-        const defaultAbs: AbsConfiguration = target.absConfiguration ?? (target.actuation === 'abs' ? (target.rearBrake === 'drum' ? 'single_channel_front' : 'dual_channel') : 'none');
-        const resolvedAbs: AbsConfiguration = target.rearBrake === 'drum' && defaultAbs === 'dual_channel' ? 'single_channel_front' : defaultAbs;
-        this.absConfiguration.set(resolvedAbs);
-
-        if (resolvedAbs === 'dual_channel') {
-          this.actuation.set('independent');
-        } else {
-          this.actuation.set(target.actuation);
-        }
-
-        this.wheelbase.set(target.wheelbase);
-        this.cogHeight.set(target.cogHeight);
-        this.rotorDiameterMm.set(target.rotorDiameterMm);
-        this.padFriction.set(target.padFriction);
-        this.fluidBoilTemp.set(target.fluidBoilTemp);
-
-        // Map legacy or current category to family
-        const cat = target.category;
-        if (cat === 'scooter' || cat === 'underbone' || cat === 'step_through') {
-          this.family.set('step_through');
-        } else if (cat === 'naked' || cat === 'standard') {
-          this.family.set('standard');
-        } else if (cat === 'sport' || cat === 'supersport') {
-          this.family.set('supersport');
-        } else if (cat === 'extended' || cat === 'cruiser' || cat === 'adventure') {
-          this.family.set('extended');
-        }
+    if (mode === 'edit' || (bikeId && mode !== 'new')) {
+      const target = bikeId ? this.garageService.getVehicleById(bikeId) : this.garageService.activeVehicle();
+      if (!target) {
+        this.router.navigate(['/not-found'], { queryParams: { reason: 'vehicle', id: bikeId ?? 'unknown' } });
+        return;
       }
-    } else if (mode === 'new') {
+
+      this.editingVehicleId.set(target.id);
+      this.title.set(target.title);
+      this.displacementCc.set(target.displacementCc);
+      this.massKg.set(target.massKg);
+      this.frontBrake.set(target.frontBrake);
+      this.rearBrake.set(target.rearBrake);
+
+      const defaultAbs: AbsConfiguration = target.absConfiguration ?? (target.actuation === 'abs' ? (target.rearBrake === 'drum' ? 'single_channel_front' : 'dual_channel') : 'none');
+      const resolvedAbs: AbsConfiguration = target.rearBrake === 'drum' && defaultAbs === 'dual_channel' ? 'single_channel_front' : defaultAbs;
+      this.absConfiguration.set(resolvedAbs);
+
+      if (resolvedAbs === 'dual_channel') {
+        this.actuation.set('independent');
+      } else {
+        this.actuation.set(target.actuation);
+      }
+
+      this.wheelbase.set(target.wheelbase);
+      this.cogHeight.set(target.cogHeight);
+      this.rotorDiameterMm.set(target.rotorDiameterMm);
+      this.padFriction.set(target.padFriction);
+      this.fluidBoilTemp.set(target.fluidBoilTemp);
+
+      // Map legacy or current category to family
+      const cat = target.category;
+      if (cat === 'scooter' || cat === 'underbone' || cat === 'step_through') {
+        this.family.set('step_through');
+      } else if (cat === 'naked' || cat === 'standard') {
+        this.family.set('standard');
+      } else if (cat === 'sport' || cat === 'supersport') {
+        this.family.set('supersport');
+      } else if (cat === 'extended' || cat === 'cruiser' || cat === 'adventure') {
+        this.family.set('extended');
+      }
+
+      this.syncQueryParams();
+    } else {
       this.editingVehicleId.set(null);
       this.title.set('Custom Build');
+
+      const parsedFamily = this.parseFamilySlug(typeParam);
+      if (parsedFamily) {
+        this.family.set(parsedFamily);
+      }
+
+      if (modelParam) {
+        const normalized = modelParam.replace(/-/g, '_').toLowerCase();
+        const found = EMPIRICAL_PRESETS.find(
+          p => p.key.toLowerCase() === normalized || p.key.toLowerCase().replace(/_/g, '-') === modelParam.toLowerCase()
+        );
+        if (found) {
+          this.family.set(found.familyKey);
+          this.applyPreset(found, false);
+        } else if (parsedFamily) {
+          const presets = EMPIRICAL_PRESETS.filter(p => p.familyKey === parsedFamily);
+          if (presets.length > 0) {
+            this.applyPreset(presets[0], false);
+          }
+        }
+      } else if (parsedFamily) {
+        const presets = EMPIRICAL_PRESETS.filter(p => p.familyKey === parsedFamily);
+        if (presets.length > 0) {
+          this.applyPreset(presets[0], false);
+        }
+      } else {
+        // Default to step_through preset
+        const defaultPreset = EMPIRICAL_PRESETS[0];
+        if (defaultPreset) {
+          this.applyPreset(defaultPreset, false);
+        }
+      }
+
+      this.syncQueryParams();
+    }
+  }
+
+  private getFamilySlug(fam: 'step_through' | 'standard' | 'supersport' | 'extended'): string {
+    if (fam === 'standard') return 'roadster';
+    if (fam === 'step_through') return 'scooter';
+    if (fam === 'supersport') return 'supersport';
+    if (fam === 'extended') return 'extended';
+    return 'roadster';
+  }
+
+  private parseFamilySlug(slug: string | null): 'step_through' | 'standard' | 'supersport' | 'extended' | null {
+    if (!slug) return null;
+    const s = slug.toLowerCase();
+    if (s === 'roadster' || s === 'standard' || s === 'naked') return 'standard';
+    if (s === 'scooter' || s === 'step_through' || s === 'step-through' || s === 'commuter' || s === 'underbone') return 'step_through';
+    if (s === 'supersport' || s === 'sport' || s === 'performance') return 'supersport';
+    if (s === 'extended' || s === 'cruiser' || s === 'adventure') return 'extended';
+    return null;
+  }
+
+  private syncQueryParams(): void {
+    if (this.isEditMode()) {
+      const id = this.editingVehicleId();
+      if (id) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { mode: 'edit', bikeId: id },
+          replaceUrl: true
+        });
+      }
+    } else {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          mode: 'new',
+          type: this.getFamilySlug(this.family()),
+          model: this.selectedPresetKey().replace(/_/g, '-')
+        },
+        replaceUrl: true
+      });
     }
   }
 
@@ -198,10 +280,12 @@ export class ConfigureStudio implements OnInit {
     const presets = EMPIRICAL_PRESETS.filter(p => p.familyKey === famKey);
     if (presets.length > 0) {
       this.applyPreset(presets[0]);
+    } else {
+      this.syncQueryParams();
     }
   }
 
-  applyPreset(preset: EmpiricalPresetDescriptor): void {
+  applyPreset(preset: EmpiricalPresetDescriptor, updateUrl = true): void {
     this.selectedPresetKey.set(preset.key);
     this.title.set(preset.name);
     this.displacementCc.set(preset.displacementCc);
@@ -222,6 +306,10 @@ export class ConfigureStudio implements OnInit {
     } else {
       this.absConfiguration.set('none');
       this.actuation.set(preset.actuation === 'cbs' ? 'cbs' : 'independent');
+    }
+
+    if (updateUrl) {
+      this.syncQueryParams();
     }
   }
 
@@ -303,12 +391,15 @@ export class ConfigureStudio implements OnInit {
       fluidBoilTemp: this.fluidBoilTemp()
     };
 
+    let targetId: string;
     if (this.isEditMode() && this.editingVehicleId()) {
       this.garageService.updateVehicle(this.editingVehicleId()!, payload);
+      targetId = this.editingVehicleId()!;
     } else {
-      this.garageService.addVehicle(payload);
+      const created = this.garageService.addVehicle(payload);
+      targetId = created.id;
     }
 
-    this.router.navigate(['/workbench']);
+    this.router.navigate(['/workbench', targetId, 'analytics']);
   }
 }
