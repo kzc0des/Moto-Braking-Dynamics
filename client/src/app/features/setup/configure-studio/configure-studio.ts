@@ -10,6 +10,8 @@ export interface FamilyDescriptor {
   key: 'step_through' | 'standard' | 'supersport' | 'extended';
   label: string;
   desc: string;
+  /** Plain-English description shown by default. */
+  plain: string;
   badge: string;
 }
 
@@ -35,31 +37,35 @@ export class ConfigureStudio implements OnInit {
       key: 'step_through',
       label: 'Step-Through / Commuter',
       desc: 'Rear-biased CoG (b/L ≈ 0.42), low pitch-over, high commuter prevalence',
+      plain: 'Scooters and city commuters. Most of the weight sits toward the back, so they rarely tip forward when braking.',
       badge: 'Rear-Biased CoG'
     },
     {
       key: 'standard',
       label: 'Standard / Roadster',
       desc: 'Neutral upright ergonomics (b/L ≈ 0.50), control dynamics benchmark',
+      plain: 'Everyday upright bikes. Weight is balanced front to back, so this is the standard reference.',
       badge: 'Neutral Baseline'
     },
     {
       key: 'supersport',
       label: 'Supersport / Performance',
       desc: 'High h/L, short wheelbase, rear lift-off (stoppie) threshold critical',
+      plain: 'Sport bikes. Tall and short, so very hard front braking can lift the rear wheel off the ground.',
       badge: 'Stoppie-Prone'
     },
     {
       key: 'extended',
       label: 'Extended Geometry',
       desc: 'Polar dynamics: long-wheelbase cruiser or tall long-travel adventure fork',
+      plain: 'Cruisers and adventure bikes. Long and stretched out, with a tall front fork.',
       badge: 'Polar Geometry'
     }
   ];
 
   readonly actuations = [
-    { key: 'independent', label: 'Independent Controls', desc: 'Separate hand lever (front) and foot/hand control without linkage' },
-    { key: 'cbs', label: 'Combi-Brake System (CBS)', desc: 'Rear actuation proportionally applies front caliper pressure' }
+    { key: 'independent', label: 'Independent controls', desc: 'Front and rear brakes work separately. You squeeze or press each one yourself.' },
+    { key: 'cbs', label: 'Linked brakes (CBS)', desc: 'Using the rear brake control also applies some front brake, so one input stops the bike more evenly.' }
   ];
 
   readonly family = signal<'step_through' | 'standard' | 'supersport' | 'extended'>('step_through');
@@ -75,6 +81,8 @@ export class ConfigureStudio implements OnInit {
 
   // Tier 2 parameters
   readonly isTier2Open = signal<boolean>(false);
+  /** Technical labels, formulas and jargon are hidden until the user asks for them. */
+  readonly showTechnical = signal<boolean>(false);
   readonly wheelbase = signal<number>(1.28);
   readonly cogHeight = signal<number>(0.48);
   readonly rotorDiameterMm = signal<number>(220);

@@ -34,20 +34,22 @@
   </header>
 
   <!-- Main Asymmetrical Engineering Studio Container -->
-  <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+  <main class="w-full p-4 sm:p-6 lg:p-8">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
       <!-- ======================================================== -->
       <!-- LEFT COLUMN: Sticky Live Vehicle Schematic & Spec Sheet -->
       <!-- ======================================================== -->
-      <aside class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-20 flex flex-col gap-5">
+      <aside class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 flex flex-col gap-5">
         <!-- Live Anatomy Schematic Card -->
         <div class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
               Live Geometry Model
             </span>
-            <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
+            }
           </div>
 
           <!-- Live Animated Sprite Machine Viewport -->
@@ -57,9 +59,11 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)] animate-pulse"></span>
                 {{ activeSpriteKey() }} archetype
               </span>
-              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
-                112×56 6-FPS Idle
-              </span>
+              @if (showTechnical()) {
+                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
+                  112×56 6-FPS Idle
+                </span>
+              }
             </div>
 
             <div class="bike-idle-stage my-1">
@@ -171,18 +175,39 @@
       <!-- ======================================================== -->
       <!-- RIGHT COLUMN: Configuration Stages & Controls -->
       <!-- ======================================================== -->
-      <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+      <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
+
+        <!-- Plain-language intro + technical details switch -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-[13px] text-[var(--ink-2)] leading-relaxed m-0 max-w-3xl">
+            Tell us about the bike you want to test. Start with a type or a ready-made model, then adjust the engine, weight and brakes. You do not need to know the technical terms.
+          </p>
+          <button
+            type="button"
+            (click)="showTechnical.set(!showTechnical())"
+            [attr.aria-pressed]="showTechnical()"
+            class="h-9 px-3.5 rounded-lg border border-[var(--kerb)] bg-white hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] inline-flex items-center gap-2 cursor-pointer shadow-2xs shrink-0"
+          >
+            <span class="w-2 h-2 rounded-full" [ngClass]="showTechnical() ? 'bg-[var(--ok)]' : 'bg-[var(--ink-3)]'"></span>
+            <span>{{ showTechnical() ? 'Hide technical details' : 'Show technical details' }}</span>
+          </button>
+        </div>
 
         <!-- Stage 1: Core Geometry Families -->
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              1. Chassis Geometry Family
+              1. Choose a bike type
             </h2>
-            <span class="text-[11px] text-[var(--ink-3)] font-mono">Governing Pitch-Plane Class</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] text-[var(--ink-3)] font-mono">Governing Pitch-Plane Class</span>
+            }
           </div>
+          <p class="text-[12px] text-[var(--ink-2)] leading-relaxed m-0 -mt-1">
+            Pick the style closest to your bike. It decides how weight shifts when you brake.
+          </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
             @for (fam of families; track fam.key) {
               <button
                 type="button"
@@ -192,13 +217,20 @@
               >
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
-                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
-                    {{ fam.badge }}
-                  </span>
+                  @if (showTechnical()) {
+                    <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
+                      {{ fam.badge }}
+                    </span>
+                  }
                 </div>
-                <p class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed m-0">
-                  {{ fam.desc }}
+                <p class="text-[12px] font-normal text-[var(--ink-2)] leading-relaxed m-0">
+                  {{ fam.plain }}
                 </p>
+                @if (showTechnical()) {
+                  <p class="text-[11px] font-mono font-normal text-[var(--ink-3)] leading-relaxed m-0">
+                    {{ fam.desc }}
+                  </p>
+                }
               </button>
             }
           </div>
@@ -208,12 +240,17 @@
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              2. Calibrated Production Presets
+              2. Or pick a ready-made model
             </h2>
-            <span class="text-[11px] text-[var(--ink-3)] font-mono">Standard Factory Baseline</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] text-[var(--ink-3)] font-mono">Standard Factory Baseline</span>
+            }
           </div>
+          <p class="text-[12px] text-[var(--ink-2)] leading-relaxed m-0 -mt-1">
+            Common bikes with factory settings. Pick one and the engine, weight and brakes are filled in for you.
+          </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
             @for (preset of activePresets(); track preset.key) {
               <button
                 type="button"
@@ -242,9 +279,11 @@
                     ></div>
                   </div>
 
-                  <p class="text-[11px] text-[var(--ink-2)] leading-relaxed m-0">
-                    {{ preset.description }}
-                  </p>
+                  @if (showTechnical()) {
+                    <p class="text-[11px] text-[var(--ink-2)] leading-relaxed m-0">
+                      {{ preset.description }}
+                    </p>
+                  }
                 </div>
 
                 <div class="flex items-center justify-between text-[11px] font-mono text-[var(--ink-3)] pt-1.5 border-t border-[var(--kerb)]/60">
@@ -260,22 +299,24 @@
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              3. Engine Displacement & Mass Envelope
+              3. Engine size &amp; weight
             </h2>
-            <span class="text-[11px] font-mono text-[var(--ink-3)]">Cossalter Chapter 1 Mechanical Constraint</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] font-mono text-[var(--ink-3)]">Cossalter Chapter 1 Mechanical Constraint</span>
+            }
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Displacement: Factory Locked Display -->
             <div class="flex flex-col gap-2.5">
               <div class="flex justify-between items-baseline text-xs">
-                <span class="font-bold text-[var(--ink)]">Engine Displacement</span>
+                <span class="font-bold text-[var(--ink)]">Engine size</span>
                 <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--line-tint)] border border-[var(--line)] text-[var(--line-deep)] flex items-center gap-1">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
-                  Factory Stock Locked
+                  Fixed for this model
                 </span>
               </div>
 
@@ -286,11 +327,11 @@
                     {{ displacementCc() }} <span class="text-sm font-semibold text-[var(--ink-2)]">cc</span>
                   </div>
                   <div class="text-[11px] text-[var(--ink-3)] font-mono">
-                    {{ activePreset().name }} OEM Powertrain
+                    {{ activePreset().name }}
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="text-[10px] uppercase font-bold text-[var(--ink-3)] block">Aero Speed Ceiling</span>
+                  <span class="text-[10px] uppercase font-bold text-[var(--ink-3)] block">Top speed limit</span>
                   <span class="font-mono text-base font-bold text-[var(--danger)]">{{ maxSpeedKmh() }} km/h</span>
                 </div>
               </div>
@@ -303,8 +344,12 @@
                   <line x1="12" y1="8" x2="12.01" y2="8"/>
                 </svg>
                 <div class="leading-relaxed">
-                  <span class="font-bold text-[var(--ink)]">Chassis Coupling Guard:</span>
-                  Displacement is locked to this preset. Swapping engine displacement beyond chassis engineering tolerances induces structural cradle overload, headstock flexing, and severe pitch instability under emergency braking.
+                  <span class="font-bold text-[var(--ink)]">{{ showTechnical() ? 'Chassis Coupling Guard:' : 'Why is this fixed?' }}</span>
+                  @if (showTechnical()) {
+                    Displacement is locked to this preset. Swapping engine displacement beyond chassis engineering tolerances induces structural cradle overload, headstock flexing, and severe pitch instability under emergency braking.
+                  } @else {
+                    This model's frame is built for a {{ displacementCc() }} cc engine. A bigger engine would make it unsafe to brake, so the size stays fixed. To test a different engine size, pick another model above.
+                  }
                 </div>
               </div>
             </div>
@@ -312,7 +357,7 @@
             <!-- Total Mass Slider -->
             <div class="flex flex-col gap-2">
               <div class="flex justify-between items-baseline text-xs">
-                <span class="font-medium text-[var(--ink)]">Total Mass (Curb + Rider)</span>
+                <span class="font-medium text-[var(--ink)]">Total weight (bike + rider)</span>
                 <span class="font-mono text-sm font-bold text-[var(--ink)]">{{ massKg() }} kg</span>
               </div>
               <input
@@ -331,8 +376,8 @@
               </div>
 
               <div class="mt-1 p-2 rounded-lg bg-[var(--concrete)] border border-[var(--kerb)] text-[11px] text-[var(--ink-2)] flex items-center justify-between">
-                <span>Assumed Rider Allowance:</span>
-                <span class="font-mono font-semibold text-[var(--ink)]">~70 kg Standard</span>
+                <span>Rider weight included:</span>
+                <span class="font-mono font-semibold text-[var(--ink)]">about 70 kg</span>
               </div>
             </div>
           </div>
@@ -342,9 +387,11 @@
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              4. Braking Hardware & Actuation Technology
+              4. Brakes
             </h2>
-            <span class="text-[11px] font-mono text-[var(--ink-3)]">Factory Stock Calipers + Selective ABS</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] font-mono text-[var(--ink-3)]">Factory Stock Calipers + Selective ABS</span>
+            }
           </div>
 
           <!-- Section A: Factory Caliper Hardware (OEM Locked) -->
@@ -352,14 +399,15 @@
             <!-- Front Caliper Selection (Factory Stock Constrained) -->
             <div class="flex flex-col gap-2">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-[var(--ink)]">Front Caliper Assembly</span>
-                <span class="text-[10px] uppercase font-bold text-[var(--ink-3)]">OEM Architecture Locked</span>
+                <span class="text-xs font-bold text-[var(--ink)]">Front brake</span>
+                <span class="text-[10px] uppercase font-bold text-[var(--ink-3)]">Fixed for this model</span>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="grid grid-cols-1 gap-2" [class.sm:grid-cols-2]="showTechnical()">
                 <!-- Single Disc Button -->
                 <button
                   type="button"
                   [disabled]="stockFrontBrake() !== 'single_disc'"
+                  [style.display]="!showTechnical() && stockFrontBrake() !== 'single_disc' ? 'none' : null"
                   (click)="frontBrake.set('single_disc')"
                   class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
                   [ngClass]="stockFrontBrake() === 'single_disc'
@@ -369,12 +417,15 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Single Hydraulic Disc</span>
                     @if (stockFrontBrake() === 'single_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">OEM Stock</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
                   </div>
-                  <span class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'single_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                  @if (!showTechnical()) {
+                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the front wheel, squeezed by hydraulic fluid.</span>
+                  }
+                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'single_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
                     {{ stockFrontBrake() === 'single_disc' ? 'Standard axial single-rotor setup for commuter & roadster classes.' : 'Superbike archetype standardizes dual radial disc geometry.' }}
                   </span>
                 </button>
@@ -383,6 +434,7 @@
                 <button
                   type="button"
                   [disabled]="stockFrontBrake() !== 'dual_disc'"
+                  [style.display]="!showTechnical() && stockFrontBrake() !== 'dual_disc' ? 'none' : null"
                   (click)="frontBrake.set('dual_disc')"
                   class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
                   [ngClass]="stockFrontBrake() === 'dual_disc'
@@ -392,12 +444,15 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Dual Hydraulic Disc</span>
                     @if (stockFrontBrake() === 'dual_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">OEM Stock</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
                   </div>
-                  <span class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'dual_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                  @if (!showTechnical()) {
+                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Two discs on the front wheel for stronger stopping.</span>
+                  }
+                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'dual_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
                     {{ stockFrontBrake() === 'dual_disc' ? 'Twin floating radial rotors standard for high kinetic energy dissipation.' : 'Superbike (≥600cc) only. Commuter/standard fork lowers lack dual caliper mounting bosses.' }}
                   </span>
                 </button>
@@ -407,14 +462,15 @@
             <!-- Rear Mechanism Selection (Factory Stock Constrained) -->
             <div class="flex flex-col gap-2">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-[var(--ink)]">Rear Mechanism Assembly</span>
-                <span class="text-[10px] uppercase font-bold text-[var(--ink-3)]">OEM Architecture Locked</span>
+                <span class="text-xs font-bold text-[var(--ink)]">Rear brake</span>
+                <span class="text-[10px] uppercase font-bold text-[var(--ink-3)]">Fixed for this model</span>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="grid grid-cols-1 gap-2" [class.sm:grid-cols-2]="showTechnical()">
                 <!-- Mechanical Drum Button -->
                 <button
                   type="button"
                   [disabled]="stockRearBrake() !== 'drum' || absConfiguration() === 'dual_channel'"
+                  [style.display]="!showTechnical() && stockRearBrake() !== 'drum' ? 'none' : null"
                   (click)="rearBrake.set('drum')"
                   class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
                   [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel'
@@ -426,12 +482,15 @@
                     @if (absConfiguration() === 'dual_channel') {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Incompatible with Dual ABS</span>
                     } @else if (stockRearBrake() === 'drum') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">OEM Stock</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
                   </div>
-                  <span class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                  @if (!showTechnical()) {
+                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Brake shoes press outward inside the rear wheel, pulled by a cable or rod.</span>
+                  }
+                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
                     {{ absConfiguration() === 'dual_channel' ? 'Incompatible: Dual-Channel ABS strictly requires rear hydraulic disc circuit.' : (stockRearBrake() === 'drum' ? 'Leading-trailing mechanical shoe brake via Bowden cable / foot rod.' : 'Factory swingarm engineered with hydraulic disc caliper mounting bracket.') }}
                   </span>
                 </button>
@@ -440,6 +499,7 @@
                 <button
                   type="button"
                   [disabled]="stockRearBrake() !== 'disc'"
+                  [style.display]="!showTechnical() && stockRearBrake() !== 'disc' ? 'none' : null"
                   (click)="rearBrake.set('disc')"
                   class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
                   [ngClass]="stockRearBrake() === 'disc'
@@ -449,12 +509,15 @@
                   <div class="flex items-center justify-between w-full">
                     <span>Hydraulic Disc</span>
                     @if (stockRearBrake() === 'disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">OEM Stock</span>
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--ink)]">Factory fitted</span>
                     } @else {
                       <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
                     }
                   </div>
-                  <span class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                  @if (!showTechnical()) {
+                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the rear wheel, squeezed by hydraulic fluid.</span>
+                  }
+                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
                     {{ stockRearBrake() === 'disc' ? 'Single hydraulic piston caliper on solid rear rotor (required for Dual-Channel ABS).' : 'Commuter 125cc swingarm incorporates integrated internal expanding drum hub.' }}
                   </span>
                 </button>
@@ -466,11 +529,11 @@
           <div class="flex flex-col gap-2.5 pt-4 border-t border-[var(--kerb)]">
             <div class="flex items-center justify-between">
               <div>
-                <span class="text-xs font-bold text-[var(--ink)] block">ABS Electronic Safety Selection</span>
-                <span class="text-[11px] text-[var(--ink-2)]">Secondary choice: Selectable across real-world commercial model trim packages.</span>
+                <span class="text-xs font-bold text-[var(--ink)] block">ABS (anti-lock brakes)</span>
+                <span class="text-[11px] text-[var(--ink-2)]">Optional. ABS stops a wheel from locking up when you brake hard.</span>
               </div>
               <span class="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)]">
-                User Interactive
+                You choose
               </span>
             </div>
 
@@ -491,7 +554,7 @@
                   </span>
                 </div>
                 <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
-                  Direct lever-to-pad fluid & mechanical linkage without solenoid relief. Highest risk of front tuck or rear skid.
+                  {{ showTechnical() ? 'Direct lever-to-pad fluid & mechanical linkage without solenoid relief. Highest risk of front tuck or rear skid.' : 'No anti-lock help. Brake too hard and a wheel can lock up and skid.' }}
                 </span>
                 <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'none' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
@@ -515,7 +578,7 @@
                   </span>
                 </div>
                 <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
-                  ECU valve modulates front caliper to prevent washout. Rear remains conventional (subject to lockup). Very common in modern commuters.
+                  {{ showTechnical() ? 'ECU valve modulates front caliper to prevent washout. Rear remains conventional (subject to lockup). Very common in modern commuters.' : 'Helps the front wheel only, so the rear can still lock up. Common on modern commuter scooters.' }}
                 </span>
                 <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'single_channel_front' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
@@ -543,9 +606,9 @@
                 </div>
                 <span class="text-[11px] font-normal leading-relaxed" [ngClass]="isRearDrum() ? 'text-[var(--ink-3)]' : 'text-[var(--ink-2)]'">
                   @if (isRearDrum()) {
-                    Locked: Mechanical drum lacks hydraulic circuit for ABS solenoid modulation. Select Single-Channel (Front) or Conventional.
+                    {{ showTechnical() ? 'Locked: Mechanical drum lacks hydraulic circuit for ABS solenoid modulation. Select Single-Channel (Front) or Conventional.' : 'Not available with a drum rear brake. Choose Single-Channel or Non-ABS.' }}
                   } @else {
-                    Dual-circuit hydraulic ECU modulation. Actively prevents both front wheel tuck and rear wheel lockup simultaneously.
+                    {{ showTechnical() ? 'Dual-circuit hydraulic ECU modulation. Actively prevents both front wheel tuck and rear wheel lockup simultaneously.' : 'Helps both wheels, so neither one can lock up.' }}
                   }
                 </span>
                 <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
@@ -559,7 +622,7 @@
           <!-- Section C: Mechanical Linkage Coupling -->
           <div class="flex flex-col gap-2 pt-3 border-t border-[var(--kerb)]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-[var(--ink)]">Mechanical Lever Linkage</span>
+              <span class="text-xs font-bold text-[var(--ink)]">How the brake levers work together</span>
               @if (isMechanicalLinkageLocked()) {
                 <span class="text-[10px] font-mono font-bold text-[var(--line-deep)] bg-[var(--line-tint)] border border-[var(--line)] px-2 py-0.5 rounded-full flex items-center gap-1">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -580,7 +643,11 @@
                 </svg>
                 <div class="leading-relaxed">
                   <span class="font-bold text-[var(--ink)]">Segregated Circuit Architecture:</span>
-                  Mechanical linkage is locked to <strong>Independent Controls</strong>. Under Dual-Channel ABS architecture, front and rear calipers operate on segregated hydraulic circuits independently modulated by dedicated ECU solenoid valves. Mechanical cross-coupling (CBS) is eliminated to prevent cross-axle hydraulic pressure interference during selective anti-lock intervention.
+                  @if (showTechnical()) {
+                    Mechanical linkage is locked to <strong>Independent Controls</strong>. Under Dual-Channel ABS architecture, front and rear calipers operate on segregated hydraulic circuits independently modulated by dedicated ECU solenoid valves. Mechanical cross-coupling (CBS) is eliminated to prevent cross-axle hydraulic pressure interference during selective anti-lock intervention.
+                  } @else {
+                    With Dual-Channel ABS, the front and rear brakes must work separately, so this is set to <strong>Independent controls</strong>.
+                  }
                 </div>
               </div>
             }
@@ -631,7 +698,7 @@
           >
             <div class="flex items-center gap-2">
               <span class="text-[var(--line-deep)]">{{ isTier2Open() ? '▼' : '▶' }}</span>
-              <span>Tier 2: Advanced Mechanical & Thermodynamic Parameters (Optional)</span>
+              <span>Advanced settings (optional)</span>
             </div>
             <span class="text-[11px] text-[var(--ink-2)] font-normal">Auto-calibrated based on category</span>
           </button>
