@@ -14,6 +14,7 @@
 
   /* chrome: the title bar, sidebar and bottom dock sit darker than the stage so they frame it */
   --chrome:      #06080B;
+  --chrome-deep: #030406;  /* the sidebar: the darkest layer */
   --chrome-edge: #1D2530;
 
   /* text */
@@ -50,6 +51,15 @@
   --caution:   var(--warn);
 }
 
+/* Inside the sidebar everything steps one shade darker, so the whole panel reads as the deepest layer. */
+.sidebar-dark {
+  --concrete: #090C10;
+  --surface:  #0C1015;
+  --well:     #05070A;
+  --kerb:     #1F2832;
+  --line-tint: #211C07;
+}
+
 /* The printable test report is a paper document: it keeps the original
    black-on-white palette even though the site itself is dark. */
 .light-paper {
@@ -61,6 +71,7 @@
   --kerb:      #DDE0E4;
   --tooltip:   #1F2328;
   --chrome:      #FFFFFF;
+  --chrome-deep: #FFFFFF;
   --chrome-edge: #DDE0E4;
   --ink:       #1F2328;
   --asphalt-7: #3B4048;
