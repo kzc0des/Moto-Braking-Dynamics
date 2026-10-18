@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[var(--bg)] text-[var(--ink)] flex flex-col font-sans select-none pb-12">
+<div class="min-h-screen lg:h-[100dvh] lg:overflow-hidden bg-[var(--bg)] text-[var(--ink)] flex flex-col font-sans select-none pb-12 lg:pb-0">
   <!-- Top Application Header -->
   <header class="flex items-center justify-between px-6 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)] border-t-2 border-[var(--ink)] shrink-0 sticky top-0 z-30 shadow-2xs">
     <div class="flex items-center gap-3">
@@ -34,15 +34,15 @@
   </header>
 
   <!-- Main Asymmetrical Engineering Studio Container -->
-  <main class="w-full p-4 sm:p-6 lg:p-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+  <main class="w-full p-4 sm:p-6 lg:p-8 lg:flex-1 lg:min-h-0">
+    <div class="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)] gap-8 items-start lg:items-stretch lg:h-full">
 
       <!-- ======================================================== -->
       <!-- LEFT COLUMN: Sticky Live Vehicle Schematic & Spec Sheet -->
       <!-- ======================================================== -->
-      <aside class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 flex flex-col gap-5">
+      <aside class="lg:col-span-4 xl:col-span-3 lg:min-h-0 lg:h-full flex flex-col gap-5">
         <!-- Live Anatomy Schematic Card -->
-        <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
+        <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
               Live Geometry Model
@@ -164,7 +164,7 @@
           <button
             type="button"
             (click)="saveAndLaunch()"
-            class="w-full py-3 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-1"
+            class="w-full mt-auto py-3 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-1"
           >
             <span>{{ isEditMode() ? 'Confirm Changes & Launch' : 'Save & Open Workbench' }}</span>
             <span class="text-sm">→</span>
@@ -175,7 +175,7 @@
       <!-- ======================================================== -->
       <!-- RIGHT COLUMN: Configuration Stages & Controls -->
       <!-- ======================================================== -->
-      <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
+      <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-6 lg:min-h-0 lg:h-full lg:overflow-y-auto lg:pr-2">
 
         <!-- Plain-language intro + technical details switch -->
         <div class="flex flex-wrap items-center justify-between gap-3">
