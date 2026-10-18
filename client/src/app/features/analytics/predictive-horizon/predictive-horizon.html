@@ -1,4 +1,4 @@
-<div class="flex-1 min-w-0 min-h-0 flex flex-col select-none bg-[var(--bg)] text-[var(--ink)] overflow-hidden relative">
+<div class="flex-1 min-w-0 min-h-0 flex flex-col bg-[var(--bg)] text-[var(--ink)] overflow-hidden relative">
   <!-- Scrollable Canvas Area (Zone 1, Zone 2, Zone 3, and Forensic Findings Report) -->
   <div class="analytics-scroll-canvas flex-1 min-w-0 min-h-0 overflow-y-auto p-2.5 sm:p-3 flex flex-col gap-2.5">
     
@@ -112,8 +112,9 @@
       </app-metric-card>
     </div>
 
-    <!-- COMPARISON: one panel, two what-if tabs -->
     <app-comparative-matrix
+      [compareTab]="compareTab()"
+      (compareTabChange)="onCompareTabChange($event)"
       [currentRoadTitle]="currentRoadTitle()"
       [activeBrakeSummary]="activeBrakeSummary()"
       [techRows]="techRows()"
@@ -124,7 +125,7 @@
     <!-- DETAILS TOGGLE -->
     <button
       type="button"
-      (click)="showDetails.set(!showDetails())"
+      (click)="toggleDetails()"
       [attr.aria-expanded]="showDetails()"
       aria-controls="engineering-details"
       class="shrink-0 h-10 px-4 rounded-xl border border-[var(--kerb)] bg-[var(--surface)] hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs"
@@ -360,7 +361,7 @@
     <!-- Expandable Forensic Assessment Statement Callout Tray -->
     @if (isStatementOpen()) {
       <section
-        class="mb-2 p-3.5 bg-[var(--surface)]/98 backdrop-blur-md border border-[var(--kerb)] rounded-xl shadow-lg text-xs space-y-2 shrink-0 max-h-72 overflow-y-auto transition-all"
+        class="mb-2 p-3.5 bg-[var(--surface)]/98 backdrop-blur-md border border-[var(--kerb)] rounded-xl shadow-lg text-xs space-y-2 shrink-0 max-h-72 overflow-y-auto transition-all select-text"
       >
         <div class="flex items-center justify-between border-b border-[var(--kerb)]/60 pb-1.5">
           <div class="flex items-center gap-2">
@@ -435,7 +436,7 @@
       <div class="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
         <button
           type="button"
-          (click)="isReportModalOpen.set(true)"
+          (click)="openReportModal()"
           class="h-7 px-2.5 bg-[var(--surface)] border border-[var(--kerb)] hover:border-[var(--line)] hover:bg-[var(--line-tint)] text-[var(--ink)] rounded-lg font-bold text-[11px] shadow-2xs inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition-colors"
           title="Open printable evaluation test report document (PDF export)"
         >
@@ -527,6 +528,6 @@
     [frontLoadKn]="frontLoadKn()"
     [plainSummary]="plainSummary()"
     [forensicReportStatement]="forensicReportStatement()"
-    (close)="isReportModalOpen.set(false)"
+    (close)="closeReportModal()"
   />
 </div>
