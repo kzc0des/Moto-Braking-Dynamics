@@ -1,5 +1,6 @@
 import { Component, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { BenchmarkStore } from '../state/benchmark.store';
 import { ThemeService } from '../core/services/theme.service';
 import { FixedSidebar } from '../features/parameters/fixed-sidebar/fixed-sidebar';
@@ -24,6 +25,7 @@ import { DiagnosticsHud } from '../features/diagnostics/diagnostics-hud/diagnost
   styleUrl: './workbench.css'
 })
 export class Workbench {
+  private readonly router = inject(Router);
   readonly store = inject(BenchmarkStore);
   readonly theme = inject(ThemeService);
 
@@ -62,6 +64,10 @@ export class Workbench {
     this.currentMode.set('simulation');
     this.store.resetPlayback();
     this.store.triggerSimulation();
+  }
+
+  goToIntro(): void {
+    this.router.navigate(['/setup'], { queryParams: { revisit: 1 } });
   }
 
   toggleSidebar(): void {
