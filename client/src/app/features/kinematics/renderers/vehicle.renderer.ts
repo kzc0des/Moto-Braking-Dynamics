@@ -167,7 +167,7 @@ export class VehicleRenderer {
     const groundY = laneY + Math.min(laneHeight - 10, Math.max(drawH * 0.9, laneHeight * 0.78));
 
     // Road surface band under the wheels (fills the lower part of the lane)
-    ctx.fillStyle = '#1C2027';
+    ctx.fillStyle = '#0B0E13';
     ctx.fillRect(0, groundY + 1, width, Math.max(0, laneY + laneHeight - groundY - 1));
     ctx.strokeStyle = '#3A414B';
     ctx.lineWidth = 1.5;

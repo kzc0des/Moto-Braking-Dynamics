@@ -39,12 +39,12 @@ export class StripChartRenderer {
 
     if (plotW <= 0 || plotH <= 0) return;
 
-    // 1. Chart Well Background (--well / #0E1115)
-    ctx.fillStyle = '#0E1115';
+    // 1. Chart Well Background (--well / #05070A)
+    ctx.fillStyle = '#05070A';
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Chart Plot Border (--kerb / #2A3039)
-    ctx.strokeStyle = '#2A3039';
+    // 2. Chart Plot Border (--kerb / #252D38)
+    ctx.strokeStyle = '#252D38';
     ctx.lineWidth = 1;
     ctx.strokeRect(padLeft, padTop, plotW, plotH);
 
@@ -72,8 +72,8 @@ export class StripChartRenderer {
     const timeToX = (t: number) => padLeft + (t / maxTime) * plotW;
     const valToY = (v: number) => padTop + plotH - ((v - minY) / yRange) * plotH;
 
-    // 3. Horizontal Gridlines & Y-axis Reference Labels (--kerb / #2A3039)
-    ctx.strokeStyle = '#2A3039';
+    // 3. Horizontal Gridlines & Y-axis Reference Labels (--kerb / #252D38)
+    ctx.strokeStyle = '#252D38';
     ctx.lineWidth = 1;
     const gridDivs = 3;
     for (let i = 1; i < gridDivs; i++) {
@@ -85,7 +85,7 @@ export class StripChartRenderer {
     }
 
     // Y-axis Bounds Annotation
-    ctx.fillStyle = '#858D98';
+    ctx.fillStyle = '#9AA2AF';
     ctx.font = '500 9.5px monospace';
     ctx.textAlign = 'right';
     ctx.fillText(maxY >= 1000 ? `${(maxY / 1000).toFixed(1)}k` : `${Math.round(maxY)}`, padLeft - 4, padTop + 10);
@@ -102,7 +102,7 @@ export class StripChartRenderer {
       if (x > padLeft + plotW) break;
 
       // Vertical tick stub
-      ctx.strokeStyle = '#2A3039';
+      ctx.strokeStyle = '#252D38';
       ctx.beginPath();
       ctx.moveTo(x, padTop + plotH);
       ctx.lineTo(x, padTop + plotH + 4);
@@ -134,7 +134,7 @@ export class StripChartRenderer {
             const labelY = Math.max(padTop + 11, Math.min(padTop + plotH - 3, y - 4));
 
             // Background pill to prevent dashed grid/threshold lines from striking through warning labels
-            ctx.fillStyle = '#0E1115';
+            ctx.fillStyle = '#05070A';
             ctx.fillRect(labelX - labelW - 3, labelY - 9, labelW + 5, 12);
 
             ctx.fillStyle = th.color;

@@ -5,24 +5,24 @@
   color-scheme: dark;
 
   /* surfaces: deep asphalt, from the page down to inset wells */
-  --bg:        #141922;  /* the stage behind the cards */
+  --bg:        #06080B;  /* the stage behind the cards: near-black */
   --bg-deep:   #090B0E;  /* the intro page: the original near-black asphalt */
-  --concrete:  #19202A;  /* panels */
-  --surface:   #202731;  /* cards and raised panels */
-  --well:      #0D1117;  /* tracks, input wells (inset) */
-  --kerb:      #323B48;  /* borders, gridlines */
+  --concrete:  #0B0E13;  /* panels */
+  --surface:   #10141A;  /* cards and raised panels */
+  --well:      #05070A;  /* tracks, input wells (inset) */
+  --kerb:      #252D38;  /* borders, gridlines */
   --tooltip:   #2A313B;  /* floating help bubbles */
 
   /* chrome: the title bar, sidebar and bottom dock sit darker than the stage so they frame it */
   --chrome:      #06080B;
-  --chrome-deep: #030406;  /* the sidebar: the darkest layer */
+  --chrome-deep: #1D2430;  /* the sidebar: blue-grey */
   --chrome-edge: #1D2530;
 
   /* text */
   --ink:       #ECEFF3;  /* main text */
   --asphalt-7: #5B636E;
-  --ink-2:     #A9B0BA;  /* labels, secondary text */
-  --ink-3:     #858D98;  /* ticks, disabled */
+  --ink-2:     #B3BAC5;  /* labels, secondary text */
+  --ink-3:     #9AA2AF;  /* ticks, disabled */
   --on-ink:    #0B0D10;  /* text on a light "ink" fill */
 
   /* pavement line yellow (accent): the road-marking color */
@@ -52,13 +52,13 @@
   --caution:   var(--warn);
 }
 
-/* Inside the sidebar everything steps one shade darker, so the whole panel reads as the deepest layer. */
+/* The sidebar and the studio preview panel use the blue-grey palette, so they stand apart from the near-black content area. */
 .sidebar-dark {
-  --concrete: #090C10;
-  --surface:  #0C1015;
-  --well:     #05070A;
-  --kerb:     #1F2832;
-  --line-tint: #211C07;
+  --concrete: #232B38;
+  --surface:  #2A3342;
+  --well:     #131822;
+  --kerb:     #3A4455;
+  --line-tint: #3F3813;
 }
 
 /* The printable test report is a paper document: it keeps the original
