@@ -14,6 +14,22 @@ export interface FamilyDescriptor {
   /** Plain-English description shown by default. */
   plain: string;
   badge: string;
+  /** Recognisable production models across the family's presets. */
+  models: string[];
+}
+
+/** Up to `limit` real-world models for a family, taking one from each preset in turn. */
+function familyModelSamples(familyKey: FamilyDescriptor['key'], limit = 3): string[] {
+  const lists = EMPIRICAL_PRESETS.filter(p => p.familyKey === familyKey).map(p => p.models);
+  const picked: string[] = [];
+  for (let i = 0; picked.length < limit && lists.some(list => i < list.length); i++) {
+    for (const list of lists) {
+      if (i < list.length && picked.length < limit) {
+        picked.push(list[i]);
+      }
+    }
+  }
+  return picked;
 }
 
 @Component({
@@ -39,28 +55,32 @@ export class ConfigureStudio implements OnInit, OnDestroy {
       label: 'Step-Through / Commuter',
       desc: 'Rear-biased CoG (b/L ≈ 0.42), low pitch-over, high commuter prevalence',
       plain: 'Scooters and city commuters. Most of the weight sits toward the back, so they rarely tip forward when braking.',
-      badge: 'Rear-Biased CoG'
+      badge: 'Rear-Biased CoG',
+      models: familyModelSamples('step_through')
     },
     {
       key: 'standard',
       label: 'Standard / Roadster',
       desc: 'Neutral upright ergonomics (b/L ≈ 0.50), control dynamics benchmark',
       plain: 'Everyday upright bikes. Weight is balanced front to back, so this is the standard reference.',
-      badge: 'Neutral Baseline'
+      badge: 'Neutral Baseline',
+      models: familyModelSamples('standard')
     },
     {
       key: 'supersport',
       label: 'Supersport / Performance',
       desc: 'High h/L, short wheelbase, rear lift-off (stoppie) threshold critical',
       plain: 'Sport bikes. Tall and short, so very hard front braking can lift the rear wheel off the ground.',
-      badge: 'Stoppie-Prone'
+      badge: 'Stoppie-Prone',
+      models: familyModelSamples('supersport')
     },
     {
       key: 'extended',
       label: 'Extended Geometry',
       desc: 'Polar dynamics: long-wheelbase cruiser or tall long-travel adventure fork',
       plain: 'Cruisers and adventure bikes. Long and stretched out, with a tall front fork.',
-      badge: 'Polar Geometry'
+      badge: 'Polar Geometry',
+      models: familyModelSamples('extended')
     }
   ];
 
