@@ -110,8 +110,6 @@ export class ConfigureStudio implements OnInit, OnDestroy {
   readonly actuation = signal<string>('cbs');
   readonly absConfiguration = signal<AbsConfiguration>('none');
 
-  // Tier 2 parameters
-  readonly isTier2Open = signal<boolean>(false);
   /** Technical labels, formulas and jargon are hidden until the user asks for them. */
   readonly showTechnical = signal<boolean>(false);
   readonly wheelbase = signal<number>(1.28);
@@ -456,26 +454,6 @@ export class ConfigureStudio implements OnInit, OnDestroy {
 
   updateMass(val: number | string): void {
     this.massKg.set(Number(val));
-  }
-
-  updateWheelbase(val: number | string): void {
-    this.wheelbase.set(Number(val));
-  }
-
-  updateCogHeight(val: number | string): void {
-    this.cogHeight.set(Number(val));
-  }
-
-  updateRotorDiameter(val: number | string): void {
-    this.rotorDiameterMm.set(Number(val));
-  }
-
-  updatePadFriction(val: number | string): void {
-    this.padFriction.set(Number(val));
-  }
-
-  updateFluidBoilTemp(val: number | string): void {
-    this.fluidBoilTemp.set(Number(val));
   }
 
   private readonly photoDialog = viewChild.required<ElementRef<HTMLDialogElement>>('photoDialog');
