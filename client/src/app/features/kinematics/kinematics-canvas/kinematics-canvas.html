@@ -44,79 +44,20 @@
     class="w-full flex-1 min-h-0 flex items-stretch border border-[var(--kerb)] rounded-lg overflow-hidden bg-[var(--surface)] shadow-xs"
   >
     <!-- Vehicle Info Column (Pinned on Left) -->
-    <div class="w-44 sm:w-52 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-2.5 sm:p-3 z-10 shadow-xs overflow-y-auto min-h-0 text-xs">
-      <div>
-        <div class="text-[11px] font-bold text-[var(--ink-3)] uppercase tracking-wider mb-1">
-          Live Telemetry
-        </div>
-
-        <div class="text-xs font-bold text-[var(--ink)] leading-snug break-words mb-0.5">
-          {{ activeInst().name }}
-        </div>
-
-        <div class="font-mono text-2xl font-bold text-[var(--ink)] leading-none mb-0.5">
-          {{ liveSpeedKmh() }} <span class="text-xs font-medium text-[var(--ink-2)]">km/h</span>
-        </div>
-
-        <!-- Distance to the impact barrier -->
-        <div class="mt-2.5">
-          <div class="flex justify-between font-mono text-[11px] text-[var(--ink-2)] mb-1">
-            <span>To impact barrier</span>
-            <b class="text-[var(--ink)]">{{ distanceToBarrierM() }} m</b>
+    <div class="w-48 sm:w-60 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-2.5 sm:p-3 z-10 shadow-xs overflow-y-auto min-h-0 text-xs">
+      <div class="flex flex-col gap-2.5">
+        <!-- Title and live status -->
+        <div>
+          <div class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Live telemetry</div>
+          <div class="flex items-start gap-1.5 mt-1">
+            <span class="w-2 h-2 rounded-full shrink-0 mt-1" [ngClass]="liveStatusDotClass()"></span>
+            <span class="text-xs leading-snug break-words" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
           </div>
-          <div class="h-2 w-full rounded-full bg-[var(--well)] border border-[var(--kerb)] overflow-hidden">
-            <div class="h-full rounded-full transition-all duration-100"
-              [style.width.%]="barrierProgressPct()"
-              [ngClass]="isCollisionReached() ? 'bg-[var(--danger-fill)]' : 'bg-[var(--line)]'"></div>
-          </div>
-        </div>
-
-        <div class="space-y-1.5 font-mono text-xs text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2.5 mt-3">
-          <div class="flex justify-between">
-            <span>Distance x</span>
-            <b class="text-[var(--ink)] text-[13px]">{{ liveDistanceM() }} m</b>
-          </div>
-          <div class="flex justify-between">
-            <span>Decel</span>
-            <b class="text-[var(--ink)] text-[13px]">{{ liveDecelG() }} g</b>
-          </div>
-          <div class="flex justify-between">
-            <span>Rotor temp</span>
-            <b class="text-[var(--ink)] text-[13px]">{{ liveTempC() }} °C</b>
-          </div>
-        </div>
-
-        <!-- Biomechanical Peak Inputs -->
-        <div class="space-y-1 font-mono text-[11px] text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2.5 mt-3">
-          <div class="text-[11px] font-bold uppercase text-[var(--ink-3)] tracking-wider mb-0.5">
-            Peak Braking Inputs
-          </div>
-          <div class="flex justify-between">
-            <span>Front Lever:</span>
-            <b class="text-[var(--ink)]">{{ frontLeverPct() }}%</b>
-          </div>
-          <div class="flex justify-between items-center gap-1" [title]="'Rear ' + rearControlLabel()">
-            <span class="text-[var(--ink-2)]">Rear {{ rearControlLabel().split(' ')[0] }}:</span>
-            <b class="text-[var(--ink)]">{{ rearControlPct() }}%</b>
-          </div>
-          <div class="flex justify-between">
-            <span>Peak Decel:</span>
-            <b class="text-[var(--ink)]">{{ peakDecelG() }}g</b>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-[11px] font-mono text-[var(--ink-3)] border-t border-[var(--kerb)] pt-1.5 mt-1.5">
-        <div class="flex items-start gap-1.5 mb-1">
-          <span class="w-2 h-2 rounded-full shrink-0 mt-0.5" [ngClass]="liveStatusDotClass()"></span>
-          <span class="leading-tight break-words text-[11px]" [ngClass]="liveStatusTextClass()">{{ liveStatusText() }}</span>
-        </div>
-
         @if (isCollisionOrCrash() && !isStagedAtStart()) {
           <button
             type="button"
             (click)="openIncidentModal()"
-            class="w-full mt-2 py-1.5 px-2 bg-[var(--danger-tint)] hover:bg-[var(--danger-tint)] text-[var(--danger-ink)] border-2 border-[var(--danger)] rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs leading-tight"
+            class="w-full mt-2.5 py-1.5 px-2 bg-[var(--danger-tint)] hover:bg-[var(--danger-tint)] text-[var(--danger-ink)] border-2 border-[var(--danger)] rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs leading-tight"
           >
             <svg class="w-3.5 h-3.5 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -126,6 +67,60 @@
             <span class="break-words">FAILED: Inspect Incident</span>
           </button>
         }
+        </div>
+
+        <!-- Speed -->
+        <div class="font-mono text-3xl font-bold text-[var(--ink)] leading-none flex items-baseline gap-1.5">
+          {{ liveSpeedKmh() }} <span class="text-sm font-medium text-[var(--ink-2)]">km/h</span>
+        </div>
+
+        <!-- Distance to the impact barrier -->
+        <div>
+          <div class="flex items-baseline justify-between gap-2 mb-1.5">
+            <span class="text-xs text-[var(--ink-2)]">Distance to barrier</span>
+            <b class="font-mono text-base text-[var(--ink)] whitespace-nowrap">{{ distanceToBarrierM() }} m</b>
+          </div>
+          <div class="h-2 w-full rounded-full bg-[var(--well)] border border-[var(--kerb)] overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-100"
+              [style.width.%]="barrierProgressPct()"
+              [ngClass]="isCollisionReached() ? 'bg-[var(--danger-fill)]' : 'bg-[var(--ink-2)]'"></div>
+          </div>
+        </div>
+
+        <!-- Live readings -->
+        <dl class="m-0 rounded-lg bg-[var(--well)] border border-[var(--kerb)] divide-y divide-[var(--kerb)]">
+          <div class="flex items-baseline justify-between gap-3 px-3 py-1">
+            <dt class="text-xs text-[var(--ink-2)]">Distance traveled</dt>
+            <dd class="m-0 font-mono text-[13px] font-semibold text-[var(--ink)] whitespace-nowrap">{{ liveDistanceM() }} m</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3 px-3 py-1">
+            <dt class="text-xs text-[var(--ink-2)]">Braking force</dt>
+            <dd class="m-0 font-mono text-[13px] font-semibold text-[var(--ink)] whitespace-nowrap">{{ liveDecelG() }} g</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3 px-3 py-1">
+            <dt class="text-xs text-[var(--ink-2)]">Brake temperature</dt>
+            <dd class="m-0 font-mono text-[13px] font-semibold text-[var(--ink)] whitespace-nowrap">{{ liveTempC() }} °C</dd>
+          </div>
+        </dl>
+
+        <!-- What the rider did -->
+        <div>
+          <div class="text-sm font-semibold text-[var(--ink)] mb-1">Rider input</div>
+          <dl class="m-0 rounded-lg bg-[var(--well)] border border-[var(--kerb)] divide-y divide-[var(--kerb)]">
+          <div class="flex items-baseline justify-between gap-3 px-3 py-1">
+            <dt class="text-xs text-[var(--ink-2)]">Front brake</dt>
+            <dd class="m-0 font-mono text-[13px] font-semibold text-[var(--ink)] whitespace-nowrap">{{ frontLeverPct() }}%</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3 px-3 py-1" [title]="'Rear ' + rearControlLabel()">
+            <dt class="text-xs text-[var(--ink-2)]">Rear brake</dt>
+            <dd class="m-0 font-mono text-[13px] font-semibold text-[var(--ink)] whitespace-nowrap">{{ rearControlPct() }}%</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3 px-3 py-1">
+            <dt class="text-xs text-[var(--ink-2)]">Hardest braking</dt>
+            <dd class="m-0 font-mono text-[13px] font-semibold text-[var(--ink)] whitespace-nowrap">{{ peakDecelG() }} g</dd>
+          </div>
+          </dl>
+        </div>
       </div>
     </div>
 

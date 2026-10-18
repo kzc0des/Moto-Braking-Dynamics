@@ -1,6 +1,6 @@
 <!-- COMPARISON: one panel, two what-if tabs -->
 <div
-  class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col gap-2 shrink-0"
+  class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col gap-2 shrink-0 grow-[3]"
 >
   <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--kerb)]/60 pb-2">
     <div class="inline-flex p-0.5 gap-0.5 rounded-lg bg-[var(--well)] border border-[var(--kerb)]" role="tablist">
@@ -44,7 +44,7 @@
   </div>
 
   @if (compareTab() === 'brakes') {
-    <div class="flex flex-col gap-2 my-1">
+    <div class="flex flex-col gap-2 my-1 flex-1 justify-around">
       @for (row of techRows(); track row.key) {
         <div class="flex items-center gap-2 sm:gap-2.5">
           <div class="w-44 sm:w-56 shrink-0 flex flex-col leading-tight">
@@ -76,8 +76,8 @@
             ></div>
           </div>
 
-          <div class="w-32 sm:w-36 shrink-0 flex flex-col items-start gap-0.5">
-            <b class="font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)]">{{ row.dist }} m</b>
+          <div class="w-36 sm:w-44 shrink-0 flex flex-col items-start gap-0.5">
+            <b class="font-mono text-base sm:text-xl font-bold leading-none text-[var(--ink)]">{{ row.dist }} m</b>
             <span class="text-[11px] sm:text-[11px] font-semibold leading-tight" [ngClass]="row.chipClass">{{
               row.chip
             }}</span>
@@ -86,7 +86,7 @@
       }
     </div>
   } @else {
-    <div class="flex flex-col gap-2 my-1">
+    <div class="flex flex-col gap-2 my-1 flex-1 justify-around">
       @for (row of surfRows(); track row.name) {
         <div class="flex items-center gap-2 sm:gap-2.5">
           <div class="w-44 sm:w-56 shrink-0 flex flex-col leading-tight">
@@ -108,8 +108,8 @@
             ></div>
           </div>
 
-          <div class="w-32 sm:w-36 shrink-0 flex flex-col items-start gap-0.5">
-            <b class="font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)]">{{ row.dist }} m</b>
+          <div class="w-36 sm:w-44 shrink-0 flex flex-col items-start gap-0.5">
+            <b class="font-mono text-base sm:text-xl font-bold leading-none text-[var(--ink)]">{{ row.dist }} m</b>
             <span class="text-[11px] sm:text-[11px] font-semibold leading-tight" [ngClass]="row.chipClass">{{
               row.chip
             }}</span>

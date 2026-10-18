@@ -1,4 +1,4 @@
-<div class="relative flex flex-col min-h-screen bg-[var(--bg)] text-[var(--ink)] font-sans select-none overflow-x-hidden">
+<div class="relative flex flex-col min-h-screen bg-[var(--bg-deep)] text-[var(--ink)] font-sans select-none overflow-x-hidden">
 
   <!-- ============ TECHNICAL AMBIENT BACKDROP ============ -->
   <div aria-hidden="true" class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -226,127 +226,107 @@
       <!-- Engineering Dimension Labels -->
       <g font-family="'JetBrains Mono', monospace" font-size="12" fill="var(--ink-3)">
         <text x="450" y="414" text-anchor="middle">L = 1.42 m</text>
-        <text x="452" y="340" fill="var(--line-deep)">h = 0.58 m</text>
         <text x="458" y="196" fill="var(--line-deep)">CoG</text>
       </g>
     </svg>
   </div>
 
   <!-- ============ TOP APPLICATION HEADER ============ -->
-  <header class="relative z-10 flex items-center justify-between px-6 py-3.5 bg-[var(--concrete)] border-b border-[var(--kerb)] border-t-2 border-[var(--ink)] shrink-0">
+  <header class="relative z-10 flex items-center justify-between px-6 py-3.5 bg-[var(--chrome)] border-b border-[var(--chrome-edge)] border-t-2 border-[var(--ink)] shrink-0">
     <div class="flex items-center gap-3">
       <div class="w-4 h-4 rounded-[3px] bg-[var(--line)] border border-[var(--ink)]/20 shrink-0"></div>
       <div>
         <div class="text-sm font-bold tracking-tight text-[var(--ink)]">Moto-Braking Dynamics</div>
-        <div class="text-[11.5px] text-[var(--ink-2)] font-medium">Computational Benchmark Workbench · Onboarding Gate</div>
+        <div class="text-[11.5px] text-[var(--ink-2)] font-medium">Computational Benchmark Workbench</div>
       </div>
     </div>
   </header>
 
-  <!-- ============ MAIN ONBOARDING GATE STAGE ============ -->
-  <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6 pb-28 max-w-5xl mx-auto w-full">
-    <!-- Title & Scientific Objective -->
-    <div class="text-center max-w-2xl mb-8 flex flex-col items-center gap-3">
+  <!-- ============ MAIN: CHOOSE HOW TO START ============ -->
+  <main class="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 pb-24 max-w-5xl mx-auto w-full">
+    <div class="text-center max-w-2xl mb-12 flex flex-col items-center gap-4">
       <span class="text-[11px] font-bold uppercase tracking-widest text-[var(--line-deep)] px-3.5 py-1 bg-[var(--line-tint)] rounded-full border border-[var(--line)]">
         INITIAL EXPERIMENT CALIBRATION
       </span>
-      <h1 class="text-2xl sm:text-3xl font-bold text-[var(--ink)] tracking-tight text-balance leading-snug">
+      <h1 class="text-3xl font-semibold text-[var(--ink)] tracking-tight text-balance leading-tight">
         Select Your Motorcycle Evaluation Pathway
       </h1>
-      <p class="text-[13.5px] text-[var(--ink-2)] leading-relaxed">
-        In computational braking dynamics, all trajectory integrations and thermal dissipation models depend on vehicle geometry, mass, and caliper specifications. Choose how you wish to initialize your experiment.
+      <p class="text-base text-[var(--ink-2)] leading-relaxed text-balance">
+        Build your own motorcycle, or open a ready-made scooter and try the simulation right away. You can change the bike at any time.
       </p>
     </div>
 
-    <!-- 2 Frosted Glass Action Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-[880px]">
-      <!-- Pathway A: Custom Setup -->
-      <section class="path-card rounded-xl p-6 border border-[var(--kerb)] shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between gap-3">
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)]">
-              PATHWAY A · CUSTOM SETUP
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-[920px]">
+      <!-- Build your own -->
+      <section class="path-card rounded-2xl p-8 border border-[var(--kerb)] shadow-sm flex flex-col justify-between gap-8">
+        <div class="flex flex-col gap-5">
+          <div class="flex items-center gap-4 min-h-[3.5rem]">
+            <span class="w-11 h-11 shrink-0 rounded-xl bg-[var(--well)] border border-[var(--kerb)] flex items-center justify-center" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"></path>
+              </svg>
             </span>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"></path>
-            </svg>
+            <h2 class="text-xl font-semibold text-[var(--ink)] tracking-tight leading-snug">Assemble Custom Motorcycle</h2>
           </div>
 
-          <h2 class="text-lg font-bold text-[var(--ink)] mt-4 mb-1.5 tracking-tight">
-            Assemble Custom Motorcycle
-          </h2>
-          <p class="text-[12.5px] text-[var(--ink-2)] leading-relaxed">
-            Manually configure your motorcycle's category, engine displacement, total mass, and braking architecture before starting the simulation.
-          </p>
+          <p class="text-sm text-[var(--ink-2)] leading-relaxed">
+              Manually configure your motorcycle's category, engine displacement, total mass, and braking architecture before starting the simulation.
+            </p>
 
-          <!-- Features checklist -->
-          <div class="space-y-2.5">
-            <div class="chk">4 Geometry Families &amp; 7 Standard Production Presets</div>
-            <div class="chk">Specify displacement (<span class="font-mono text-xs">50cc – 1000cc</span>) &amp; curb weight</div>
-            <div class="chk">Configure front/rear hardware (Disc, Dual Disc, or Drum)</div>
-            <div class="chk">Select actuation: Conventional Levers, Linked CBS, or ABS</div>
-          </div>
+          <ul class="m-0 p-0 list-none flex flex-col gap-3.5 pt-5 border-t border-[var(--kerb)]">
+            <li class="chk">Choose from 7 ready-made models, or start from scratch</li>
+            <li class="chk">Set the engine size and the total weight</li>
+            <li class="chk">Pick the brakes: disc, dual disc or drum, with or without ABS</li>
+          </ul>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-[var(--kerb)]">
-          <button
-            type="button"
-            (click)="goToConfigure()"
-            class="btn-a w-full h-11 rounded-lg text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>Configure Custom Motorcycle</span>
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          (click)="goToConfigure()"
+          class="btn-a w-full h-12 rounded-xl text-sm font-bold shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>Set up Custom Motorcycle</span>
+          <span aria-hidden="true">→</span>
+        </button>
       </section>
 
-      <!-- Pathway B: Ground-Truth Baseline -->
-      <section class="path-card rounded-xl p-6 border border-[var(--kerb)] shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between gap-3">
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)]">
-              PATHWAY B · GROUND-TRUTH BASELINE
+      <!-- Ready-made scooter -->
+      <section class="path-card rounded-2xl p-8 border border-[var(--kerb)] shadow-sm flex flex-col justify-between gap-8">
+        <div class="flex flex-col gap-5">
+          <div class="flex items-center gap-4 min-h-[3.5rem]">
+            <span class="w-11 h-11 shrink-0 rounded-xl bg-[var(--well)] border border-[var(--kerb)] flex items-center justify-center" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
+              </svg>
             </span>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--line-deep)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
-            </svg>
+            <h2 class="text-xl font-semibold text-[var(--ink)] tracking-tight leading-snug">Load Calibrated Baseline (125cc Scooter)</h2>
           </div>
 
-          <h2 class="text-lg font-bold text-[var(--ink)] mt-4 mb-1.5 tracking-tight">
-            Load Calibrated Baseline (125cc Scooter)
-          </h2>
-          <p class="text-[12.5px] text-[var(--ink-2)] leading-relaxed">
-            Immediately launch the workbench using the pre-calibrated 125cc commuter motorcycle baseline verified against empirical road test standards.
-          </p>
+          <p class="text-sm text-[var(--ink-2)] leading-relaxed">
+              Immediately launch the workbench using the pre-calibrated 125cc commuter motorcycle baseline verified against empirical road test standards.
+            </p>
 
-          <div class="my-4 border-t border-[var(--kerb)]"></div>
-
-          <!-- Features checklist -->
-          <div class="space-y-2.5">
-            <div class="chk">Vehicle: 125cc Commuter Step-Through (<span class="font-mono text-xs">130 kg</span> Total Mass)</div>
-            <div class="chk">Braking: <span class="font-mono text-xs">220mm</span> Front Hydraulic Disc + <span class="font-mono text-xs">130mm</span> Rear Drum</div>
-            <div class="chk">Benchmark: Calibrated against empirical road test data</div>
-            <div class="chk">Instant Access: Populates the Predictive Horizon with zero setup delay</div>
-          </div>
+          <ul class="m-0 p-0 list-none flex flex-col gap-3.5 pt-5 border-t border-[var(--kerb)]">
+            <li class="chk">125cc scooter, 130 kg with the rider</li>
+            <li class="chk">Disc brake on the front, drum brake on the rear</li>
+            <li class="chk">Checked against real road-test results</li>
+            <li class="chk">Opens straight on the dashboard, with nothing to set up</li>
+          </ul>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-[var(--kerb)]">
-          <button
-            type="button"
-            (click)="loadBaselineAndProceed()"
-            class="btn-b w-full h-11 rounded-lg text-[13.5px] font-bold shadow-xs flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>Load Baseline &amp; Enter Workbench</span>
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          (click)="loadBaselineAndProceed()"
+          class="btn-b w-full h-12 rounded-xl text-sm font-bold shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>Open the workbench</span>
+          <span aria-hidden="true">→</span>
+        </button>
       </section>
     </div>
 
-    <!-- Academic Integrity Notice -->
-    <p class="mt-8 text-center text-xs text-[var(--ink-2)] flex items-center justify-center gap-2">
-      <span class="w-[7px] h-[7px] rounded-full bg-[var(--ok)] shrink-0"></span>
-      <span>You can modify your configured vehicle anytime via the left sidebar "Edit Configuration" button.</span>
+    <p class="mt-10 max-w-xl text-center text-sm text-[var(--ink-2)] leading-relaxed rounded-xl bg-[var(--surface)]/90 border border-[var(--kerb)] px-5 py-3 backdrop-blur">
+      You can change your bike later with <b class="text-[var(--ink)] font-semibold">Edit Specs</b> in the sidebar.
     </p>
   </main>
 </div>

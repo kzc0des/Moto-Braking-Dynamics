@@ -1,123 +1,109 @@
 <!-- ZONE 1: PRIMARY FORECAST HERO BANNER -->
 <section
-  class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col gap-2.5 shrink-0"
+  class="bg-[var(--surface)] border border-[var(--kerb)] rounded-xl p-4 sm:p-5 shadow-2xs flex flex-col gap-5 shrink-0"
 >
-  <div class="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 sm:gap-5">
-    <!-- Verdict & Primary Numeric Stats -->
-    <div class="flex flex-wrap items-center gap-3 sm:gap-5 shrink-0">
+  <!-- Row 1: what happened (left) and the three key numbers (right) -->
+  <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 xl:gap-8">
+    <div class="min-w-0 flex flex-col items-start gap-2.5">
       <span
-        class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border text-xs sm:text-sm font-bold tracking-wide whitespace-nowrap shadow-2xs"
+        class="px-3 py-1 rounded-full border text-xs font-bold tracking-wide whitespace-nowrap"
         [ngClass]="verdict().badgeClass"
       >
         {{ verdict().text }}
       </span>
-
-      <div class="flex flex-col">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping distance</span>
-        <div class="font-mono text-lg sm:text-2xl font-bold text-[var(--ink)]">
-          {{ stopDistanceFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
-        </div>
-      </div>
-
-      <div class="flex flex-col">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping margin</span>
-        <div
-          class="font-mono text-lg sm:text-2xl font-bold"
-          [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
+      <p
+        class="m-0 max-w-2xl text-base sm:text-lg font-semibold leading-snug"
+        [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--ink)]'"
+      >
+        {{ plainSummary() }}
+      </p>
+      @if (rearLoadPct() <= 10) {
+        <span class="text-[var(--danger-ink)] font-semibold text-xs"
+          >Warning: the rear wheel is close to lifting off the ground.</span
         >
-          {{ marginFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
-        </div>
-      </div>
-
-      <div class="flex flex-col">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping time</span>
-        <div class="font-mono text-lg sm:text-2xl font-bold text-[var(--ink)]">
-          {{ stopTimeFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">s</span>
-        </div>
-      </div>
+      }
     </div>
 
-    <!-- Proportional Distance Decomposition Tape -->
-    <div class="flex-1 min-w-0 w-full flex flex-col gap-1.5">
-      <!-- Barrier Text Annotation -->
-      <div class="relative h-4 w-full">
-        <span
-          class="absolute font-mono text-[11px] sm:text-[11px] font-bold uppercase tracking-wider text-[var(--danger)] whitespace-nowrap"
-          [style.left.%]="tape().barrierPct"
-          style="transform: translateX(-50%);"
-        >
-          IMPACT BARRIER ({{ hazardDistance() }} m)
-        </span>
+    <div class="flex flex-wrap items-end gap-x-8 gap-y-3 shrink-0">
+      <div class="flex flex-col gap-1">
+        <span class="text-xs text-[var(--ink-2)]">Stopping distance</span>
+        <div class="font-mono text-3xl sm:text-4xl leading-none flex items-baseline gap-x-1.5 font-bold text-[var(--ink)]">
+          {{ stopDistanceFormatted() }} <span class="text-sm font-medium text-[var(--ink-2)]">m</span>
+        </div>
       </div>
 
-      <!-- The Linear Bar Tape -->
-      <div
-        class="relative h-5 sm:h-6 w-full rounded-md bg-[var(--well)] border border-[var(--kerb)] overflow-visible"
-      >
-        <!-- Phase 1: Reaction Distance Fill (Diagonal Stripe) -->
+      <div class="flex flex-col gap-1">
+        <span class="text-xs text-[var(--ink-2)]">Margin</span>
         <div
-          class="absolute inset-y-0 left-0 rounded-l-md transition-all duration-150"
-          [style.width.%]="tape().phase1Pct"
-          style="background: repeating-linear-gradient(45deg, var(--kerb) 0, var(--kerb) 6px, var(--well) 6px, var(--well) 12px);"
-        ></div>
-
-        <!-- Phase 2: Active Braking Deceleration Fill -->
-        <div
-          class="absolute inset-y-0 transition-all duration-150 rounded-r-md"
-          [style.left.%]="tape().phase1Pct"
-          [style.width.%]="tape().phase2Pct"
-          [ngClass]="tape().fillClass"
-        ></div>
-
-        <!-- Hazard Barrier Line Marker -->
-        <div
-          class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dotted border-[var(--danger)] z-10"
-          [style.left.%]="tape().barrierPct"
-        ></div>
-      </div>
-
-      <!-- Tape Legend Callouts -->
-      <div
-        class="flex flex-wrap items-center justify-between text-[11px] sm:text-[11px] text-[var(--ink-2)] gap-x-3 gap-y-1 pt-0.5"
-      >
-        <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
-          <span
-            class="w-2.5 h-2.5 rounded-xs border border-[var(--kerb)] shrink-0"
-            style="background: repeating-linear-gradient(45deg, var(--kerb) 0, var(--kerb) 3px, var(--well) 3px, var(--well) 6px);"
-          ></span>
-          Reaction delay · free-roll <i>d</i><sub>rxn</sub>:
-          <b class="font-mono text-[var(--ink)]">{{ reactionDistance() }} m</b>
-        </span>
-
-        <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
-          <span
-            class="w-2.5 h-2.5 rounded-xs shrink-0"
-            [ngClass]="margin() >= 0 ? 'bg-[var(--ok)]' : 'bg-[var(--danger-fill)]'"
-          ></span>
-          Active braking <i>d</i><sub>brake</sub>:
-          <b class="font-mono text-[var(--ink)]">{{ brakingDistance() }} m</b>
-        </span>
-
-        <span
-          class="font-mono font-semibold whitespace-nowrap"
+          class="font-mono text-3xl sm:text-4xl leading-none flex items-baseline gap-x-1.5 font-bold"
           [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
         >
-          {{ tape().note }}
-        </span>
+          {{ marginFormatted() }} <span class="text-sm font-medium text-[var(--ink-2)]">m</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <span class="text-xs text-[var(--ink-2)]">Time to stop</span>
+        <div class="font-mono text-3xl sm:text-4xl leading-none flex items-baseline gap-x-1.5 font-bold text-[var(--ink)]">
+          {{ stopTimeFormatted() }} <span class="text-sm font-medium text-[var(--ink-2)]">s</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Plain-language verdict -->
-  <p
-    class="text-sm sm:text-[15px] font-medium leading-snug border-t border-[var(--kerb)]/60 pt-2.5"
-    [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--ink)]'"
-  >
-    {{ plainSummary() }}
-    @if (rearLoadPct() <= 10) {
-      <span class="block text-[var(--danger-ink)] font-semibold text-xs mt-1"
-        >Warning: the rear wheel is close to lifting off the ground.</span
+  <!-- Row 2: where the distance goes, against the barrier -->
+  <div class="flex flex-col gap-2 border-t border-[var(--kerb)]/60 pt-4">
+    <!-- Barrier label -->
+    <div class="relative h-4 w-full">
+      <span
+        class="absolute text-xs font-semibold text-[var(--ink-2)] whitespace-nowrap"
+        [style.left.%]="tape().barrierPct"
+        style="transform: translateX(-50%);"
       >
-    }
-  </p>
+        Barrier at {{ hazardDistance() }} m
+      </span>
+    </div>
+
+    <!-- The linear bar -->
+    <div
+      class="relative h-5 sm:h-6 w-full rounded-md bg-[var(--well)] border border-[var(--kerb)] overflow-visible"
+    >
+      <div
+        class="absolute inset-y-0 left-0 rounded-l-md transition-all duration-150"
+        [style.width.%]="tape().phase1Pct"
+        style="background: repeating-linear-gradient(45deg, var(--kerb) 0, var(--kerb) 6px, var(--well) 6px, var(--well) 12px);"
+      ></div>
+
+      <div
+        class="absolute inset-y-0 transition-all duration-150 rounded-r-md"
+        [style.left.%]="tape().phase1Pct"
+        [style.width.%]="tape().phase2Pct"
+        [ngClass]="tape().fillClass"
+      ></div>
+
+      <div
+        class="absolute -top-1 -bottom-1 w-0 border-l-2 border-dotted border-[var(--ink)] z-10"
+        [style.left.%]="tape().barrierPct"
+      ></div>
+    </div>
+
+    <!-- Legend: two plain items, no symbols -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-[var(--ink-2)] pt-1">
+      <span class="inline-flex items-center gap-2 whitespace-nowrap">
+        <span
+          class="w-3 h-3 rounded-xs border border-[var(--kerb)] shrink-0"
+          style="background: repeating-linear-gradient(45deg, var(--kerb) 0, var(--kerb) 3px, var(--well) 3px, var(--well) 6px);"
+        ></span>
+        Reaction: <b class="font-mono text-[var(--ink)]">{{ reactionDistance() }} m</b> before braking starts
+      </span>
+
+      <span class="inline-flex items-center gap-2 whitespace-nowrap">
+        <span
+          class="w-3 h-3 rounded-xs shrink-0"
+          [ngClass]="margin() >= 0 ? 'bg-[var(--ok)]' : 'bg-[var(--danger-fill)]'"
+        ></span>
+        Braking: <b class="font-mono text-[var(--ink)]">{{ brakingDistance() }} m</b> to stop
+      </span>
+    </div>
+  </div>
 </section>

@@ -18,16 +18,16 @@
     />
 
     <!-- KEY CARDS: the three things most people need -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 shrink-0 grow">
       <!-- Card 1: Deceleration (MFDD) -->
       <app-metric-card
         title="Braking strength"
         formula="SAE J214"
         [showFormula]="showDetails()"
       >
-        <div class="font-mono text-xl sm:text-2xl font-bold text-[var(--ink)] mt-1">
-          {{ mfddG() }} <span class="text-sm font-medium text-[var(--ink-2)]">g</span>
-          <span class="text-xs font-normal text-[var(--ink-2)] ml-1">({{ decelMs2() }} m/s²)</span>
+        <div class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold text-[var(--ink)] mt-1">
+          {{ mfddG() }} <span class="text-base font-medium text-[var(--ink-2)]">g</span>
+          <span class="text-sm font-normal text-[var(--ink-2)] ml-1">({{ decelMs2() }} m/s²)</span>
         </div>
         <div class="collapsible" [class.open]="showDetails()" [attr.aria-hidden]="!showDetails()">
           <div class="collapsible-inner">
@@ -56,9 +56,9 @@
         formula="Pacejka '96"
         [showFormula]="showDetails()"
       >
-        <div class="font-mono text-xl sm:text-2xl font-bold text-[var(--ink)] mt-1">
-          {{ (+peakSlip() * 100).toFixed(0) }}% <span class="text-sm font-medium text-[var(--ink-2)]">tire slip</span>
-          <span class="text-xs font-normal text-[var(--ink-2)] ml-1">(limit {{ (criticalSlip() * 100).toFixed(0) }}%)</span>
+        <div class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold text-[var(--ink)] mt-1">
+          {{ (+peakSlip() * 100).toFixed(0) }}% <span class="text-base font-medium text-[var(--ink-2)]">tire slip</span>
+          <span class="text-sm font-normal text-[var(--ink-2)] ml-1">(limit {{ (criticalSlip() * 100).toFixed(0) }}%)</span>
         </div>
         <div class="collapsible" [class.open]="showDetails()" [attr.aria-hidden]="!showDetails()">
           <div class="collapsible-inner">
@@ -89,10 +89,10 @@
         [showFormula]="showDetails()"
       >
         <div
-          class="font-mono text-xl sm:text-2xl font-bold mt-1"
+          class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold mt-1"
           [ngClass]="peakTemp() > 210 ? 'text-[var(--danger)]' : 'text-[var(--ink)]'"
         >
-          {{ peakTemp() }}<span class="text-sm font-medium">°C</span>
+          {{ peakTemp() }}<span class="text-base font-medium">°C</span>
         </div>
         <div class="font-mono text-[11px] text-[var(--ink-2)] mt-0.5 leading-tight">
           {{ thermalMarginText() }}
@@ -128,7 +128,7 @@
       (click)="toggleDetails()"
       [attr.aria-expanded]="showDetails()"
       aria-controls="engineering-details"
-      class="shrink-0 h-10 px-4 rounded-xl border border-[var(--kerb)] bg-[var(--surface)] hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs"
+      class="shrink-0 h-12 px-5 rounded-xl border-2 border-[var(--line)] bg-[var(--line-tint)] hover:bg-[var(--line)] hover:text-[var(--on-line)] text-sm font-extrabold tracking-wide text-[var(--line-deep)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs"
     >
       <span>{{ showDetails() ? 'Hide engineering details' : 'Show engineering details' }}</span>
       <svg
@@ -206,9 +206,9 @@
           formula="ΔE_k = ½m·v₀²"
           [showFormula]="true"
         >
-          <div class="font-mono text-xl sm:text-2xl font-bold text-[var(--ink)] mt-1">
-            {{ kineticEnergyKj() }} <span class="text-sm font-medium text-[var(--ink-2)]">kJ</span>
-            <span class="text-xs font-normal text-[var(--ink-2)] ml-1">({{ horsepowerEquivalent() }} hp·s)</span>
+          <div class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold text-[var(--ink)] mt-1">
+            {{ kineticEnergyKj() }} <span class="text-base font-medium text-[var(--ink-2)]">kJ</span>
+            <span class="text-sm font-normal text-[var(--ink-2)] ml-1">({{ horsepowerEquivalent() }} hp·s)</span>
           </div>
           <div class="text-[11px] sm:text-[11px] text-[var(--ink-2)] mt-0.5">
             Caloric work: {{ caloriesKcal() }} kcal
@@ -356,7 +356,7 @@
 
   <!-- ZONE 4: PINNED MISSION CONTROL DOCK BAR -->
   <footer
-    class="shrink-0 px-2.5 sm:px-3 pb-2 pt-1.5 bg-[var(--bg)]/95 backdrop-blur-xs border-t border-[var(--kerb)] flex flex-col z-10 shadow-xs relative"
+    class="shrink-0 px-2.5 sm:px-3 pb-2 pt-1.5 bg-[var(--chrome)] border-t border-[var(--chrome-edge)] flex flex-col z-10 relative"
   >
     <!-- Expandable Forensic Assessment Statement Callout Tray -->
     @if (isStatementOpen()) {

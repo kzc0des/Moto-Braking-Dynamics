@@ -77,9 +77,9 @@
 
 .chk {
   position: relative;
-  padding-left: 22px;
-  font-size: 12.5px;
-  line-height: 1.45;
+  padding-left: 28px;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--ink);
 }
 .chk::before {
