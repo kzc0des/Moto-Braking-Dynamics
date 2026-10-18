@@ -122,7 +122,7 @@ export class KinematicsCanvas implements OnDestroy {
 
   readonly liveStatusText = computed(() => {
     const f = this.liveFrame();
-    if (!f || this.isStagedAtStart()) return 'READY · press Launch Run below to start';
+    if (!f || this.isStagedAtStart()) return 'Ready: press Launch Run';
     if (this.isCollisionReached()) {
       return 'FAILED: BARRIER COLLISION';
     }
