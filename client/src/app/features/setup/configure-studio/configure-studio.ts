@@ -64,8 +64,8 @@ export class ConfigureStudio implements OnInit {
   ];
 
   readonly actuations = [
-    { key: 'independent', label: 'Independent Controls', desc: 'Separate hand lever (front) and foot/hand control without linkage' },
-    { key: 'cbs', label: 'Combi-Brake System (CBS)', desc: 'Rear actuation proportionally applies front caliper pressure' }
+    { key: 'independent', label: 'Independent controls', desc: 'Front and rear brakes work separately. You squeeze or press each one yourself.' },
+    { key: 'cbs', label: 'Linked brakes (CBS)', desc: 'Using the rear brake control also applies some front brake, so one input stops the bike more evenly.' }
   ];
 
   readonly family = signal<'step_through' | 'standard' | 'supersport' | 'extended'>('step_through');
