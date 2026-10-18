@@ -30,7 +30,7 @@ export const routes: Routes = [
     pathMatch: 'full',
     redirectTo: (route) => {
       const bikeId = route.params['bikeId'];
-      return `workbench/${bikeId}/analytics`;
+      return `/workbench/${bikeId}/analytics`;
     }
   },
   {
@@ -40,10 +40,10 @@ export const routes: Routes = [
       const garage = inject(GarageService);
       const store = inject(BenchmarkStore);
       if (!store.isVehicleConfigured() && !garage.hasVehicles()) {
-        return 'setup';
+        return '/setup';
       }
       const activeId = garage.activeVehicleId() || (garage.hasVehicles() ? garage.vehicles()[0].id : 'baseline-scooter-125');
-      return `workbench/${activeId}/analytics`;
+      return `/workbench/${activeId}/analytics`;
     }
   },
   {
@@ -53,7 +53,15 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'workbench'
+    redirectTo: () => {
+      const garage = inject(GarageService);
+      const store = inject(BenchmarkStore);
+      if (!store.isVehicleConfigured() && !garage.hasVehicles()) {
+        return '/setup';
+      }
+      const activeId = garage.activeVehicleId() || (garage.hasVehicles() ? garage.vehicles()[0].id : 'baseline-scooter-125');
+      return `/workbench/${activeId}/analytics`;
+    }
   },
   {
     path: '**',
