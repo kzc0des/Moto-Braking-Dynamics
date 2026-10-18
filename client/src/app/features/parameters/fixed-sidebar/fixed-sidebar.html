@@ -1,7 +1,7 @@
-<aside class="w-full lg:w-[300px] shrink-0 h-full bg-[var(--concrete)] border-r border-[var(--kerb)] p-4 flex flex-col gap-4 overflow-y-auto select-none">
+<aside class="w-full lg:w-[300px] shrink-0 h-full bg-[var(--chrome)] border-r border-[var(--chrome-edge)] shadow-[10px_0_30px_-16px_rgb(0_0_0/0.95)] p-4 flex flex-col gap-4 overflow-y-auto select-none">
   <!-- 1. VEHICLE ANATOMY SCHEMATIC HEADER -->
   <div class="flex flex-col gap-2 shrink-0">
-    <div class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Vehicle anatomy</div>
+    <div class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Vehicle anatomy</div>
     
     <div class="border border-[var(--kerb)] rounded-lg bg-[var(--surface)] p-1.5 flex items-center justify-center">
       <svg width="100%" height="86" viewBox="0 0 268 96" role="img" class="block">
@@ -40,7 +40,7 @@
   <!-- 2. CUSTOM VEHICLE CONFIGURATION PROFILE CARD & EDIT BUTTON -->
   <div class="flex flex-col gap-2.5 shrink-0 bg-[var(--surface)] p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
     <div class="flex items-center justify-between">
-      <div class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Vehicle Fleet</div>
+      <div class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Vehicle Fleet</div>
       <span class="text-[11px] font-mono text-[var(--ok)] font-bold">{{ garageVehicles().length }} In Garage</span>
     </div>
 
@@ -105,7 +105,7 @@
   <!-- 3. OPERATING KINEMATICS -->
   <div class="flex flex-col gap-2.5 shrink-0">
     <button type="button" (click)="toggleGroup('kin')" [attr.aria-expanded]="isOpen('kin')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Operating kinematics</span>
+      <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Operating kinematics</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('kin')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('kin')) {
@@ -163,7 +163,7 @@
   <!-- 4. RIDER BRAKE MODULATION (BIOMECHANICAL DUAL-BRAKE) -->
   <div class="flex flex-col gap-2.5 shrink-0 bg-[var(--surface)] p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
     <button type="button" (click)="toggleGroup('brake')" [attr.aria-expanded]="isOpen('brake')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Brake Controls &amp; ABS</span>
+      <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Brake Controls &amp; ABS</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('brake')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('brake')) {
@@ -250,7 +250,7 @@
   <div class="flex flex-col gap-2.5 shrink-0 bg-[var(--surface)] p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
     <button type="button" (click)="toggleGroup('tire')" [attr.aria-expanded]="isOpen('tire')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
       <div class="flex items-center gap-1.5">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Tire Pneumatic Pressure</span>
+        <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Tire Pneumatic Pressure</span>
       </div>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('tire')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
@@ -318,7 +318,7 @@
   <!-- 5. ROADWAY & ENVIRONMENT -->
   <div class="flex flex-col gap-2.5 shrink-0">
     <button type="button" (click)="toggleGroup('road')" [attr.aria-expanded]="isOpen('road')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Roadway &amp; environment</span>
+      <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Roadway &amp; environment</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('road')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('road')) {

@@ -1,6 +1,6 @@
 <div class="bg-[var(--bg)] text-[var(--ink)] flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
   <!-- Top Application Header -->
-  <header class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 sm:px-6 py-2 bg-[var(--surface)] border-b border-[var(--kerb)] shrink-0 lg:h-14 lg:flex-nowrap">
+  <header class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 sm:px-6 py-2 bg-[var(--chrome)] border-b-2 border-[var(--line)] shrink-0 lg:h-14 lg:flex-nowrap">
     <!-- Left: Brand / Topic Title -->
     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
       <!-- Mobile/tablet: open the controls sidebar as a drawer -->
@@ -41,7 +41,7 @@
         (click)="setMode('analytics')"
         class="h-9 lg:h-8 flex-1 lg:flex-none justify-center px-3.5 rounded-lg text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2"
         [ngClass]="currentMode() === 'analytics'
-          ? 'bg-[var(--surface)] border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
+          ? 'bg-[var(--line)] text-[var(--on-line)] shadow-xs'
           : 'text-[var(--ink-2)] hover:text-[var(--ink)]'"
       >
         <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -55,7 +55,7 @@
         (click)="setMode('simulation')"
         class="h-9 lg:h-8 flex-1 lg:flex-none justify-center px-3.5 rounded-lg text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2"
         [ngClass]="currentMode() === 'simulation'
-          ? 'bg-[var(--surface)] border border-[var(--kerb)] text-[var(--ink)] shadow-2xs'
+          ? 'bg-[var(--line)] text-[var(--on-line)] shadow-xs'
           : 'text-[var(--ink-2)] hover:text-[var(--ink)]'"
       >
         <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -109,7 +109,7 @@
       ></div>
     }
     <div
-      class="fixed inset-y-0 left-0 z-45 w-[300px] max-w-[88vw] flex flex-col bg-[var(--concrete)] shadow-2xl transition-transform duration-300 ease-in-out lg:static lg:z-auto lg:max-w-none lg:shadow-none lg:translate-x-0 lg:shrink-0"
+      class="fixed inset-y-0 left-0 z-45 w-[300px] max-w-[88vw] flex flex-col bg-[var(--concrete)] shadow-2xl transition-transform duration-300 ease-in-out lg:relative lg:z-10 lg:max-w-none lg:shadow-none lg:translate-x-0 lg:shrink-0"
       [class.-translate-x-full]="!isSidebarOpen()"
       [class.translate-x-0]="isSidebarOpen()"
     >

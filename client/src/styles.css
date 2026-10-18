@@ -5,12 +5,16 @@
   color-scheme: dark;
 
   /* surfaces: deep asphalt, from the page down to inset wells */
-  --bg:        #090B0E;  /* page */
-  --concrete:  #10141A;  /* panels, sidebar */
-  --surface:   #1B2028;  /* cards and raised panels */
-  --well:      #0A0D11;  /* tracks, input wells (inset) */
-  --kerb:      #303842;  /* borders, gridlines */
+  --bg:        #141922;  /* the stage behind the cards */
+  --concrete:  #19202A;  /* panels */
+  --surface:   #202731;  /* cards and raised panels */
+  --well:      #0D1117;  /* tracks, input wells (inset) */
+  --kerb:      #323B48;  /* borders, gridlines */
   --tooltip:   #2A313B;  /* floating help bubbles */
+
+  /* chrome: the title bar, sidebar and bottom dock sit darker than the stage so they frame it */
+  --chrome:      #06080B;
+  --chrome-edge: #1D2530;
 
   /* text */
   --ink:       #ECEFF3;  /* main text */
@@ -56,6 +60,8 @@
   --well:      #ECEEF0;
   --kerb:      #DDE0E4;
   --tooltip:   #1F2328;
+  --chrome:      #FFFFFF;
+  --chrome-edge: #DDE0E4;
   --ink:       #1F2328;
   --asphalt-7: #3B4048;
   --ink-2:     #656C76;
@@ -93,6 +99,7 @@
   --color-bg: var(--bg);
   --color-concrete: var(--concrete);
   --color-surface: var(--surface);
+  --color-chrome: var(--chrome);
   --color-well: var(--well);
   --color-kerb: var(--kerb);
   --color-panel: var(--concrete);

@@ -127,7 +127,7 @@
       (click)="showDetails.set(!showDetails())"
       [attr.aria-expanded]="showDetails()"
       aria-controls="engineering-details"
-      class="shrink-0 h-10 px-4 rounded-xl border border-[var(--kerb)] bg-[var(--surface)] hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs"
+      class="shrink-0 h-12 px-5 rounded-xl border-2 border-[var(--line)] bg-[var(--line-tint)] hover:bg-[var(--line)] hover:text-[var(--on-line)] text-sm font-extrabold tracking-wide text-[var(--line-deep)] cursor-pointer inline-flex items-center justify-center gap-2 shadow-2xs"
     >
       <span>{{ showDetails() ? 'Hide engineering details' : 'Show engineering details' }}</span>
       <svg
@@ -355,7 +355,7 @@
 
   <!-- ZONE 4: PINNED MISSION CONTROL DOCK BAR -->
   <footer
-    class="shrink-0 px-2.5 sm:px-3 pb-2 pt-1.5 bg-[var(--bg)]/95 backdrop-blur-xs border-t border-[var(--kerb)] flex flex-col z-10 shadow-xs relative"
+    class="shrink-0 px-2.5 sm:px-3 pb-2 pt-1.5 bg-[var(--chrome)] border-t border-[var(--chrome-edge)] flex flex-col z-10 relative"
   >
     <!-- Expandable Forensic Assessment Statement Callout Tray -->
     @if (isStatementOpen()) {
