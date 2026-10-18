@@ -10,6 +10,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client
   },
   {
+    path: 'workbench',
+    renderMode: RenderMode.Client
+  },
+  {
     path: 'configure',
     renderMode: RenderMode.Client
   },
