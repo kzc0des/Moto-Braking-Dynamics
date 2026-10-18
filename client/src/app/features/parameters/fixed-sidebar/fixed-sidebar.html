@@ -115,7 +115,7 @@
     <div class="flex flex-col gap-1.5">
       <div class="flex items-baseline justify-between text-xs">
         <span class="font-medium text-[var(--ink)]">Initial speed <i class="italic font-serif">v</i><sub>0</sub></span>
-        <span class="font-mono text-xs font-medium text-[var(--ink)]">
+        <span class="font-mono text-sm font-bold text-[var(--ink)]">
           {{ speedKmh() }} km/h <span class="text-[var(--ink-2)]">({{ speedMs() }} m/s)</span>
         </span>
       </div>
@@ -138,7 +138,7 @@
     <div class="flex flex-col gap-1.5 mt-1">
       <div class="flex items-baseline justify-between text-xs">
         <span class="font-medium text-[var(--ink)]">Impact distance <i class="italic font-serif">X</i><sub>impact</sub></span>
-        <span class="font-mono text-xs font-medium text-[var(--ink)]">
+        <span class="font-mono text-sm font-bold text-[var(--ink)]">
           {{ hazardDistance() }} m
         </span>
       </div>
@@ -366,7 +366,7 @@
     <div class="flex flex-col gap-1.5 mt-1">
       <div class="flex items-baseline justify-between text-xs">
         <span class="font-medium text-[var(--ink)]">Road grade <i class="italic font-serif">θ</i></span>
-        <span class="font-mono text-xs font-medium text-[var(--ink)]">
+        <span class="font-mono text-sm font-bold text-[var(--ink)]">
           {{ gradeDeg() > 0 ? '+' : '' }}{{ gradeDeg() }}°
         </span>
       </div>

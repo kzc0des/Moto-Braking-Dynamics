@@ -44,7 +44,7 @@
     class="w-full flex-1 min-h-0 flex items-stretch border border-[var(--kerb)] rounded-lg overflow-hidden bg-[var(--surface)] shadow-xs"
   >
     <!-- Vehicle Info Column (Pinned on Left) -->
-    <div class="w-44 sm:w-52 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-2.5 sm:p-3 z-10 shadow-xs overflow-y-auto min-h-0 text-xs">
+    <div class="w-48 sm:w-60 border-r border-[var(--kerb)] bg-[var(--concrete)] shrink-0 flex flex-col justify-between p-2.5 sm:p-3 z-10 shadow-xs overflow-y-auto min-h-0 text-xs">
       <div>
         <div class="text-[11px] font-bold text-[var(--ink-3)] uppercase tracking-wider mb-1">
           Live Telemetry
@@ -54,15 +54,15 @@
           {{ activeInst().name }}
         </div>
 
-        <div class="font-mono text-2xl font-bold text-[var(--ink)] leading-none mb-0.5">
-          {{ liveSpeedKmh() }} <span class="text-xs font-medium text-[var(--ink-2)]">km/h</span>
+        <div class="font-mono text-3xl font-bold text-[var(--ink)] leading-none mb-0.5 flex items-baseline gap-1.5">
+          {{ liveSpeedKmh() }} <span class="text-sm font-medium text-[var(--ink-2)]">km/h</span>
         </div>
 
         <!-- Distance to the impact barrier -->
         <div class="mt-2.5">
           <div class="flex justify-between font-mono text-[11px] text-[var(--ink-2)] mb-1">
             <span>To impact barrier</span>
-            <b class="text-[var(--ink)]">{{ distanceToBarrierM() }} m</b>
+            <b class="text-[var(--ink)] text-base whitespace-nowrap">{{ distanceToBarrierM() }} m</b>
           </div>
           <div class="h-2 w-full rounded-full bg-[var(--well)] border border-[var(--kerb)] overflow-hidden">
             <div class="h-full rounded-full transition-all duration-100"
@@ -74,15 +74,15 @@
         <div class="space-y-1.5 font-mono text-xs text-[var(--ink-2)] border-t border-[var(--kerb)] pt-2.5 mt-3">
           <div class="flex justify-between">
             <span>Distance x</span>
-            <b class="text-[var(--ink)] text-[13px]">{{ liveDistanceM() }} m</b>
+            <b class="text-[var(--ink)] text-base">{{ liveDistanceM() }} m</b>
           </div>
           <div class="flex justify-between">
             <span>Decel</span>
-            <b class="text-[var(--ink)] text-[13px]">{{ liveDecelG() }} g</b>
+            <b class="text-[var(--ink)] text-base">{{ liveDecelG() }} g</b>
           </div>
           <div class="flex justify-between">
             <span>Rotor temp</span>
-            <b class="text-[var(--ink)] text-[13px]">{{ liveTempC() }} °C</b>
+            <b class="text-[var(--ink)] text-base">{{ liveTempC() }} °C</b>
           </div>
         </div>
 
