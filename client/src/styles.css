@@ -121,6 +121,13 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Accessibility: text selection for diagnostics, terminal logs, and tables */
+.select-text,
+.user-select-text {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
 /* Custom range input styling matching road pavement ambiance */
 input[type="range"] {
   accent-color: var(--line);
