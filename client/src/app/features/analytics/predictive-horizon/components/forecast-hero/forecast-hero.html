@@ -14,25 +14,25 @@
 
       <div class="flex flex-col">
         <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping distance</span>
-        <div class="font-mono text-lg sm:text-2xl font-bold text-[var(--ink)]">
-          {{ stopDistanceFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
+        <div class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold text-[var(--ink)]">
+          {{ stopDistanceFormatted() }} <span class="text-sm font-medium text-[var(--ink-2)]">m</span>
         </div>
       </div>
 
       <div class="flex flex-col">
         <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping margin</span>
         <div
-          class="font-mono text-lg sm:text-2xl font-bold"
+          class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold"
           [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
         >
-          {{ marginFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">m</span>
+          {{ marginFormatted() }} <span class="text-sm font-medium text-[var(--ink-2)]">m</span>
         </div>
       </div>
 
       <div class="flex flex-col">
         <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Stopping time</span>
-        <div class="font-mono text-lg sm:text-2xl font-bold text-[var(--ink)]">
-          {{ stopTimeFormatted() }} <span class="text-xs font-medium text-[var(--ink-2)]">s</span>
+        <div class="font-mono text-2xl sm:text-4xl leading-none flex flex-wrap items-baseline gap-x-2 font-bold text-[var(--ink)]">
+          {{ stopTimeFormatted() }} <span class="text-sm font-medium text-[var(--ink-2)]">s</span>
         </div>
       </div>
     </div>

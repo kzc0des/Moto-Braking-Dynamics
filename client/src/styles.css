@@ -5,12 +5,18 @@
   color-scheme: dark;
 
   /* surfaces: deep asphalt, from the page down to inset wells */
-  --bg:        #0B0D10;  /* page */
-  --concrete:  #12151A;  /* panels, sidebar */
-  --surface:   #171B21;  /* cards and raised panels */
-  --well:      #0E1115;  /* tracks, input wells (inset) */
-  --kerb:      #2A3039;  /* borders, gridlines */
-  --tooltip:   #262C35;  /* floating help bubbles */
+  --bg:        #141922;  /* the stage behind the cards */
+  --bg-deep:   #090B0E;  /* the intro page: the original near-black asphalt */
+  --concrete:  #19202A;  /* panels */
+  --surface:   #202731;  /* cards and raised panels */
+  --well:      #0D1117;  /* tracks, input wells (inset) */
+  --kerb:      #323B48;  /* borders, gridlines */
+  --tooltip:   #2A313B;  /* floating help bubbles */
+
+  /* chrome: the title bar, sidebar and bottom dock sit darker than the stage so they frame it */
+  --chrome:      #06080B;
+  --chrome-deep: #030406;  /* the sidebar: the darkest layer */
+  --chrome-edge: #1D2530;
 
   /* text */
   --ink:       #ECEFF3;  /* main text */
@@ -46,16 +52,29 @@
   --caution:   var(--warn);
 }
 
+/* Inside the sidebar everything steps one shade darker, so the whole panel reads as the deepest layer. */
+.sidebar-dark {
+  --concrete: #090C10;
+  --surface:  #0C1015;
+  --well:     #05070A;
+  --kerb:     #1F2832;
+  --line-tint: #211C07;
+}
+
 /* The printable test report is a paper document: it keeps the original
    black-on-white palette even though the site itself is dark. */
 .light-paper {
   color-scheme: light;
   --bg:        #FFFFFF;
+  --bg-deep:   #FFFFFF;
   --concrete:  #F4F5F6;
   --surface:   #FFFFFF;
   --well:      #ECEEF0;
   --kerb:      #DDE0E4;
   --tooltip:   #1F2328;
+  --chrome:      #FFFFFF;
+  --chrome-deep: #FFFFFF;
+  --chrome-edge: #DDE0E4;
   --ink:       #1F2328;
   --asphalt-7: #3B4048;
   --ink-2:     #656C76;
@@ -78,12 +97,22 @@
 }
 
 @theme {
+  /* Elevation for the dark theme: a faint top highlight plus a soft, deep drop shadow. */
+  --shadow-2xs: 0 1px 0 0 rgb(255 255 255 / 0.05) inset, 0 1px 2px 0 rgb(0 0 0 / 0.55);
+  --shadow-xs: 0 1px 0 0 rgb(255 255 255 / 0.05) inset, 0 2px 5px -1px rgb(0 0 0 / 0.6);
+  --shadow-sm: 0 1px 0 0 rgb(255 255 255 / 0.06) inset, 0 4px 10px -2px rgb(0 0 0 / 0.65);
+  --shadow-md: 0 1px 0 0 rgb(255 255 255 / 0.06) inset, 0 8px 20px -6px rgb(0 0 0 / 0.7);
+  --shadow-lg: 0 1px 0 0 rgb(255 255 255 / 0.07) inset, 0 14px 32px -10px rgb(0 0 0 / 0.75);
+  --shadow-xl: 0 1px 0 0 rgb(255 255 255 / 0.07) inset, 0 20px 44px -12px rgb(0 0 0 / 0.8);
+  --shadow-2xl: 0 1px 0 0 rgb(255 255 255 / 0.08) inset, 0 30px 70px -14px rgb(0 0 0 / 0.9);
+
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --color-bg: var(--bg);
   --color-concrete: var(--concrete);
   --color-surface: var(--surface);
+  --color-chrome: var(--chrome);
   --color-well: var(--well);
   --color-kerb: var(--kerb);
   --color-panel: var(--concrete);
@@ -122,8 +151,10 @@ html, body {
 }
 
 /* Custom range input styling matching road pavement ambiance */
-input[type="range"] {
-  accent-color: var(--line);
+@layer base {
+  input[type="range"] {
+    accent-color: var(--line);
+  }
 }
 
 input[type="range"].road-slider {
@@ -207,6 +238,40 @@ input[type="range"].road-slider::-moz-range-thumb {
     --ok-tint:     #EAF7EE;
     --ok-ink:      #156939;
     --info:        #2B6CB0;
+  }
+}
+
+/* ========================================================= */
+/* DEPTH: soft sheen on cards, glowing yellow, pressed wells */
+/* ========================================================= */
+[class~="bg-[var(--surface)]"] {
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0) 65%);
+}
+
+button[class~="bg-[var(--line)]"] {
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.24), rgb(255 255 255 / 0) 70%);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 8px 18px -8px rgb(255 200 0 / 0.55);
+}
+
+[class~="bg-[var(--line-tint)]"][class~="border-[var(--line)]"] {
+  box-shadow: 0 0 0 1px rgb(255 200 0 / 0.22), 0 10px 26px -10px rgb(255 200 0 / 0.38);
+}
+
+[class~="bg-[var(--well)]"] {
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.6);
+}
+
+/* The paper report and the printed page stay flat. */
+.light-paper,
+.light-paper * {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+@media print {
+  * {
+    box-shadow: none !important;
+    background-image: none !important;
   }
 }
 
