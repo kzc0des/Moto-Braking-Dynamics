@@ -28,3 +28,27 @@
   background: var(--ink-3);
 }
 
+/* Smooth expand / collapse for engineering details and formula boxes.
+   grid-template-rows 0fr -> 1fr animates height without measuring content. */
+.collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 220ms ease, opacity 180ms ease;
+}
+
+.collapsible.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.collapsible > .collapsible-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsible {
+    transition: none;
+  }
+}
