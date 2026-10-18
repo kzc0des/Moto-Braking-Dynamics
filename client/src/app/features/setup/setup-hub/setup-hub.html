@@ -245,8 +245,11 @@
   <!-- ============ MAIN: CHOOSE HOW TO START ============ -->
   <main class="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 pb-24 max-w-5xl mx-auto w-full">
     <div class="text-center max-w-2xl mb-12 flex flex-col items-center gap-4">
-      <h1 class="text-3xl sm:text-4xl font-semibold text-[var(--ink)] tracking-tight text-balance leading-tight">
-        How do you want to start?
+      <span class="text-[11px] font-bold uppercase tracking-widest text-[var(--line-deep)] px-3.5 py-1 bg-[var(--line-tint)] rounded-full border border-[var(--line)]">
+        INITIAL EXPERIMENT CALIBRATION
+      </span>
+      <h1 class="text-3xl font-semibold text-[var(--ink)] tracking-tight text-balance leading-tight">
+        Select Your Motorcycle Evaluation Pathway
       </h1>
       <p class="text-base text-[var(--ink-2)] leading-relaxed text-balance">
         Build your own motorcycle, or open a ready-made scooter and try the simulation right away. You can change the bike at any time.
@@ -257,17 +260,17 @@
       <!-- Build your own -->
       <section class="path-card rounded-2xl p-8 border border-[var(--kerb)] shadow-sm flex flex-col justify-between gap-8">
         <div class="flex flex-col gap-5">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-4 min-h-[3.5rem]">
             <span class="w-11 h-11 shrink-0 rounded-xl bg-[var(--well)] border border-[var(--kerb)] flex items-center justify-center" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"></path>
               </svg>
             </span>
-            <h2 class="text-xl font-semibold text-[var(--ink)] tracking-tight leading-snug">Build your own bike</h2>
+            <h2 class="text-xl font-semibold text-[var(--ink)] tracking-tight leading-snug">Assemble Custom Motorcycle</h2>
           </div>
 
           <p class="text-sm text-[var(--ink-2)] leading-relaxed">
-              Pick a type of bike, set its engine size and weight, and choose its brakes.
+              Manually configure your motorcycle's category, engine displacement, total mass, and braking architecture before starting the simulation.
             </p>
 
           <ul class="m-0 p-0 list-none flex flex-col gap-3.5 pt-5 border-t border-[var(--kerb)]">
@@ -290,17 +293,17 @@
       <!-- Ready-made scooter -->
       <section class="path-card rounded-2xl p-8 border border-[var(--kerb)] shadow-sm flex flex-col justify-between gap-8">
         <div class="flex flex-col gap-5">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-4 min-h-[3.5rem]">
             <span class="w-11 h-11 shrink-0 rounded-xl bg-[var(--well)] border border-[var(--kerb)] flex items-center justify-center" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
               </svg>
             </span>
-            <h2 class="text-xl font-semibold text-[var(--ink)] tracking-tight leading-snug">Start with a ready-made scooter</h2>
+            <h2 class="text-xl font-semibold text-[var(--ink)] tracking-tight leading-snug">Load Calibrated Baseline (125cc Scooter)</h2>
           </div>
 
           <p class="text-sm text-[var(--ink-2)] leading-relaxed">
-              A 125cc commuter scooter that is already set up and checked against real road tests. Good for a quick first look.
+              Immediately launch the workbench using the pre-calibrated 125cc commuter motorcycle baseline verified against empirical road test standards.
             </p>
 
           <ul class="m-0 p-0 list-none flex flex-col gap-3.5 pt-5 border-t border-[var(--kerb)]">
