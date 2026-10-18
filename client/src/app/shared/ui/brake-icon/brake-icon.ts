@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { BrakePreviewKind } from '../brake-preview/brake-preview';
+import { BrakeKind } from '../brake-preview/brake-preview';
 
 /**
  * Small always-visible glyph for a brake card: drilled rotor + caliper for discs, a closed
@@ -11,5 +11,5 @@ import { BrakePreviewKind } from '../brake-preview/brake-preview';
   styleUrl: './brake-icon.css'
 })
 export class BrakeIcon {
-  readonly kind = input.required<BrakePreviewKind>();
+  readonly kind = input.required<BrakeKind>();
 }

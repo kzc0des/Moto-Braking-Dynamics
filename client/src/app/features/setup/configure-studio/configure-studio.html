@@ -541,83 +541,89 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <!-- Non-ABS Option -->
-              <button
-                type="button"
-                (click)="setAbsConfiguration('none')"
-                class="p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
-                [ngClass]="absConfiguration() === 'none'
-                  ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
-                  : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span class="text-[13px]">Non-ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
-                    Conventional
+              <app-brake-preview kind="abs_none">
+                <button
+                  type="button"
+                  (click)="setAbsConfiguration('none')"
+                  class="w-full h-full p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
+                  [ngClass]="absConfiguration() === 'none'
+                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
+                    : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[13px]">Non-ABS</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                      Conventional
+                    </span>
+                  </div>
+                  <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
+                    {{ showTechnical() ? 'Direct lever-to-pad fluid & mechanical linkage without solenoid relief. Highest risk of front tuck or rear skid.' : 'No anti-lock help. Brake too hard and a wheel can lock up and skid.' }}
                   </span>
-                </div>
-                <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
-                  {{ showTechnical() ? 'Direct lever-to-pad fluid & mechanical linkage without solenoid relief. Highest risk of front tuck or rear skid.' : 'No anti-lock help. Brake too hard and a wheel can lock up and skid.' }}
-                </span>
-                <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'none' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
-                  Standard / Budget Trim
-                </div>
-              </button>
+                  <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'none' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
+                    Standard / Budget Trim
+                  </div>
+                </button>
+              </app-brake-preview>
 
               <!-- Single-Channel ABS Option -->
-              <button
-                type="button"
-                (click)="setAbsConfiguration('single_channel_front')"
-                class="p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
-                [ngClass]="absConfiguration() === 'single_channel_front'
-                  ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
-                  : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span class="text-[13px]">Single-Channel ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
-                    Front Only
+              <app-brake-preview kind="abs_single">
+                <button
+                  type="button"
+                  (click)="setAbsConfiguration('single_channel_front')"
+                  class="w-full h-full p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
+                  [ngClass]="absConfiguration() === 'single_channel_front'
+                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
+                    : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[13px]">Single-Channel ABS</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                      Front Only
+                    </span>
+                  </div>
+                  <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
+                    {{ showTechnical() ? 'ECU valve modulates front caliper to prevent washout. Rear remains conventional (subject to lockup). Very common in modern commuters.' : 'Helps the front wheel only, so the rear can still lock up. Common on modern commuter scooters.' }}
                   </span>
-                </div>
-                <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
-                  {{ showTechnical() ? 'ECU valve modulates front caliper to prevent washout. Rear remains conventional (subject to lockup). Very common in modern commuters.' : 'Helps the front wheel only, so the rear can still lock up. Common on modern commuter scooters.' }}
-                </span>
-                <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'single_channel_front' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
-                  Aerox S / Click / 125-160cc
-                </div>
-              </button>
+                  <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'single_channel_front' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
+                    Aerox S / Click / 125-160cc
+                  </div>
+                </button>
+              </app-brake-preview>
 
               <!-- Dual-Channel ABS Option -->
-              <button
-                type="button"
-                [disabled]="isRearDrum()"
-                (click)="setAbsConfiguration('dual_channel')"
-                class="p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 transition-all"
-                [ngClass]="[
-                  isRearDrum() ? 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]' : 'cursor-pointer',
-                  absConfiguration() === 'dual_channel' && !isRearDrum() ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : '',
-                  absConfiguration() !== 'dual_channel' && !isRearDrum() ? 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]' : ''
-                ]"
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span class="text-[13px]">Dual-Channel ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
-                    Front & Rear
+              <app-brake-preview kind="abs_dual">
+                <button
+                  type="button"
+                  [disabled]="isRearDrum()"
+                  (click)="setAbsConfiguration('dual_channel')"
+                  class="w-full h-full p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 transition-all"
+                  [ngClass]="[
+                    isRearDrum() ? 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]' : 'cursor-pointer',
+                    absConfiguration() === 'dual_channel' && !isRearDrum() ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : '',
+                    absConfiguration() !== 'dual_channel' && !isRearDrum() ? 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]' : ''
+                  ]"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[13px]">Dual-Channel ABS</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                      Front & Rear
+                    </span>
+                  </div>
+                  <span class="text-[11px] font-normal leading-relaxed" [ngClass]="isRearDrum() ? 'text-[var(--ink-3)]' : 'text-[var(--ink-2)]'">
+                    @if (isRearDrum()) {
+                      {{ showTechnical() ? 'Locked: Mechanical drum lacks hydraulic circuit for ABS solenoid modulation. Select Single-Channel (Front) or Conventional.' : 'Not available with a drum rear brake. Choose Single-Channel or Non-ABS.' }}
+                    } @else {
+                      {{ showTechnical() ? 'Dual-circuit hydraulic ECU modulation. Actively prevents both front wheel tuck and rear wheel lockup simultaneously.' : 'Helps both wheels, so neither one can lock up.' }}
+                    }
                   </span>
-                </div>
-                <span class="text-[11px] font-normal leading-relaxed" [ngClass]="isRearDrum() ? 'text-[var(--ink-3)]' : 'text-[var(--ink-2)]'">
-                  @if (isRearDrum()) {
-                    {{ showTechnical() ? 'Locked: Mechanical drum lacks hydraulic circuit for ABS solenoid modulation. Select Single-Channel (Front) or Conventional.' : 'Not available with a drum rear brake. Choose Single-Channel or Non-ABS.' }}
-                  } @else {
-                    {{ showTechnical() ? 'Dual-circuit hydraulic ECU modulation. Actively prevents both front wheel tuck and rear wheel lockup simultaneously.' : 'Helps both wheels, so neither one can lock up.' }}
-                  }
-                </span>
-                <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'dual_channel' && !isRearDrum() ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
-                  {{ isRearDrum() ? 'Requires Rear Hydraulic Disc' : 'Premium Performance Trim' }}
-                </div>
-              </button>
+                  <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'dual_channel' && !isRearDrum() ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
+                    {{ isRearDrum() ? 'Requires Rear Hydraulic Disc' : 'Premium Performance Trim' }}
+                  </div>
+                </button>
+              </app-brake-preview>
             </div>
           </div>
 
