@@ -391,58 +391,60 @@
               </div>
               <div class="grid grid-cols-1 gap-2" [class.sm:grid-cols-2]="showTechnical()">
                 <!-- Single Disc Button -->
-                <button
-                  type="button"
-                  [disabled]="stockFrontBrake() !== 'single_disc'"
-                  [style.display]="!showTechnical() && stockFrontBrake() !== 'single_disc' ? 'none' : null"
-                  (click)="frontBrake.set('single_disc')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockFrontBrake() === 'single_disc'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Single Hydraulic Disc</span>
-                    @if (stockFrontBrake() === 'single_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="single_disc" [style.display]="!showTechnical() && stockFrontBrake() !== 'single_disc' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockFrontBrake() !== 'single_disc'"
+                    (click)="frontBrake.set('single_disc')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockFrontBrake() === 'single_disc'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span>Single Hydraulic Disc</span>
+                      @if (stockFrontBrake() === 'single_disc') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the front wheel, squeezed by hydraulic fluid.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the front wheel, squeezed by hydraulic fluid.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'single_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ stockFrontBrake() === 'single_disc' ? 'Standard axial single-rotor setup for commuter & roadster classes.' : 'Superbike archetype standardizes dual radial disc geometry.' }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'single_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ stockFrontBrake() === 'single_disc' ? 'Standard axial single-rotor setup for commuter & roadster classes.' : 'Superbike archetype standardizes dual radial disc geometry.' }}
+                    </span>
+                  </button>
+                </app-brake-preview>
 
                 <!-- Dual Disc Button -->
-                <button
-                  type="button"
-                  [disabled]="stockFrontBrake() !== 'dual_disc'"
-                  [style.display]="!showTechnical() && stockFrontBrake() !== 'dual_disc' ? 'none' : null"
-                  (click)="frontBrake.set('dual_disc')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockFrontBrake() === 'dual_disc'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Dual Hydraulic Disc</span>
-                    @if (stockFrontBrake() === 'dual_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="dual_disc" [style.display]="!showTechnical() && stockFrontBrake() !== 'dual_disc' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockFrontBrake() !== 'dual_disc'"
+                    (click)="frontBrake.set('dual_disc')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockFrontBrake() === 'dual_disc'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span>Dual Hydraulic Disc</span>
+                      @if (stockFrontBrake() === 'dual_disc') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Two discs on the front wheel for stronger stopping.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Two discs on the front wheel for stronger stopping.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'dual_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ stockFrontBrake() === 'dual_disc' ? 'Twin floating radial rotors standard for high kinetic energy dissipation.' : 'Superbike (≥600cc) only. Commuter/standard fork lowers lack dual caliper mounting bosses.' }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'dual_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ stockFrontBrake() === 'dual_disc' ? 'Twin floating radial rotors standard for high kinetic energy dissipation.' : 'Superbike (≥600cc) only. Commuter/standard fork lowers lack dual caliper mounting bosses.' }}
+                    </span>
+                  </button>
+                </app-brake-preview>
               </div>
             </div>
 
@@ -454,60 +456,62 @@
               </div>
               <div class="grid grid-cols-1 gap-2" [class.sm:grid-cols-2]="showTechnical()">
                 <!-- Mechanical Drum Button -->
-                <button
-                  type="button"
-                  [disabled]="stockRearBrake() !== 'drum' || absConfiguration() === 'dual_channel'"
-                  [style.display]="!showTechnical() && stockRearBrake() !== 'drum' ? 'none' : null"
-                  (click)="rearBrake.set('drum')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Mechanical Drum</span>
-                    @if (absConfiguration() === 'dual_channel') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Incompatible with Dual ABS</span>
-                    } @else if (stockRearBrake() === 'drum') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="drum" [style.display]="!showTechnical() && stockRearBrake() !== 'drum' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockRearBrake() !== 'drum' || absConfiguration() === 'dual_channel'"
+                    (click)="rearBrake.set('drum')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span>Mechanical Drum</span>
+                      @if (absConfiguration() === 'dual_channel') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Incompatible with Dual ABS</span>
+                      } @else if (stockRearBrake() === 'drum') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Brake shoes press outward inside the rear wheel, pulled by a cable or rod.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Brake shoes press outward inside the rear wheel, pulled by a cable or rod.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ absConfiguration() === 'dual_channel' ? 'Incompatible: Dual-Channel ABS strictly requires rear hydraulic disc circuit.' : (stockRearBrake() === 'drum' ? 'Leading-trailing mechanical shoe brake via Bowden cable / foot rod.' : 'Factory swingarm engineered with hydraulic disc caliper mounting bracket.') }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ absConfiguration() === 'dual_channel' ? 'Incompatible: Dual-Channel ABS strictly requires rear hydraulic disc circuit.' : (stockRearBrake() === 'drum' ? 'Leading-trailing mechanical shoe brake via Bowden cable / foot rod.' : 'Factory swingarm engineered with hydraulic disc caliper mounting bracket.') }}
+                    </span>
+                  </button>
+                </app-brake-preview>
 
                 <!-- Hydraulic Disc Button -->
-                <button
-                  type="button"
-                  [disabled]="stockRearBrake() !== 'disc'"
-                  [style.display]="!showTechnical() && stockRearBrake() !== 'disc' ? 'none' : null"
-                  (click)="rearBrake.set('disc')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockRearBrake() === 'disc'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Hydraulic Disc</span>
-                    @if (stockRearBrake() === 'disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="rear_disc" [style.display]="!showTechnical() && stockRearBrake() !== 'disc' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockRearBrake() !== 'disc'"
+                    (click)="rearBrake.set('disc')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockRearBrake() === 'disc'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span>Hydraulic Disc</span>
+                      @if (stockRearBrake() === 'disc') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the rear wheel, squeezed by hydraulic fluid.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the rear wheel, squeezed by hydraulic fluid.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ stockRearBrake() === 'disc' ? 'Single hydraulic piston caliper on solid rear rotor (required for Dual-Channel ABS).' : 'Commuter 125cc swingarm incorporates integrated internal expanding drum hub.' }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ stockRearBrake() === 'disc' ? 'Single hydraulic piston caliper on solid rear rotor (required for Dual-Channel ABS).' : 'Commuter 125cc swingarm incorporates integrated internal expanding drum hub.' }}
+                    </span>
+                  </button>
+                </app-brake-preview>
               </div>
             </div>
           </div>
