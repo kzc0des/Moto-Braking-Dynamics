@@ -151,8 +151,10 @@ html, body {
 }
 
 /* Custom range input styling matching road pavement ambiance */
-input[type="range"] {
-  accent-color: var(--line);
+@layer base {
+  input[type="range"] {
+    accent-color: var(--line);
+  }
 }
 
 input[type="range"].road-slider {
