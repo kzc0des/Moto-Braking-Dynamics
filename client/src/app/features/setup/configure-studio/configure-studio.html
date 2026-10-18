@@ -34,20 +34,22 @@
   </header>
 
   <!-- Main Asymmetrical Engineering Studio Container -->
-  <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+  <main class="w-full p-4 sm:p-6 lg:p-8">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
       <!-- ======================================================== -->
       <!-- LEFT COLUMN: Sticky Live Vehicle Schematic & Spec Sheet -->
       <!-- ======================================================== -->
-      <aside class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-20 flex flex-col gap-5">
+      <aside class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 flex flex-col gap-5">
         <!-- Live Anatomy Schematic Card -->
         <div class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
               Live Geometry Model
             </span>
-            <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
+            }
           </div>
 
           <!-- Live Animated Sprite Machine Viewport -->
@@ -57,9 +59,11 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)] animate-pulse"></span>
                 {{ activeSpriteKey() }} archetype
               </span>
-              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
-                112×56 6-FPS Idle
-              </span>
+              @if (showTechnical()) {
+                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-white/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
+                  112×56 6-FPS Idle
+                </span>
+              }
             </div>
 
             <div class="bike-idle-stage my-1">
@@ -171,18 +175,39 @@
       <!-- ======================================================== -->
       <!-- RIGHT COLUMN: Configuration Stages & Controls -->
       <!-- ======================================================== -->
-      <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+      <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
+
+        <!-- Plain-language intro + technical details switch -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-[13px] text-[var(--ink-2)] leading-relaxed m-0 max-w-3xl">
+            Tell us about the bike you want to test. Start with a type or a ready-made model, then adjust the engine, weight and brakes. You do not need to know the technical terms.
+          </p>
+          <button
+            type="button"
+            (click)="showTechnical.set(!showTechnical())"
+            [attr.aria-pressed]="showTechnical()"
+            class="h-9 px-3.5 rounded-lg border border-[var(--kerb)] bg-white hover:bg-[var(--line-tint)] text-xs font-bold text-[var(--ink)] inline-flex items-center gap-2 cursor-pointer shadow-2xs shrink-0"
+          >
+            <span class="w-2 h-2 rounded-full" [ngClass]="showTechnical() ? 'bg-[var(--ok)]' : 'bg-[var(--ink-3)]'"></span>
+            <span>{{ showTechnical() ? 'Hide technical details' : 'Show technical details' }}</span>
+          </button>
+        </div>
 
         <!-- Stage 1: Core Geometry Families -->
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              1. Chassis Geometry Family
+              1. Choose a bike type
             </h2>
-            <span class="text-[11px] text-[var(--ink-3)] font-mono">Governing Pitch-Plane Class</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] text-[var(--ink-3)] font-mono">Governing Pitch-Plane Class</span>
+            }
           </div>
+          <p class="text-[12px] text-[var(--ink-2)] leading-relaxed m-0 -mt-1">
+            Pick the style closest to your bike. It decides how weight shifts when you brake.
+          </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
             @for (fam of families; track fam.key) {
               <button
                 type="button"
@@ -192,13 +217,20 @@
               >
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
-                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
-                    {{ fam.badge }}
-                  </span>
+                  @if (showTechnical()) {
+                    <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/70 border border-[var(--kerb)] text-[var(--ink-2)] font-medium">
+                      {{ fam.badge }}
+                    </span>
+                  }
                 </div>
-                <p class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed m-0">
-                  {{ fam.desc }}
+                <p class="text-[12px] font-normal text-[var(--ink-2)] leading-relaxed m-0">
+                  {{ fam.plain }}
                 </p>
+                @if (showTechnical()) {
+                  <p class="text-[11px] font-mono font-normal text-[var(--ink-3)] leading-relaxed m-0">
+                    {{ fam.desc }}
+                  </p>
+                }
               </button>
             }
           </div>
@@ -208,12 +240,17 @@
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              2. Calibrated Production Presets
+              2. Or pick a ready-made model
             </h2>
-            <span class="text-[11px] text-[var(--ink-3)] font-mono">Standard Factory Baseline</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] text-[var(--ink-3)] font-mono">Standard Factory Baseline</span>
+            }
           </div>
+          <p class="text-[12px] text-[var(--ink-2)] leading-relaxed m-0 -mt-1">
+            Common bikes with factory settings. Pick one and the engine, weight and brakes are filled in for you.
+          </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
             @for (preset of activePresets(); track preset.key) {
               <button
                 type="button"
@@ -242,9 +279,11 @@
                     ></div>
                   </div>
 
-                  <p class="text-[11px] text-[var(--ink-2)] leading-relaxed m-0">
-                    {{ preset.description }}
-                  </p>
+                  @if (showTechnical()) {
+                    <p class="text-[11px] text-[var(--ink-2)] leading-relaxed m-0">
+                      {{ preset.description }}
+                    </p>
+                  }
                 </div>
 
                 <div class="flex items-center justify-between text-[11px] font-mono text-[var(--ink-3)] pt-1.5 border-t border-[var(--kerb)]/60">
@@ -260,9 +299,11 @@
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              3. Engine Displacement & Mass Envelope
+              3. Engine size &amp; weight
             </h2>
-            <span class="text-[11px] font-mono text-[var(--ink-3)]">Cossalter Chapter 1 Mechanical Constraint</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] font-mono text-[var(--ink-3)]">Cossalter Chapter 1 Mechanical Constraint</span>
+            }
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -342,9 +383,11 @@
         <section class="bg-white border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
-              4. Braking Hardware & Actuation Technology
+              4. Brakes
             </h2>
-            <span class="text-[11px] font-mono text-[var(--ink-3)]">Factory Stock Calipers + Selective ABS</span>
+            @if (showTechnical()) {
+              <span class="text-[11px] font-mono text-[var(--ink-3)]">Factory Stock Calipers + Selective ABS</span>
+            }
           </div>
 
           <!-- Section A: Factory Caliper Hardware (OEM Locked) -->
@@ -631,7 +674,7 @@
           >
             <div class="flex items-center gap-2">
               <span class="text-[var(--line-deep)]">{{ isTier2Open() ? '▼' : '▶' }}</span>
-              <span>Tier 2: Advanced Mechanical & Thermodynamic Parameters (Optional)</span>
+              <span>Advanced settings (optional)</span>
             </div>
             <span class="text-[11px] text-[var(--ink-2)] font-normal">Auto-calibrated based on category</span>
           </button>
