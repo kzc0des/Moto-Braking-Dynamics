@@ -65,7 +65,7 @@ export class TrackRenderer {
     }
     // Beyond the impact barrier: soft red
     if (endPx > barrierPx) {
-      ctx.fillStyle = 'rgba(242, 84, 75, 0.09)';
+      ctx.fillStyle = 'rgba(224, 86, 78, 0.06)';
       ctx.fillRect(barrierPx, zoneTop, endPx - barrierPx, zoneH);
     }
     // Zone captions (only when the zone is wide enough to hold them)
@@ -80,7 +80,7 @@ export class TrackRenderer {
     };
     caption('REACTION · FREE-ROLL', startPx, onsetPx);
     caption('BRAKING ZONE', onsetPx, barrierPx);
-    ctx.fillStyle = '#FF8F88';
+    ctx.fillStyle = '#D98F8A';
     caption('BEYOND BARRIER', barrierPx, endPx);
 
     // 2. Vertical distance gridlines (every 10m, big and readable)
@@ -154,7 +154,7 @@ export class TrackRenderer {
     // 3. Impact Barrier at X_impact (hazardDistance) - Red Signal Barrier
     const barrierX = meterToPx(hazardDistance);
     if (barrierX <= width) {
-      ctx.strokeStyle = '#F2544B';
+      ctx.strokeStyle = '#E0564E';
       ctx.lineWidth = 2.2;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -164,14 +164,14 @@ export class TrackRenderer {
       ctx.setLineDash([]);
 
       // "Barrier 32.5 m" label
-      ctx.fillStyle = '#F2544B';
+      ctx.fillStyle = '#E0564E';
       ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'right';
       const barrierLabel = `Impact Barrier ${hazardDistance} m`;
       const barrierW = ctx.measureText(barrierLabel).width + 10;
       ctx.fillStyle = '#171B21';
       ctx.fillRect(barrierX - 4 - barrierW, topOffset + 20, barrierW, 16);
-      ctx.fillStyle = '#F2544B';
+      ctx.fillStyle = '#E0564E';
       ctx.fillText(barrierLabel, barrierX - 9, topOffset + 32);
 
       // High-Visibility Red Canvas Callout if Collision Occurred
@@ -185,14 +185,14 @@ export class TrackRenderer {
         const pillY = topOffset + 18;
 
         ctx.fillStyle = '#2D1514';
-        ctx.strokeStyle = '#F2544B';
+        ctx.strokeStyle = '#E0564E';
         ctx.lineWidth = 1.8;
         ctx.beginPath();
         ctx.roundRect(pillX, pillY, pillW, pillH, 6);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#FF8F88';
+        ctx.fillStyle = '#D98F8A';
         ctx.textAlign = 'center';
         ctx.fillText(impactLabel, barrierX, pillY + 15);
       }
@@ -221,12 +221,12 @@ export class TrackRenderer {
         const groundY = laneY + laneHeight - 20;
 
         ctx.fillStyle = '#2D1514';
-        ctx.strokeStyle = '#F2544B';
+        ctx.strokeStyle = '#E0564E';
         ctx.lineWidth = 1.5;
         ctx.fillRect(holeX1, groundY, holeW, 8);
         ctx.strokeRect(holeX1, groundY, holeW, 8);
 
-        ctx.fillStyle = '#F2544B';
+        ctx.fillStyle = '#E0564E';
         ctx.font = '600 10px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('POTHOLE', holeX1 + holeW / 2, groundY - 4);

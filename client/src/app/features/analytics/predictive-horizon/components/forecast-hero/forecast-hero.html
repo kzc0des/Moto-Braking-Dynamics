@@ -92,7 +92,7 @@
         <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
           <span
             class="w-2.5 h-2.5 rounded-xs shrink-0"
-            [ngClass]="margin() >= 0 ? 'bg-[var(--ok)]' : 'bg-[var(--danger)]'"
+            [ngClass]="margin() >= 0 ? 'bg-[var(--ok)]' : 'bg-[var(--danger-fill)]'"
           ></span>
           Active braking <i>d</i><sub>brake</sub>:
           <b class="font-mono text-[var(--ink)]">{{ brakingDistance() }} m</b>
@@ -111,7 +111,7 @@
   <!-- Plain-language verdict -->
   <p
     class="text-sm sm:text-[15px] font-medium leading-snug border-t border-[var(--kerb)]/60 pt-2.5"
-    [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--danger-ink)]'"
+    [ngClass]="margin() >= 0 ? 'text-[var(--ok-ink)]' : 'text-[var(--ink)]'"
   >
     {{ plainSummary() }}
     @if (rearLoadPct() <= 10) {

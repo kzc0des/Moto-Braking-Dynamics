@@ -209,7 +209,7 @@ export class TelemetryPanel implements OnDestroy {
               { name: 'Rear Fz', color: '#5AA2F0', times: telem.time, values: telem.normalLoadRear, unit: ' N' }
             ],
             thresholds: [
-              { value: 0, label: 'Lift-Off Limit (0 N)', color: '#F2544B', dashed: true }
+              { value: 0, label: 'Lift-Off Limit (0 N)', color: '#E0564E', dashed: true }
             ],
             maxTime: maxT,
             scrubTime: scrubT,
@@ -234,10 +234,10 @@ export class TelemetryPanel implements OnDestroy {
             width: dim.width,
             height: dim.height,
             curves: [
-              { name: 'Rotor Temp', color: '#F2544B', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
+              { name: 'Rotor Temp', color: '#E0564E', times: telem.time, values: telem.rotorTemperature, unit: ' °C' }
             ],
             thresholds: [
-              { value: 230, label: 'Boil Limit (230°C)', color: '#F2544B', dashed: true }
+              { value: 230, label: 'Boil Limit (230°C)', color: '#E0564E', dashed: true }
             ],
             maxTime: maxT,
             scrubTime: scrubT,

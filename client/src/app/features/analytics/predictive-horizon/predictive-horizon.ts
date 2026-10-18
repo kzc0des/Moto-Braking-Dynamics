@@ -184,7 +184,7 @@ export class PredictiveHorizon {
     const p2Pct = (this.brakingDistance() / maxScale) * 100;
 
     const col = this.margin() < 0;
-    const fillClass = col ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]';
+    const fillClass = col ? 'bg-[var(--danger-fill)]' : 'bg-[var(--ok)]';
     const note = col
       ? `COLLISION DEFICIT: ${Math.abs(this.margin()).toFixed(1)} m OVERRUN`
       : `SAFETY CLEARANCE: +${this.margin().toFixed(1)} m BUFFER`;
@@ -359,8 +359,8 @@ export class PredictiveHorizon {
         isActive,
         activeTag: isActive ? '[Active]' : '',
         widthPct: Number(wPct.toFixed(1)),
-        barClass: col ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]',
-        chipClass: col ? 'text-[var(--danger-ink)]' : 'text-[var(--ok-ink)]',
+        barClass: col ? 'bg-[var(--danger-fill)]' : 'bg-[var(--ok)]',
+        chipClass: col ? 'text-[var(--ink-2)]' : 'text-[var(--ok-ink)]',
         chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });
@@ -393,8 +393,8 @@ export class PredictiveHorizon {
         dist,
         activeTag: Math.abs(s.mu - this.frictionCoeff()) < 0.011 ? '[Active]' : '',
         widthPct: Number(wPct.toFixed(1)),
-        barClass: col ? 'bg-[var(--danger)]' : 'bg-[var(--ok)]',
-        chipClass: col ? 'text-[var(--danger-ink)]' : 'text-[var(--ok-ink)]',
+        barClass: col ? 'bg-[var(--danger-fill)]' : 'bg-[var(--ok)]',
+        chipClass: col ? 'text-[var(--ink-2)]' : 'text-[var(--ok-ink)]',
         chip: col ? `Failed · Collision (${Math.abs(m)}m deficit)` : `Passed · Safe Stop (+${m}m margin)`
       };
     });

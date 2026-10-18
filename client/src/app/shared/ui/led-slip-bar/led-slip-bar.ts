@@ -23,7 +23,7 @@ export class LedSlipBar {
         color = 'bg-[var(--warn)]';
       } else if (i >= 6) {
         // unstable / impending lockup
-        color = 'bg-[var(--danger)]';
+        color = 'bg-[var(--danger-fill)]';
       }
       return { active, color };
     });

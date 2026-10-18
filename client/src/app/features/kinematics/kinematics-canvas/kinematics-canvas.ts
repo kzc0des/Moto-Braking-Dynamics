@@ -133,7 +133,7 @@ export class KinematicsCanvas implements OnDestroy {
 
   readonly liveStatusDotClass = computed(() => {
     if (this.isStagedAtStart()) return 'bg-[var(--line-deep)] animate-pulse';
-    if (this.isCollisionReached()) return 'bg-[var(--danger)] animate-ping';
+    if (this.isCollisionReached()) return 'bg-[var(--danger-fill)] animate-ping';
     const f = this.liveFrame();
     if (f && f.velocity <= 0.08) return 'bg-[var(--ok)]';
     return 'bg-[var(--line)]';

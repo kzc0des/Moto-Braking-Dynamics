@@ -27,9 +27,10 @@
   --on-line:     #15120A;  /* text on a yellow fill */
 
   /* road signals */
-  --danger:      #F2544B;  /* collision, brake-light red */
-  --danger-tint: #2D1514;
-  --danger-ink:  #FF8F88;
+  --danger:      #E0564E;  /* collision, brake-light red (lines, badges) */
+  --danger-fill: #A8403A;  /* large filled areas such as bars: deeper, so it does not glow */
+  --danger-tint: #2A1716;
+  --danger-ink:  #F29A94;
   --warn:        #F58A2D;  /* caution, traffic-cone orange */
   --ok:          #2FBF71;  /* safe stop */
   --ok-tint:     #112A1D;
@@ -40,7 +41,7 @@
   --panel:     var(--concrete);
   --border:    var(--kerb);
   --coral:     var(--danger);
-  --coral-deep:#FF8F88;
+  --coral-deep:#F29A94;
   --coral-tint:var(--danger-tint);
   --caution:   var(--warn);
 }
@@ -66,6 +67,7 @@
   --line-deep:   #7A5800;
   --on-line:     #1F2328;
   --danger:      #D93A32;
+  --danger-fill: #D93A32;
   --danger-tint: #FDF0EF;
   --danger-ink:  #9E241E;
   --warn:        #E8750F;
@@ -98,6 +100,7 @@
   --color-line-deep: var(--line-deep);
 
   --color-danger: var(--danger);
+  --color-danger-fill: var(--danger-fill);
   --color-warn: var(--warn);
   --color-ok: var(--ok);
   --color-info: var(--info);
@@ -196,6 +199,7 @@ input[type="range"].road-slider::-moz-range-thumb {
     --line-deep:   #7A5800;
     --on-line:     #1F2328;
     --danger:      #D93A32;
+  --danger-fill: #D93A32;
     --danger-tint: #FDF0EF;
     --danger-ink:  #9E241E;
     --warn:        #E8750F;

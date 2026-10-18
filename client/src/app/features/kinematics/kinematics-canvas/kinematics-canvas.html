@@ -12,7 +12,7 @@
       @if (isAtEnd() || isCollisionReached()) {
         @if (isCollisionOrCrash()) {
           <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-[var(--danger-tint)] border-2 border-[var(--danger)] text-[var(--danger-ink)] shadow-2xs flex items-center gap-1.5 animate-pulse">
-            <span class="w-1.5 h-1.5 rounded-full bg-[var(--danger)]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[var(--danger-fill)]"></span>
             <span>FAILED: BARRIER COLLISION</span>
           </span>
         } @else {
@@ -67,7 +67,7 @@
           <div class="h-2 w-full rounded-full bg-[var(--well)] border border-[var(--kerb)] overflow-hidden">
             <div class="h-full rounded-full transition-all duration-100"
               [style.width.%]="barrierProgressPct()"
-              [ngClass]="isCollisionReached() ? 'bg-[var(--danger)]' : 'bg-[var(--line)]'"></div>
+              [ngClass]="isCollisionReached() ? 'bg-[var(--danger-fill)]' : 'bg-[var(--line)]'"></div>
           </div>
         </div>
 
