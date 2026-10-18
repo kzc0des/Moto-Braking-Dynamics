@@ -1,7 +1,7 @@
 <aside class="w-full lg:w-[300px] shrink-0 h-full sidebar-dark bg-[var(--chrome-deep)] border-r border-[var(--chrome-edge)] shadow-[10px_0_30px_-16px_rgb(0_0_0/0.95)] p-4 flex flex-col gap-4 overflow-y-auto select-none">
   <!-- 1. VEHICLE ANATOMY SCHEMATIC HEADER -->
   <div class="flex flex-col gap-2 shrink-0">
-    <div class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Vehicle anatomy</div>
+    <div class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Vehicle anatomy</div>
     
     <div class="border border-[var(--kerb)] rounded-lg bg-[var(--surface)] p-1.5 flex items-center justify-center">
       <svg width="100%" height="86" viewBox="0 0 268 96" role="img" class="block">
@@ -28,7 +28,7 @@
     </div>
 
     <div class="flex items-center justify-between gap-2">
-      <span class="inline-flex px-2 py-0.5 rounded-md bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)] text-[11px] font-semibold break-words">
+      <span class="inline-flex px-2 py-0.5 rounded-md bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)] text-[11px] font-semibold break-words">
         {{ vehicleTitle() }}
       </span>
       <span class="font-mono text-[11px] text-[var(--ink-2)] shrink-0">
@@ -38,9 +38,9 @@
   </div>
 
   <!-- 2. CUSTOM VEHICLE CONFIGURATION PROFILE CARD & EDIT BUTTON -->
-  <div class="flex flex-col gap-2.5 shrink-0 bg-[var(--surface)] p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
+  <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
     <div class="flex items-center justify-between">
-      <div class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Vehicle Fleet</div>
+      <div class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Vehicle fleet</div>
       <span class="text-[11px] font-mono text-[var(--ok)] font-bold">{{ garageVehicles().length }} In Garage</span>
     </div>
 
@@ -68,7 +68,7 @@
       <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)] font-medium text-[var(--ink)]">
         {{ brakeHardwareLabel() }}
       </span>
-      <span class="px-2 py-0.5 rounded-md bg-[var(--line-tint)] border border-[var(--line)] text-[var(--line-deep)] font-mono font-medium">
+      <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)] text-[var(--ink)] font-mono font-medium">
         Cap: {{ maxSpeedKmh() }} km/h
       </span>
     </div>
@@ -103,9 +103,9 @@
   </div>
 
   <!-- 3. OPERATING KINEMATICS -->
-  <div class="flex flex-col gap-2.5 shrink-0">
+  <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
     <button type="button" (click)="toggleGroup('kin')" [attr.aria-expanded]="isOpen('kin')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Operating kinematics</span>
+      <span class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Speed &amp; distance</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('kin')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('kin')) {
@@ -126,7 +126,7 @@
         step="1"
         [ngModel]="speedKmh()"
         (ngModelChange)="onSpeedChange($event)"
-        class="w-full cursor-pointer accent-[var(--line)]"
+        class="w-full cursor-pointer accent-[var(--ink-2)]"
       />
       <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
         <span>20 km/h</span>
@@ -149,7 +149,7 @@
         step="0.5"
         [ngModel]="hazardDistance()"
         (ngModelChange)="onHazardChange($event)"
-        class="w-full cursor-pointer accent-[var(--line)]"
+        class="w-full cursor-pointer accent-[var(--ink-2)]"
       />
       <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
         <span>10 m</span>
@@ -161,9 +161,9 @@
   </div>
 
   <!-- 4. RIDER BRAKE MODULATION (BIOMECHANICAL DUAL-BRAKE) -->
-  <div class="flex flex-col gap-2.5 shrink-0 bg-[var(--surface)] p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
+  <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
     <button type="button" (click)="toggleGroup('brake')" [attr.aria-expanded]="isOpen('brake')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Brake Controls &amp; ABS</span>
+      <span class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Brakes &amp; ABS</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('brake')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('brake')) {
@@ -172,7 +172,7 @@
       <div class="flex flex-col gap-1 -mt-0.5">
         <div class="flex items-center justify-between text-[11px]">
           <span class="font-bold text-[var(--ink)]">ABS Control Tier</span>
-          <span class="font-mono text-[var(--line-deep)] font-semibold">{{ absConfiguration() === 'none' ? 'Conventional Non-ABS' : absConfiguration() === 'single_channel_front' ? 'Single-Channel' : 'Dual-Channel' }}</span>
+          <span class="font-mono text-[var(--ink)] font-semibold">{{ absConfiguration() === 'none' ? 'Conventional Non-ABS' : absConfiguration() === 'single_channel_front' ? 'Single-Channel' : 'Dual-Channel' }}</span>
         </div>
         <div class="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[var(--well)] border border-[var(--kerb)]">
           @for (opt of absOptions; track opt.key) {
@@ -212,7 +212,7 @@
         step="1"
         [ngModel]="frontLeverPct()"
         (ngModelChange)="onFrontLeverChange($event)"
-        class="w-full cursor-pointer accent-[var(--line)]"
+        class="w-full cursor-pointer accent-[var(--ink-2)]"
       />
       <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
         <span>0%</span>
@@ -235,7 +235,7 @@
         step="1"
         [ngModel]="rearControlPct()"
         (ngModelChange)="onRearControlChange($event)"
-        class="w-full cursor-pointer accent-[var(--line-deep)]"
+        class="w-full cursor-pointer accent-[var(--ink-2)]"
       />
       <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
         <span class="text-[11px]">{{ rearControlSubtext() }}</span>
@@ -247,10 +247,10 @@
   </div>
 
   <!-- 4b. TIRE INFLATION PRESSURE (ADR 0028) -->
-  <div class="flex flex-col gap-2.5 shrink-0 bg-[var(--surface)] p-3 border border-[var(--kerb)] rounded-xl shadow-2xs">
+  <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
     <button type="button" (click)="toggleGroup('tire')" [attr.aria-expanded]="isOpen('tire')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
       <div class="flex items-center gap-1.5">
-        <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Tire Pneumatic Pressure</span>
+        <span class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Tire pressure</span>
       </div>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('tire')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
@@ -281,7 +281,7 @@
           step="1"
           [ngModel]="frontTirePressurePsi()"
           (ngModelChange)="onFrontTirePressureChange($event)"
-          class="w-full cursor-pointer accent-[var(--line)]"
+          class="w-full cursor-pointer accent-[var(--ink-2)]"
         />
         <div class="flex justify-between font-mono text-[10px] text-[var(--ink-3)]">
           <span>15 PSI (Soft)</span>
@@ -304,7 +304,7 @@
           step="1"
           [ngModel]="rearTirePressurePsi()"
           (ngModelChange)="onRearTirePressureChange($event)"
-          class="w-full cursor-pointer accent-[var(--line-deep)]"
+          class="w-full cursor-pointer accent-[var(--ink-2)]"
         />
         <div class="flex justify-between font-mono text-[10px] text-[var(--ink-3)]">
           <span>15 PSI</span>
@@ -316,9 +316,9 @@
   </div>
 
   <!-- 5. ROADWAY & ENVIRONMENT -->
-  <div class="flex flex-col gap-2.5 shrink-0">
+  <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
     <button type="button" (click)="toggleGroup('road')" [attr.aria-expanded]="isOpen('road')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--line-deep)] border-l-[3px] border-[var(--line)] pl-2">Roadway &amp; environment</span>
+      <span class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Roadway &amp; environment</span>
       <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('road')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
     </button>
     @if (isOpen('road')) {
@@ -377,7 +377,7 @@
         step="1"
         [ngModel]="gradeDeg()"
         (ngModelChange)="onGradeChange($event)"
-        class="w-full cursor-pointer accent-[var(--line)]"
+        class="w-full cursor-pointer accent-[var(--ink-2)]"
       />
       <div class="flex justify-between font-mono text-[11px] text-[var(--ink-3)]">
         <span>−12° downhill</span>

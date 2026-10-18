@@ -44,9 +44,7 @@
         <!-- Live Anatomy Schematic Card -->
         <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4 *:shrink-0 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
-              Live Geometry Model
-            </span>
+            <span class="text-base font-semibold tracking-tight text-[var(--ink)]">Live preview</span>
             @if (showTechnical()) {
               <span class="text-[11px] font-mono text-[var(--ink-3)]">Planar 2-DOF</span>
             }
@@ -106,7 +104,7 @@
 
           <!-- Vehicle Name Field -->
           <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Vehicle Designation Name</label>
+            <label class="text-sm font-semibold text-[var(--ink)]">Vehicle name</label>
             <input
               type="text"
               [ngModel]="title()"
@@ -118,7 +116,7 @@
 
           <!-- Live Engineering Spec Matrix -->
           <div class="pt-5 border-t border-[var(--kerb)] flex flex-col gap-3">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Calibrated Spec Sheet</span>
+            <span class="text-sm font-semibold text-[var(--ink)]">Spec sheet</span>
             <div class="bg-[var(--concrete)] border border-[var(--kerb)] rounded-xl p-4 grid grid-cols-2 gap-x-5 gap-y-5 text-xs font-mono">
               <div>
                 <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Wheelbase (L)</span>
@@ -196,7 +194,7 @@
         <!-- Stage 1: Core Geometry Families -->
         <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
+            <h2 class="text-base font-semibold tracking-tight text-[var(--ink)]">
               1. Choose a bike type
             </h2>
             @if (showTechnical()) {
@@ -239,7 +237,7 @@
         <!-- Stage 2: Calibrated Production Presets -->
         <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
+            <h2 class="text-base font-semibold tracking-tight text-[var(--ink)]">
               2. Or pick a ready-made model
             </h2>
             @if (showTechnical()) {
@@ -298,7 +296,7 @@
         <!-- Stage 3: Powertrain & Curb Mass -->
         <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
+            <h2 class="text-base font-semibold tracking-tight text-[var(--ink)]">
               3. Engine size &amp; weight
             </h2>
             @if (showTechnical()) {
@@ -386,7 +384,7 @@
         <!-- Stage 4: Caliper Hardware & Electronic Control -->
         <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-5">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-2)]">
+            <h2 class="text-base font-semibold tracking-tight text-[var(--ink)]">
               4. Brakes
             </h2>
             @if (showTechnical()) {
