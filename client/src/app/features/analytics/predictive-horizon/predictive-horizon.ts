@@ -76,11 +76,28 @@ export class PredictiveHorizon {
 
   readonly modulationEfficiencyPct = computed(() => Math.round(this.modulationEfficiency() * 100));
 
+  // Brake efficiency per setup (shared by the headline and the comparison rows)
+  private readonly BRAKE_ETA: Record<string, number> = {
+    drum: 0.70,
+    disc: 0.85,
+    single_abs: 0.92,
+    dual_abs: 0.97
+  };
+
+  readonly activeBrakeKey = computed<'drum' | 'disc' | 'single_abs' | 'dual_abs'>(() => {
+    const abs = this.selectedInst().absConfiguration ?? 'none';
+    if (abs === 'dual_channel') return 'dual_abs';
+    if (abs === 'single_channel_front') return 'single_abs';
+    return this.isRearDrum() ? 'drum' : 'disc';
+  });
+
+  readonly activeBrakeEta = computed(() => this.BRAKE_ETA[this.activeBrakeKey()]);
+
   // Effective deceleration
   readonly decelMs2 = computed(() => {
     const mu = this.frictionCoeff();
     const th = this.selectedInst().environment.roadGradeAngle;
-    const eff = 0.85 * this.modulationEfficiency();
+    const eff = this.activeBrakeEta() * this.modulationEfficiency();
     const a = this.G * (mu * eff * Math.cos(th) + Math.sin(th));
     return Number(Math.max(0.5, a).toFixed(2));
   });
@@ -296,8 +313,6 @@ export class PredictiveHorizon {
     const mu = this.frictionCoeff();
     const th = this.selectedInst().environment.roadGradeAngle;
     const maxScale = Math.max(X, this.stopDistance()) * 1.15;
-    const abs = this.selectedInst().absConfiguration ?? 'none';
-    const rearDrum = this.isRearDrum();
     const frontLabel = this.frontBrakeLabel();
 
     const techs = [
@@ -305,25 +320,25 @@ export class PredictiveHorizon {
         key: 'drum',
         name: 'Rear Mechanical Drum',
         axleSpec: `${frontLabel} + Rear Drum (Cable/Rod)`,
-        eta: 0.70
+        eta: this.BRAKE_ETA['drum']
       },
       {
         key: 'disc',
         name: 'Rear Hydraulic Disc',
         axleSpec: `${frontLabel} + Rear Disc (Non-ABS)`,
-        eta: 0.85
+        eta: this.BRAKE_ETA['disc']
       },
       {
         key: 'single_abs',
         name: 'Single-Channel ABS',
         axleSpec: 'Front Wheel Modulated · Rear Unmodulated',
-        eta: 0.92
+        eta: this.BRAKE_ETA['single_abs']
       },
       {
         key: 'dual_abs',
         name: 'Dual-Channel ABS',
         axleSpec: 'Front & Rear Axles Modulated (Dual Disc)',
-        eta: 0.97
+        eta: this.BRAKE_ETA['dual_abs']
       }
     ];
 
@@ -334,11 +349,7 @@ export class PredictiveHorizon {
       const col = m < 0;
       const wPct = Math.min(100, (dist / maxScale) * 100);
 
-      let isActive = false;
-      if (abs === 'dual_channel' && t.key === 'dual_abs') isActive = true;
-      else if (abs === 'single_channel_front' && t.key === 'single_abs') isActive = true;
-      else if (abs === 'none' && rearDrum && t.key === 'drum') isActive = true;
-      else if (abs === 'none' && !rearDrum && t.key === 'disc') isActive = true;
+      const isActive = t.key === this.activeBrakeKey();
 
       return {
         key: t.key,
@@ -359,7 +370,7 @@ export class PredictiveHorizon {
     const v0 = this.selectedInst().simulation.initialVelocity;
     const X = this.hazardDistance();
     const rxn = this.reactionDistance();
-    const eff = 0.85 * this.modulationEfficiency();
+    const eff = this.activeBrakeEta() * this.modulationEfficiency();
     const th = this.selectedInst().environment.roadGradeAngle;
     const maxScale = Math.max(X, this.stopDistance()) * 1.15;
 
