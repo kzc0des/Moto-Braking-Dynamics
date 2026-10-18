@@ -6,6 +6,7 @@
 
   /* surfaces: deep asphalt, from the page down to inset wells */
   --bg:        #141922;  /* the stage behind the cards */
+  --bg-deep:   #090B0E;  /* the intro page: the original near-black asphalt */
   --concrete:  #19202A;  /* panels */
   --surface:   #202731;  /* cards and raised panels */
   --well:      #0D1117;  /* tracks, input wells (inset) */
@@ -65,6 +66,7 @@
 .light-paper {
   color-scheme: light;
   --bg:        #FFFFFF;
+  --bg-deep:   #FFFFFF;
   --concrete:  #F4F5F6;
   --surface:   #FFFFFF;
   --well:      #ECEEF0;

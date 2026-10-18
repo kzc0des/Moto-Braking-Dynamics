@@ -41,7 +41,7 @@
   <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
     <div class="flex items-center justify-between">
       <div class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Vehicle fleet</div>
-      <span class="text-[11px] font-mono text-[var(--ok)] font-bold">{{ garageVehicles().length }} In Garage</span>
+      <span class="text-xs text-[var(--ink-2)]">{{ garageVehicles().length }} saved</span>
     </div>
 
     <!-- Fleet Switcher Select -->
@@ -57,21 +57,25 @@
       </select>
     </div>
 
-    <!-- Specifications tags -->
-    <div class="flex flex-wrap gap-1.5 text-[11px]">
-      <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)] font-mono font-medium text-[var(--ink)]">
-        {{ mass() }} kg
-      </span>
-      <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)] font-mono font-medium text-[var(--ink)]">
-        h = {{ cogHeight() }}m
-      </span>
-      <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)] font-medium text-[var(--ink)]">
-        {{ brakeHardwareLabel() }}
-      </span>
-      <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)] text-[var(--ink)] font-mono font-medium">
-        Cap: {{ maxSpeedKmh() }} km/h
-      </span>
-    </div>
+    <!-- Specifications: a plain label / value list -->
+    <dl class="m-0 rounded-lg bg-[var(--well)] border border-[var(--kerb)] divide-y divide-[var(--kerb)]">
+      <div class="flex items-baseline justify-between gap-3 px-3 py-2">
+        <dt class="text-xs text-[var(--ink-2)]">Weight</dt>
+        <dd class="m-0 text-[13px] font-semibold font-mono text-[var(--ink)]">{{ mass() }} kg</dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3 px-3 py-2">
+        <dt class="text-xs text-[var(--ink-2)]">Top speed</dt>
+        <dd class="m-0 text-[13px] font-semibold font-mono text-[var(--ink)]">{{ maxSpeedKmh() }} km/h</dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3 px-3 py-2">
+        <dt class="text-xs text-[var(--ink-2)]">Center of gravity</dt>
+        <dd class="m-0 text-[13px] font-semibold font-mono text-[var(--ink)]">{{ cogHeight() }} m high</dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3 px-3 py-2">
+        <dt class="text-xs text-[var(--ink-2)]">Brakes</dt>
+        <dd class="m-0 text-[13px] font-semibold text-[var(--ink)] text-right">{{ brakeHardwareLabel() }}</dd>
+      </div>
+    </dl>
 
     <!-- Actions Row: Edit Specs + Create Another Motorcycle -->
     <div class="grid grid-cols-2 gap-1.5 mt-1">
