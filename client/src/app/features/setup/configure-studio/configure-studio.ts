@@ -273,11 +273,8 @@ export class ConfigureStudio implements OnInit {
   }
 
   goBack(): void {
-    if (this.garageService.hasVehicles()) {
-      this.router.navigate(['/workbench']);
-    } else {
-      this.router.navigate(['/setup']);
-    }
+    // Always go to the intro page; ?revisit keeps it open even when a vehicle is already saved.
+    this.router.navigate(['/setup'], { queryParams: { revisit: 1 } });
   }
 
   saveAndLaunch(): void {
