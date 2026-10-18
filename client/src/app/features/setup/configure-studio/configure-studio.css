@@ -54,3 +54,14 @@
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+
+/* Short laptop screens: shrink the two preview drawings so the spec sheet still fits without a long scroll. */
+@media (min-width: 1024px) and (max-height: 960px) {
+  .studio-schematic {
+    height: 92px;
+  }
+
+  .bike-idle-stage {
+    height: 84px;
+  }
+}

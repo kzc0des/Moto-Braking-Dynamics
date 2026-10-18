@@ -42,7 +42,7 @@
       <!-- ======================================================== -->
       <aside class="lg:col-span-4 xl:col-span-3 lg:min-h-0 lg:h-full flex flex-col gap-5">
         <!-- Live Anatomy Schematic Card -->
-        <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+        <div class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs flex flex-col gap-4 *:shrink-0 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--line-deep)] bg-[var(--line-tint)] px-2.5 py-0.5 rounded border border-[var(--line)]">
               Live Geometry Model
@@ -77,7 +77,7 @@
 
           <!-- Dynamic SVG Schematic Viewport -->
           <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--well)] p-4 flex items-center justify-center">
-            <svg width="100%" height="130" viewBox="0 0 280 110" role="img" class="block">
+            <svg width="100%" height="130" viewBox="0 0 280 110" role="img" class="block studio-schematic">
               <!-- Ground Line -->
               <line x1="10" y1="92" x2="270" y2="92" stroke="var(--kerb)" stroke-width="1.5" />
               <!-- Rear Wheel Assembly -->
@@ -117,45 +117,45 @@
           </div>
 
           <!-- Live Engineering Spec Matrix -->
-          <div class="pt-2 border-t border-[var(--kerb)] flex flex-col gap-2">
+          <div class="pt-5 border-t border-[var(--kerb)] flex flex-col gap-3">
             <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--ink-2)]">Calibrated Spec Sheet</span>
-            <div class="bg-[var(--concrete)] border border-[var(--kerb)] rounded-xl p-3 grid grid-cols-2 gap-2 text-xs font-mono">
+            <div class="bg-[var(--concrete)] border border-[var(--kerb)] rounded-xl p-4 grid grid-cols-2 gap-x-5 gap-y-5 text-xs font-mono">
               <div>
-                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Wheelbase (L)</span>
-                <span class="font-bold text-[var(--ink)]">{{ wheelbase().toFixed(2) }} m</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Wheelbase (L)</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ wheelbase().toFixed(2) }} m</span>
               </div>
               <div>
-                <span class="text-[11px] text-[var(--ink-3)] block uppercase">CoG Height (h)</span>
-                <span class="font-bold text-[var(--ink)]">{{ cogHeight().toFixed(2) }} m</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">CoG Height (h)</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ cogHeight().toFixed(2) }} m</span>
               </div>
               <div>
-                <span class="text-[11px] text-[var(--ink-3)] flex items-center justify-between uppercase">
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] flex items-center justify-between gap-2 uppercase mb-1.5">
                   <span>Displacement</span>
                   <span class="text-[9px] font-bold text-[var(--line-deep)] bg-[var(--line-tint)] px-1 rounded">OEM</span>
                 </span>
-                <span class="font-bold text-[var(--ink)]">{{ displacementCc() }} cc</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ displacementCc() }} cc</span>
               </div>
               <div>
-                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Total Mass</span>
-                <span class="font-bold text-[var(--ink)]">{{ massKg() }} kg</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Total Mass</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ massKg() }} kg</span>
               </div>
               <div>
-                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Front Assembly</span>
-                <span class="font-bold text-[var(--ink)] truncate block">{{ frontBrake() === 'dual_disc' ? 'Dual Disc (OEM)' : 'Single Disc (OEM)' }}</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Front Assembly</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--ink)] truncate block">{{ frontBrake() === 'dual_disc' ? 'Dual Disc (OEM)' : 'Single Disc (OEM)' }}</span>
               </div>
               <div>
-                <span class="text-[11px] text-[var(--ink-3)] block uppercase">Rear Assembly</span>
-                <span class="font-bold text-[var(--ink)] truncate block">{{ rearBrake() === 'drum' ? 'Mech. Drum (OEM)' : 'Hyd. Disc (OEM)' }}</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Rear Assembly</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--ink)] truncate block">{{ rearBrake() === 'drum' ? 'Mech. Drum (OEM)' : 'Hyd. Disc (OEM)' }}</span>
               </div>
-              <div class="col-span-2 pt-1 border-t border-[var(--kerb)]/60">
-                <span class="text-[11px] text-[var(--ink-3)] block uppercase">ABS Configuration</span>
-                <span class="font-bold text-[var(--line-deep)] truncate block">
+              <div class="col-span-2 pt-4 border-t border-[var(--kerb)]/60">
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">ABS Configuration</span>
+                <span class="font-bold text-[13px] leading-snug text-[var(--line-deep)] truncate block">
                   {{ absConfiguration() === 'dual_channel' ? 'Dual-Channel (Front & Rear)' : (absConfiguration() === 'single_channel_front' ? 'Single-Channel (Front Only)' : 'Non-ABS (Conventional)') }}
                 </span>
               </div>
-              <div class="col-span-2 pt-1 border-t border-[var(--kerb)] flex items-center justify-between">
-                <span class="text-[11px] text-[var(--danger)] font-bold">Speed Cap Ceiling:</span>
-                <span class="font-bold text-[var(--danger)] text-sm">{{ maxSpeedKmh() }} km/h</span>
+              <div class="col-span-2 pt-4 border-t border-[var(--kerb)] flex items-center justify-between">
+                <span class="text-xs text-[var(--danger)] font-bold">Speed Cap Ceiling:</span>
+                <span class="font-bold text-[var(--danger)] text-base">{{ maxSpeedKmh() }} km/h</span>
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@
           <button
             type="button"
             (click)="saveAndLaunch()"
-            class="w-full mt-auto py-3 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-1"
+            class="w-full mt-auto sticky bottom-0 z-10 py-3 px-5 bg-[var(--line)] hover:bg-[var(--line-hover)] text-[var(--on-line)] rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-1"
           >
             <span>{{ isEditMode() ? 'Confirm Changes & Launch' : 'Save & Open Workbench' }}</span>
             <span class="text-sm">→</span>
