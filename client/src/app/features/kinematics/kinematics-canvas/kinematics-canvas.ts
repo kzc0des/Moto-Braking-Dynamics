@@ -124,11 +124,11 @@ export class KinematicsCanvas implements OnDestroy {
     const f = this.liveFrame();
     if (!f || this.isStagedAtStart()) return 'Ready: press Launch Run';
     if (this.isCollisionReached()) {
-      return 'FAILED: BARRIER COLLISION';
+      return 'Crashed into the barrier';
     }
-    if (f.velocity <= 0.08) return 'Standstill / Safe Stop';
-    if (f.isBrakingActive === false) return 'Reaction Delay (1.0s Free-Roll)';
-    return 'Active Deceleration (Brakes Clamped)';
+    if (f.velocity <= 0.08) return 'Stopped safely';
+    if (f.isBrakingActive === false) return 'Reacting: brakes not on yet';
+    return 'Braking';
   });
 
   readonly liveStatusDotClass = computed(() => {
