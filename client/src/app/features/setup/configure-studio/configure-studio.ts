@@ -7,6 +7,7 @@ import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.s
 import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
 import { VehicleSpriteKey, AbsConfiguration } from '../../../core/models/benchmark.types';
 import { VehicleSilhouette } from '../../../shared/ui/vehicle-silhouette/vehicle-silhouette';
+import { InfoTip } from '../../../shared/ui/info-tip/info-tip';
 
 export interface FamilyDescriptor {
   key: 'step_through' | 'standard' | 'supersport' | 'extended';
@@ -37,7 +38,7 @@ function familyModelSamples(familyKey: FamilyDescriptor['key'], limit = 3): stri
 
 @Component({
   selector: 'app-configure-studio',
-  imports: [CommonModule, FormsModule, VehicleSilhouette],
+  imports: [CommonModule, FormsModule, VehicleSilhouette, InfoTip],
   templateUrl: './configure-studio.html',
   styleUrl: './configure-studio.css'
 })
