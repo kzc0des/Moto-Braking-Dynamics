@@ -1,0 +1,12 @@
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+/* Reset the UA popover box (centred, bordered, Canvas colours) so it can be placed by floating-position. */
+.floating-panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  overflow: visible;
+}
