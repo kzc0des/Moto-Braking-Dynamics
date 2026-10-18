@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+/* Reset the UA popover box (centred, bordered, Canvas colours) so it can be placed by floating-position. */
+.floating-panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 120ms ease, display 120ms allow-discrete, overlay 120ms allow-discrete;
+}
+
+.floating-panel:popover-open {
+  opacity: 1;
+}
+
+@starting-style {
+  .floating-panel:popover-open {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-panel {
+    transition: none;
+  }
+}

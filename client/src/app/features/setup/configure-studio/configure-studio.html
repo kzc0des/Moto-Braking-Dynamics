@@ -50,27 +50,32 @@
             }
           </div>
 
-          <!-- Live Animated Sprite Machine Viewport -->
-          <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--concrete)] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden">
-            <div class="w-full flex items-center justify-between z-10">
-              <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)] animate-pulse"></span>
-                {{ activeSpriteKey() }} archetype
-              </span>
-              @if (showTechnical()) {
-                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
-                  112×56 6-FPS Idle
-                </span>
-              }
-            </div>
+          <!-- Archetype Profile Viewport -->
+          <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--concrete)] p-3 flex flex-col gap-2">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)]"></span>
+              {{ activeSpriteKey() }} archetype
+            </span>
 
-            <div class="bike-idle-stage my-1">
-              <div
-                class="bike-idle-sprite"
-                [style.background-image]="'url(sprites/' + activeSpriteKey() + '_sheet.png)'"
-              ></div>
+            <button
+              type="button"
+              (click)="openPhoto()"
+              [attr.aria-label]="'Enlarge picture of ' + activePreset().name"
+              class="studio-preview-bike group relative h-32 w-full rounded-lg cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--line)]"
+            >
+              <app-vehicle-silhouette [kind]="activeSpriteKey()" class="h-full w-full transition-transform duration-200 group-hover:scale-[1.04]" />
+              <span class="absolute top-0 right-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[var(--surface)]/90 border border-[var(--kerb)] text-[10px] font-semibold text-[var(--ink-2)] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /><path d="M11 8v6M8 11h6" />
+                </svg>
+                Enlarge
+              </span>
+            </button>
+
+            <div class="text-[11px] leading-snug text-center">
+              <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
+              <span class="font-semibold text-[var(--ink)]">{{ activePreset().models.join(' · ') }}</span>
             </div>
-            <div class="bike-shadow-oval"></div>
           </div>
 
           <!-- Dynamic SVG Schematic Viewport -->
@@ -119,11 +124,11 @@
             <span class="text-sm font-semibold text-[var(--ink)]">Spec sheet</span>
             <div class="bg-[var(--concrete)] border border-[var(--kerb)] rounded-xl p-4 grid grid-cols-2 gap-x-5 gap-y-5 text-xs font-mono">
               <div>
-                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Wheelbase (L)</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] flex items-center gap-1 uppercase mb-1.5">Wheelbase (L) <app-info-tip term="wheelbase" /></span>
                 <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ wheelbase().toFixed(2) }} m</span>
               </div>
               <div>
-                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">CoG Height (h)</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] flex items-center gap-1 uppercase mb-1.5">CoG Height (h) <app-info-tip term="cogHeight" /></span>
                 <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ cogHeight().toFixed(2) }} m</span>
               </div>
               <div>
@@ -134,7 +139,7 @@
                 <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ displacementCc() }} cc</span>
               </div>
               <div>
-                <span class="text-[11px] tracking-wider text-[var(--ink-3)] block uppercase mb-1.5">Total Mass</span>
+                <span class="text-[11px] tracking-wider text-[var(--ink-3)] flex items-center gap-1 uppercase mb-1.5">Total Mass <app-info-tip term="totalMass" /></span>
                 <span class="font-bold text-[13px] leading-snug text-[var(--ink)]">{{ massKg() }} kg</span>
               </div>
               <div>
@@ -213,6 +218,7 @@
                 class="p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex flex-col gap-1.5 cursor-pointer"
                 [ngClass]="family() === fam.key ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
               >
+                <app-vehicle-silhouette [kind]="fam.spriteKey" class="h-20 w-full" />
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
                   @if (showTechnical()) {
@@ -221,6 +227,9 @@
                     </span>
                   }
                 </div>
+                <p class="text-[12px] font-semibold text-[var(--ink)] leading-snug m-0">
+                  {{ fam.models.join(' · ') }}
+                </p>
                 <p class="text-[12px] font-normal text-[var(--ink-2)] leading-relaxed m-0">
                   {{ fam.plain }}
                 </p>
@@ -263,18 +272,11 @@
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
-                  @if (preset.alias) {
-                    <div class="text-[11px] font-semibold text-[var(--line-deep)] bg-[var(--line-tint)]/60 px-1.5 py-0.5 rounded border border-[var(--line)]/40 mb-1.5 leading-snug">
-                      {{ preset.alias }}
-                    </div>
-                  }
+                  <app-vehicle-silhouette [kind]="preset.spriteKey" class="h-20 w-full mb-1.5" />
 
-                  <!-- Sprite Silhouette Thumbnail -->
-                  <div class="w-full h-10 bg-[var(--concrete)] rounded-lg border border-[var(--kerb)]/50 flex items-center justify-center overflow-hidden mb-1.5">
-                    <div
-                      class="preset-thumb-sprite"
-                      [style.background-image]="'url(sprites/' + preset.spriteKey + '_sheet.png)'"
-                    ></div>
+                  <div class="mb-1.5 leading-snug">
+                    <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
+                    <span class="text-[12px] font-semibold text-[var(--ink)]">{{ preset.models.join(' · ') }}</span>
                   </div>
 
                   @if (showTechnical()) {
@@ -355,7 +357,7 @@
             <!-- Total Mass Slider -->
             <div class="flex flex-col gap-2">
               <div class="flex justify-between items-baseline text-xs">
-                <span class="font-medium text-[var(--ink)]">Total weight (bike + rider)</span>
+                <span class="font-medium text-[var(--ink)] flex items-center gap-1.5">Total weight (bike + rider) <app-info-tip term="totalMass" /></span>
                 <span class="font-mono text-lg font-bold text-[var(--ink)]">{{ massKg() }} kg</span>
               </div>
               <input
@@ -402,58 +404,60 @@
               </div>
               <div class="grid grid-cols-1 gap-2" [class.sm:grid-cols-2]="showTechnical()">
                 <!-- Single Disc Button -->
-                <button
-                  type="button"
-                  [disabled]="stockFrontBrake() !== 'single_disc'"
-                  [style.display]="!showTechnical() && stockFrontBrake() !== 'single_disc' ? 'none' : null"
-                  (click)="frontBrake.set('single_disc')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockFrontBrake() === 'single_disc'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Single Hydraulic Disc</span>
-                    @if (stockFrontBrake() === 'single_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="single_disc" [style.display]="!showTechnical() && stockFrontBrake() !== 'single_disc' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockFrontBrake() !== 'single_disc'"
+                    (click)="frontBrake.set('single_disc')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockFrontBrake() === 'single_disc'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span class="inline-flex items-center gap-2"><app-brake-icon kind="single_disc" class="w-5 h-5 shrink-0" />Single Hydraulic Disc</span>
+                      @if (stockFrontBrake() === 'single_disc') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the front wheel, squeezed by hydraulic fluid.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the front wheel, squeezed by hydraulic fluid.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'single_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ stockFrontBrake() === 'single_disc' ? 'Standard axial single-rotor setup for commuter & roadster classes.' : 'Superbike archetype standardizes dual radial disc geometry.' }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'single_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ stockFrontBrake() === 'single_disc' ? 'Standard axial single-rotor setup for commuter & roadster classes.' : 'Superbike archetype standardizes dual radial disc geometry.' }}
+                    </span>
+                  </button>
+                </app-brake-preview>
 
                 <!-- Dual Disc Button -->
-                <button
-                  type="button"
-                  [disabled]="stockFrontBrake() !== 'dual_disc'"
-                  [style.display]="!showTechnical() && stockFrontBrake() !== 'dual_disc' ? 'none' : null"
-                  (click)="frontBrake.set('dual_disc')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockFrontBrake() === 'dual_disc'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Dual Hydraulic Disc</span>
-                    @if (stockFrontBrake() === 'dual_disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="dual_disc" [style.display]="!showTechnical() && stockFrontBrake() !== 'dual_disc' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockFrontBrake() !== 'dual_disc'"
+                    (click)="frontBrake.set('dual_disc')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockFrontBrake() === 'dual_disc'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span class="inline-flex items-center gap-2"><app-brake-icon kind="dual_disc" class="w-5 h-5 shrink-0" />Dual Hydraulic Disc</span>
+                      @if (stockFrontBrake() === 'dual_disc') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Two discs on the front wheel for stronger stopping.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Two discs on the front wheel for stronger stopping.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'dual_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ stockFrontBrake() === 'dual_disc' ? 'Twin floating radial rotors standard for high kinetic energy dissipation.' : 'Superbike (≥600cc) only. Commuter/standard fork lowers lack dual caliper mounting bosses.' }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockFrontBrake() === 'dual_disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ stockFrontBrake() === 'dual_disc' ? 'Twin floating radial rotors standard for high kinetic energy dissipation.' : 'Superbike (≥600cc) only. Commuter/standard fork lowers lack dual caliper mounting bosses.' }}
+                    </span>
+                  </button>
+                </app-brake-preview>
               </div>
             </div>
 
@@ -465,60 +469,62 @@
               </div>
               <div class="grid grid-cols-1 gap-2" [class.sm:grid-cols-2]="showTechnical()">
                 <!-- Mechanical Drum Button -->
-                <button
-                  type="button"
-                  [disabled]="stockRearBrake() !== 'drum' || absConfiguration() === 'dual_channel'"
-                  [style.display]="!showTechnical() && stockRearBrake() !== 'drum' ? 'none' : null"
-                  (click)="rearBrake.set('drum')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Mechanical Drum</span>
-                    @if (absConfiguration() === 'dual_channel') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Incompatible with Dual ABS</span>
-                    } @else if (stockRearBrake() === 'drum') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="drum" [style.display]="!showTechnical() && stockRearBrake() !== 'drum' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockRearBrake() !== 'drum' || absConfiguration() === 'dual_channel'"
+                    (click)="rearBrake.set('drum')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span class="inline-flex items-center gap-2"><app-brake-icon kind="drum" class="w-5 h-5 shrink-0" />Mechanical Drum</span>
+                      @if (absConfiguration() === 'dual_channel') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Incompatible with Dual ABS</span>
+                      } @else if (stockRearBrake() === 'drum') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Brake shoes press outward inside the rear wheel, pulled by a cable or rod.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">Brake shoes press outward inside the rear wheel, pulled by a cable or rod.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ absConfiguration() === 'dual_channel' ? 'Incompatible: Dual-Channel ABS strictly requires rear hydraulic disc circuit.' : (stockRearBrake() === 'drum' ? 'Leading-trailing mechanical shoe brake via Bowden cable / foot rod.' : 'Factory swingarm engineered with hydraulic disc caliper mounting bracket.') }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'drum' && absConfiguration() !== 'dual_channel' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ absConfiguration() === 'dual_channel' ? 'Incompatible: Dual-Channel ABS strictly requires rear hydraulic disc circuit.' : (stockRearBrake() === 'drum' ? 'Leading-trailing mechanical shoe brake via Bowden cable / foot rod.' : 'Factory swingarm engineered with hydraulic disc caliper mounting bracket.') }}
+                    </span>
+                  </button>
+                </app-brake-preview>
 
                 <!-- Hydraulic Disc Button -->
-                <button
-                  type="button"
-                  [disabled]="stockRearBrake() !== 'disc'"
-                  [style.display]="!showTechnical() && stockRearBrake() !== 'disc' ? 'none' : null"
-                  (click)="rearBrake.set('disc')"
-                  class="p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
-                  [ngClass]="stockRearBrake() === 'disc'
-                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
-                    : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <span>Hydraulic Disc</span>
-                    @if (stockRearBrake() === 'disc') {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
-                    } @else {
-                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                <app-brake-preview kind="rear_disc" [style.display]="!showTechnical() && stockRearBrake() !== 'disc' ? 'none' : null">
+                  <button
+                    type="button"
+                    [disabled]="stockRearBrake() !== 'disc'"
+                    (click)="rearBrake.set('disc')"
+                    class="w-full h-full p-3 rounded-xl border text-xs font-bold text-left transition-all flex flex-col justify-between gap-1.5 min-h-[90px]"
+                    [ngClass]="stockRearBrake() === 'disc'
+                      ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] cursor-default'
+                      : 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]'"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <span class="inline-flex items-center gap-2"><app-brake-icon kind="rear_disc" class="w-5 h-5 shrink-0" />Hydraulic Disc</span>
+                      @if (stockRearBrake() === 'disc') {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--on-line)]">Factory fitted</span>
+                      } @else {
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--kerb)] text-[var(--ink-3)]">Locked</span>
+                      }
+                    </div>
+                    @if (!showTechnical()) {
+                      <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the rear wheel, squeezed by hydraulic fluid.</span>
                     }
-                  </div>
-                  @if (!showTechnical()) {
-                    <span class="text-[11px] font-normal leading-tight text-[var(--ink-2)]">One brake disc on the rear wheel, squeezed by hydraulic fluid.</span>
-                  }
-                  <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
-                    {{ stockRearBrake() === 'disc' ? 'Single hydraulic piston caliper on solid rear rotor (required for Dual-Channel ABS).' : 'Commuter 125cc swingarm incorporates integrated internal expanding drum hub.' }}
-                  </span>
-                </button>
+                    <span [style.display]="showTechnical() ? null : 'none'" class="text-[11px] font-normal leading-tight" [ngClass]="stockRearBrake() === 'disc' ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]'">
+                      {{ stockRearBrake() === 'disc' ? 'Single hydraulic piston caliper on solid rear rotor (required for Dual-Channel ABS).' : 'Commuter 125cc swingarm incorporates integrated internal expanding drum hub.' }}
+                    </span>
+                  </button>
+                </app-brake-preview>
               </div>
             </div>
           </div>
@@ -704,7 +710,7 @@
           @if (isTier2Open()) {
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-[var(--kerb)] text-xs">
               <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)]">Wheelbase L (m)</span>
+                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Wheelbase L (m) <app-info-tip term="wheelbase" /></span>
                 <input
                   type="number"
                   step="0.02"
@@ -717,7 +723,7 @@
               </div>
 
               <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)]">CoG Height h (m)</span>
+                <span class="text-[var(--ink-2)] flex items-center gap-1.5">CoG Height h (m) <app-info-tip term="cogHeight" /></span>
                 <input
                   type="number"
                   step="0.02"
@@ -730,7 +736,7 @@
               </div>
 
               <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)]">Rotor Diameter (mm)</span>
+                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Rotor Diameter (mm) <app-info-tip term="rotorDiameter" /></span>
                 <input
                   type="number"
                   step="10"
@@ -743,7 +749,7 @@
               </div>
 
               <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)]">Pad Nominal Friction μ</span>
+                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Pad Nominal Friction μ <app-info-tip term="padFriction" /></span>
                 <input
                   type="number"
                   step="0.02"
@@ -756,7 +762,7 @@
               </div>
 
               <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)]">Fluid Boil Temp (°C)</span>
+                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Fluid Boil Temp (°C) <app-info-tip term="fluidBoilTemp" /></span>
                 <input
                   type="number"
                   step="5"
@@ -774,4 +780,48 @@
       </div>
     </div>
   </main>
+
+  <!-- Enlarged model picture (opened from the Live Geometry Model preview) -->
+  <dialog
+    #photoDialog
+    (click)="onPhotoDialogClick($event)"
+    aria-labelledby="photo-dialog-title"
+    class="photo-dialog m-auto p-0 w-[min(880px,92vw)] rounded-2xl border border-[var(--kerb)] bg-[var(--surface)] text-[var(--ink)] shadow-2xl backdrop:bg-black/75"
+  >
+    <div class="p-5 flex flex-col gap-4">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-3)]">{{ activeSpriteKey() }} archetype</span>
+          <h2 id="photo-dialog-title" class="text-lg font-bold tracking-tight m-0">{{ activePreset().name }}</h2>
+        </div>
+        <button
+          type="button"
+          (click)="closePhoto()"
+          aria-label="Close picture"
+          class="h-9 w-9 shrink-0 inline-flex items-center justify-center rounded-lg border border-[var(--kerb)] bg-[var(--well)] hover:bg-[var(--kerb)] text-[var(--ink)] cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="rounded-xl border border-[var(--kerb)] bg-[var(--concrete)] p-4">
+        <app-vehicle-silhouette [kind]="activeSpriteKey()" class="w-full aspect-[2/1]" />
+      </div>
+
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div class="leading-snug">
+          <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
+          <span class="text-[13px] font-semibold text-[var(--ink)]">{{ activePreset().models.join(' · ') }}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5 font-mono text-[11px] text-[var(--ink)]">
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">{{ displacementCc() }} cc</span>
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">{{ massKg() }} kg</span>
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">L = {{ wheelbase().toFixed(2) }} m</span>
+          <span class="px-2 py-0.5 rounded-md bg-[var(--well)] border border-[var(--kerb)]">h = {{ cogHeight().toFixed(2) }} m</span>
+        </div>
+      </div>
+    </div>
+  </dialog>
 </div>

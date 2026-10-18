@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, inject, signal, computed, viewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,6 +6,10 @@ import { Subscription } from 'rxjs';
 import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.service';
 import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
 import { VehicleSpriteKey, AbsConfiguration } from '../../../core/models/benchmark.types';
+import { VehicleSilhouette } from '../../../shared/ui/vehicle-silhouette/vehicle-silhouette';
+import { BrakePreview } from '../../../shared/ui/brake-preview/brake-preview';
+import { BrakeIcon } from '../../../shared/ui/brake-icon/brake-icon';
+import { InfoTip } from '../../../shared/ui/info-tip/info-tip';
 
 export interface FamilyDescriptor {
   key: 'step_through' | 'standard' | 'supersport' | 'extended';
@@ -14,11 +18,29 @@ export interface FamilyDescriptor {
   /** Plain-English description shown by default. */
   plain: string;
   badge: string;
+  /** Representative profile drawn on the family card. */
+  spriteKey: VehicleSpriteKey;
+  /** Recognisable production models across the family's presets. */
+  models: string[];
+}
+
+/** Up to `limit` real-world models for a family, taking one from each preset in turn. */
+function familyModelSamples(familyKey: FamilyDescriptor['key'], limit = 3): string[] {
+  const lists = EMPIRICAL_PRESETS.filter(p => p.familyKey === familyKey).map(p => p.models);
+  const picked: string[] = [];
+  for (let i = 0; picked.length < limit && lists.some(list => i < list.length); i++) {
+    for (const list of lists) {
+      if (i < list.length && picked.length < limit) {
+        picked.push(list[i]);
+      }
+    }
+  }
+  return picked;
 }
 
 @Component({
   selector: 'app-configure-studio',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VehicleSilhouette, BrakePreview, BrakeIcon, InfoTip],
   templateUrl: './configure-studio.html',
   styleUrl: './configure-studio.css'
 })
@@ -39,28 +61,36 @@ export class ConfigureStudio implements OnInit, OnDestroy {
       label: 'Step-Through / Commuter',
       desc: 'Rear-biased CoG (b/L ≈ 0.42), low pitch-over, high commuter prevalence',
       plain: 'Scooters and city commuters. Most of the weight sits toward the back, so they rarely tip forward when braking.',
-      badge: 'Rear-Biased CoG'
+      badge: 'Rear-Biased CoG',
+      spriteKey: 'scooter',
+      models: familyModelSamples('step_through')
     },
     {
       key: 'standard',
       label: 'Standard / Roadster',
       desc: 'Neutral upright ergonomics (b/L ≈ 0.50), control dynamics benchmark',
       plain: 'Everyday upright bikes. Weight is balanced front to back, so this is the standard reference.',
-      badge: 'Neutral Baseline'
+      badge: 'Neutral Baseline',
+      spriteKey: 'naked',
+      models: familyModelSamples('standard')
     },
     {
       key: 'supersport',
       label: 'Supersport / Performance',
       desc: 'High h/L, short wheelbase, rear lift-off (stoppie) threshold critical',
       plain: 'Sport bikes. Tall and short, so very hard front braking can lift the rear wheel off the ground.',
-      badge: 'Stoppie-Prone'
+      badge: 'Stoppie-Prone',
+      spriteKey: 'supersport',
+      models: familyModelSamples('supersport')
     },
     {
       key: 'extended',
       label: 'Extended Geometry',
       desc: 'Polar dynamics: long-wheelbase cruiser or tall long-travel adventure fork',
       plain: 'Cruisers and adventure bikes. Long and stretched out, with a tall front fork.',
-      badge: 'Polar Geometry'
+      badge: 'Polar Geometry',
+      spriteKey: 'adventure',
+      models: familyModelSamples('extended')
     }
   ];
 
@@ -202,6 +232,13 @@ export class ConfigureStudio implements OnInit, OnDestroy {
         this.family.set('supersport');
       } else if (cat === 'extended' || cat === 'cruiser' || cat === 'adventure') {
         this.family.set('extended');
+      }
+
+      // Restore the matching preset so the preview, model names and saved spriteKey follow the edited bike.
+      const familyPresets = EMPIRICAL_PRESETS.filter(p => p.familyKey === this.family());
+      const matchedPreset = familyPresets.find(p => p.spriteKey === target.spriteKey) ?? familyPresets[0];
+      if (matchedPreset) {
+        this.selectedPresetKey.set(matchedPreset.key);
       }
 
       this.syncQueryParams();
@@ -439,6 +476,24 @@ export class ConfigureStudio implements OnInit, OnDestroy {
 
   updateFluidBoilTemp(val: number | string): void {
     this.fluidBoilTemp.set(Number(val));
+  }
+
+  private readonly photoDialog = viewChild.required<ElementRef<HTMLDialogElement>>('photoDialog');
+
+  /** Opens the enlarged picture of the selected model (native modal dialog: focus trap + Esc built in). */
+  openPhoto(): void {
+    this.photoDialog().nativeElement.showModal();
+  }
+
+  closePhoto(): void {
+    this.photoDialog().nativeElement.close();
+  }
+
+  /** A click that lands on the dialog element itself (not its content) is a backdrop click. */
+  onPhotoDialogClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closePhoto();
+    }
   }
 
   goBack(): void {

@@ -1,0 +1,48 @@
+<button
+  #trigger
+  type="button"
+  (click)="toggle(); $event.stopPropagation()"
+  [attr.aria-label]="'About ' + entry().title"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="panelId"
+  class="w-4 h-4 inline-flex items-center justify-center rounded-full border hover:text-[var(--line-deep)] hover:border-[var(--line)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--line)] transition-colors cursor-pointer align-middle"
+  [class]="open() ? 'border-[var(--line)] text-[var(--line-deep)]' : 'border-[var(--kerb)] text-[var(--ink-3)]'"
+>
+  <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
+    <path d="M12 11v7" /><path d="M12 6.5v.01" />
+  </svg>
+</button>
+
+<div
+  #panel
+  popover="manual"
+  role="dialog"
+  [id]="panelId"
+  [attr.aria-label]="entry().title"
+  class="floating-panel w-[280px] p-3 rounded-xl border border-[var(--kerb)] bg-[var(--tooltip)] text-[var(--ink-2)] shadow-xl text-left normal-case tracking-normal font-sans font-normal"
+>
+  <div class="flex items-baseline justify-between gap-2 mb-1">
+    <span class="text-xs font-bold text-[var(--ink)]">{{ entry().title }}</span>
+    @if (entry().symbol || entry().unit) {
+      <span class="text-[10px] font-mono text-[var(--ink-3)] shrink-0">
+        {{ entry().symbol }}{{ entry().symbol && entry().unit ? ' · ' : '' }}{{ entry().unit }}
+      </span>
+    }
+  </div>
+  <p class="m-0 text-[11.5px] leading-relaxed">{{ entry().plain }}</p>
+
+  @if (expanded()) {
+    <p class="mt-2 mb-0 pt-2 border-t border-[var(--kerb)] text-[11px] font-mono leading-relaxed text-[var(--ink-2)]">
+      {{ entry().detail }}
+    </p>
+  }
+
+  <button
+    type="button"
+    (click)="toggleDetail(); pinned.set(true)"
+    [attr.aria-expanded]="expanded()"
+    class="mt-2 text-[11px] font-semibold text-[var(--line-deep)] hover:underline cursor-pointer"
+  >
+    {{ expanded() ? 'Show less' : 'Read more' }}
+  </button>
+</div>

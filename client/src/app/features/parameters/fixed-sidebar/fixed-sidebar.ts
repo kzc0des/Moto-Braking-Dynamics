@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { GarageService } from '../../../core/services/garage.service';
-import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration } from '../../../core/models/benchmark.types';
+import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration, VehicleSpriteKey } from '../../../core/models/benchmark.types';
+import { EMPIRICAL_PRESETS } from '../../../core/models/archetype-defaults';
+import { InfoTip } from '../../../shared/ui/info-tip/info-tip';
+import { VehicleSilhouette } from '../../../shared/ui/vehicle-silhouette/vehicle-silhouette';
 
 @Component({
   selector: 'app-fixed-sidebar',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, InfoTip, VehicleSilhouette],
   templateUrl: './fixed-sidebar.html',
   styleUrl: './fixed-sidebar.css'
 })
@@ -48,6 +51,9 @@ export class FixedSidebar {
 
   readonly selectedInst = computed(() => this.store.selectedInstance());
   readonly vehicleTitle = computed(() => this.selectedInst().name);
+  readonly vehicleSprite = computed<VehicleSpriteKey>(() => this.selectedInst().spriteKey ?? 'naked');
+  /** Real-world models for the selected vehicle; each preset has its own sprite key. */
+  readonly vehicleModels = computed(() => EMPIRICAL_PRESETS.find(p => p.spriteKey === this.vehicleSprite())?.models ?? []);
   readonly mass = computed(() => this.selectedInst().vehicle.mass);
   readonly wheelbase = computed(() => this.selectedInst().vehicle.wheelbase.toFixed(2));
   readonly cogHeight = computed(() => this.selectedInst().vehicle.cogHeight.toFixed(2));
