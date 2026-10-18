@@ -23,8 +23,8 @@ export class TrackRenderer {
 
     const meterToPx = (m: number) => paddingLeft + (m / maxDistance) * trackWidth;
 
-    // 1. Clean track background (--panel / #171B21)
-    ctx.fillStyle = '#171B21';
+    // 1. Clean track background (--panel / #2A3342)
+    ctx.fillStyle = '#2A3342';
     ctx.fillRect(0, 0, width, height);
 
     const topOffset = 26;
@@ -46,9 +46,9 @@ export class TrackRenderer {
       ctx.beginPath();
       ctx.rect(startPx, zoneTop, onsetPx - startPx, zoneH);
       ctx.clip();
-      ctx.fillStyle = '#14181D';
+      ctx.fillStyle = '#252D3A';
       ctx.fillRect(startPx, zoneTop, onsetPx - startPx, zoneH);
-      ctx.strokeStyle = '#232830';
+      ctx.strokeStyle = '#303A4A';
       ctx.lineWidth = 1;
       for (let x = startPx - zoneH; x < onsetPx; x += 12) {
         ctx.beginPath();
@@ -71,7 +71,7 @@ export class TrackRenderer {
     // Zone captions (only when the zone is wide enough to hold them)
     ctx.font = '700 12px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#858D98';
+    ctx.fillStyle = '#9AA2AF';
     const captionY = zoneTop + zoneH * 0.30;
     const caption = (label: string, x1: number, x2: number) => {
       if (x2 - x1 >= ctx.measureText(label).width + 16) {
@@ -114,7 +114,7 @@ export class TrackRenderer {
         ctx.fillText('START 0 m', x, 18);
         continue;
       } else {
-        ctx.strokeStyle = '#2A3039';
+        ctx.strokeStyle = '#3A4455';
         ctx.lineWidth = 1;
       }
 
@@ -124,7 +124,7 @@ export class TrackRenderer {
       ctx.stroke();
 
       // Top distance tick labels: "10 m", "20 m", ...
-      ctx.fillStyle = '#A9B0BA';
+      ctx.fillStyle = '#B3BAC5';
       ctx.textAlign = 'center';
       ctx.fillText(`${m} m`, x, 18);
     }
@@ -132,7 +132,7 @@ export class TrackRenderer {
     // 2b. Reaction Distance / Brake Onset Demarcation Line (Neutral Cool Slate)
     if (params.reactionDistance && params.reactionDistance > 0 && params.reactionDistance < maxDistance) {
       const rxnX = meterToPx(params.reactionDistance);
-      ctx.strokeStyle = '#A9B0BA';
+      ctx.strokeStyle = '#B3BAC5';
       ctx.lineWidth = 1.6;
       ctx.setLineDash([4, 3]);
       ctx.beginPath();
@@ -145,9 +145,9 @@ export class TrackRenderer {
       ctx.textAlign = 'center';
       const onsetLabel = `BRAKE ONSET (${params.reactionDistance.toFixed(1)}m)`;
       const onsetW = ctx.measureText(onsetLabel).width + 10;
-      ctx.fillStyle = '#171B21';
+      ctx.fillStyle = '#2A3342';
       ctx.fillRect(rxnX - onsetW / 2, topOffset + 3, onsetW, 16);
-      ctx.fillStyle = '#C7CCD4';
+      ctx.fillStyle = '#D5DAE2';
       ctx.fillText(onsetLabel, rxnX, topOffset + 15);
     }
 
@@ -169,7 +169,7 @@ export class TrackRenderer {
       ctx.textAlign = 'right';
       const barrierLabel = `Impact Barrier ${hazardDistance} m`;
       const barrierW = ctx.measureText(barrierLabel).width + 10;
-      ctx.fillStyle = '#171B21';
+      ctx.fillStyle = '#2A3342';
       ctx.fillRect(barrierX - 4 - barrierW, topOffset + 20, barrierW, 16);
       ctx.fillStyle = '#E0564E';
       ctx.fillText(barrierLabel, barrierX - 9, topOffset + 32);
@@ -184,7 +184,7 @@ export class TrackRenderer {
         const pillX = barrierX - pillW / 2;
         const pillY = topOffset + 18;
 
-        ctx.fillStyle = '#2D1514';
+        ctx.fillStyle = '#3B2327';
         ctx.strokeStyle = '#E0564E';
         ctx.lineWidth = 1.8;
         ctx.beginPath();
@@ -220,7 +220,7 @@ export class TrackRenderer {
         const holeW = Math.max(12, holeX2 - holeX1);
         const groundY = laneY + laneHeight - 20;
 
-        ctx.fillStyle = '#2D1514';
+        ctx.fillStyle = '#3B2327';
         ctx.strokeStyle = '#E0564E';
         ctx.lineWidth = 1.5;
         ctx.fillRect(holeX1, groundY, holeW, 8);

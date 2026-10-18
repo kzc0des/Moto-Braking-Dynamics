@@ -5,13 +5,13 @@
   color-scheme: dark;
 
   /* surfaces: deep asphalt, from the page down to inset wells */
-  --bg:        #141922;  /* the stage behind the cards */
+  --bg:        #1D2430;  /* the stage behind the cards: blue-grey, a little lighter */
   --bg-deep:   #090B0E;  /* the intro page: the original near-black asphalt */
-  --concrete:  #19202A;  /* panels */
-  --surface:   #202731;  /* cards and raised panels */
-  --well:      #0D1117;  /* tracks, input wells (inset) */
-  --kerb:      #323B48;  /* borders, gridlines */
-  --tooltip:   #2A313B;  /* floating help bubbles */
+  --concrete:  #232B38;  /* panels */
+  --surface:   #2A3342;  /* cards and raised panels */
+  --well:      #131822;  /* tracks, input wells (inset) */
+  --kerb:      #3A4455;  /* borders, gridlines */
+  --tooltip:   #323C4D;  /* floating help bubbles */
 
   /* chrome: the title bar, sidebar and bottom dock sit darker than the stage so they frame it */
   --chrome:      #06080B;
@@ -21,25 +21,25 @@
   /* text */
   --ink:       #ECEFF3;  /* main text */
   --asphalt-7: #5B636E;
-  --ink-2:     #A9B0BA;  /* labels, secondary text */
-  --ink-3:     #858D98;  /* ticks, disabled */
+  --ink-2:     #B3BAC5;  /* labels, secondary text */
+  --ink-3:     #9AA2AF;  /* ticks, disabled */
   --on-ink:    #0B0D10;  /* text on a light "ink" fill */
 
   /* pavement line yellow (accent): the road-marking color */
   --line:        #FFC800;  /* primary button, active state, key line */
   --line-hover:  #FFD84D;
-  --line-tint:   #2A2308;  /* selected cards, soft chips (yellow glow on asphalt) */
+  --line-tint:   #3F3813;  /* selected cards, soft chips (yellow glow on asphalt) */
   --line-deep:   #FFD24A;  /* yellow text on dark */
   --on-line:     #15120A;  /* text on a yellow fill */
 
   /* road signals */
   --danger:      #E0564E;  /* collision, brake-light red (lines, badges) */
   --danger-fill: #A8403A;  /* large filled areas such as bars: deeper, so it does not glow */
-  --danger-tint: #2A1716;
+  --danger-tint: #3B2327;
   --danger-ink:  #F29A94;
   --warn:        #F58A2D;  /* caution, traffic-cone orange */
   --ok:          #2FBF71;  /* safe stop */
-  --ok-tint:     #112A1D;
+  --ok-tint:     #1F3A2C;
   --ok-ink:      #62DC9B;
   --info:        #5AA2F0;  /* data series, guide-sign blue */
 
