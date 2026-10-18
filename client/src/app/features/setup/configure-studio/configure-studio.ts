@@ -224,6 +224,13 @@ export class ConfigureStudio implements OnInit, OnDestroy {
         this.family.set('extended');
       }
 
+      // Restore the matching preset so the preview, model names and saved spriteKey follow the edited bike.
+      const familyPresets = EMPIRICAL_PRESETS.filter(p => p.familyKey === this.family());
+      const matchedPreset = familyPresets.find(p => p.spriteKey === target.spriteKey) ?? familyPresets[0];
+      if (matchedPreset) {
+        this.selectedPresetKey.set(matchedPreset.key);
+      }
+
       this.syncQueryParams();
     } else {
       this.editingVehicleId.set(null);
