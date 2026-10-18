@@ -4,12 +4,13 @@
   #panel
   popover="manual"
   role="tooltip"
-  class="floating-panel w-[440px] max-w-[calc(100vw-16px)] p-3 rounded-xl border border-[var(--kerb)] bg-[var(--tooltip)] text-[var(--ink-2)] shadow-xl pointer-events-none"
+  [style.width.px]="info().panelWidth ?? 440"
+  class="floating-panel max-w-[calc(100vw-16px)] p-3 rounded-xl border border-[var(--kerb)] bg-[var(--tooltip)] text-[var(--ink-2)] shadow-xl pointer-events-none"
 >
   <div class="flex items-center justify-between gap-2 mb-2">
     <span class="text-xs font-bold text-[var(--ink)]">{{ info().title }}</span>
     <span class="text-[10px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--line-tint)] text-[var(--line-deep)] border border-[var(--line)]/60">
-      {{ info().position }}
+      {{ info().badge }}
     </span>
   </div>
 

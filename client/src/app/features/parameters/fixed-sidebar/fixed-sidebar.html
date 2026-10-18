@@ -8,7 +8,6 @@
       <app-vehicle-silhouette [kind]="vehicleSprite()" class="h-28 w-full" />
       @if (vehicleModels().length) {
         <div class="text-[11px] leading-snug text-center">
-          <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
           <span class="font-semibold text-[var(--ink)]">{{ vehicleModels().join(' · ') }}</span>
         </div>
       }

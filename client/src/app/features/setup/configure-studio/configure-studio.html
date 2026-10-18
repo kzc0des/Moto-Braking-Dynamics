@@ -61,9 +61,9 @@
               type="button"
               (click)="openPhoto()"
               [attr.aria-label]="'Enlarge picture of ' + activePreset().name"
-              class="studio-preview-bike group relative h-32 w-full rounded-lg cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--line)]"
+              class="studio-preview-bike group relative h-32 w-full rounded-lg overflow-hidden cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--line)]"
             >
-              <app-vehicle-silhouette [kind]="activeSpriteKey()" class="h-full w-full transition-transform duration-200 group-hover:scale-[1.04]" />
+              <app-vehicle-silhouette [kind]="activeSpriteKey()" scene class="h-full w-full transition-transform duration-200 group-hover:scale-[1.04]" />
               <span class="absolute top-0 right-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[var(--surface)]/90 border border-[var(--kerb)] text-[10px] font-semibold text-[var(--ink-2)] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /><path d="M11 8v6M8 11h6" />
@@ -73,7 +73,6 @@
             </button>
 
             <div class="text-[11px] leading-snug text-center">
-              <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
               <span class="font-semibold text-[var(--ink)]">{{ activePreset().models.join(' · ') }}</span>
             </div>
           </div>
@@ -218,7 +217,7 @@
                 class="p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex flex-col gap-1.5 cursor-pointer"
                 [ngClass]="family() === fam.key ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
               >
-                <app-vehicle-silhouette [kind]="fam.spriteKey" class="h-20 w-full" />
+                <app-vehicle-silhouette [kind]="fam.spriteKey" scene class="h-28 -mx-3.5 -mt-3.5 mb-1 rounded-t-[11px]" />
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
                   @if (showTechnical()) {
@@ -272,10 +271,9 @@
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
-                  <app-vehicle-silhouette [kind]="preset.spriteKey" class="h-20 w-full mb-1.5" />
+                  <app-vehicle-silhouette [kind]="preset.spriteKey" scene class="h-24 -mx-3 mb-1.5" />
 
                   <div class="mb-1.5 leading-snug">
-                    <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
                     <span class="text-[12px] font-semibold text-[var(--ink)]">{{ preset.models.join(' · ') }}</span>
                   </div>
 
@@ -543,83 +541,89 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <!-- Non-ABS Option -->
-              <button
-                type="button"
-                (click)="setAbsConfiguration('none')"
-                class="p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
-                [ngClass]="absConfiguration() === 'none'
-                  ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
-                  : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span class="text-[13px]">Non-ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
-                    Conventional
+              <app-brake-preview kind="abs_none">
+                <button
+                  type="button"
+                  (click)="setAbsConfiguration('none')"
+                  class="w-full h-full p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
+                  [ngClass]="absConfiguration() === 'none'
+                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
+                    : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[13px]">Non-ABS</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                      Conventional
+                    </span>
+                  </div>
+                  <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
+                    {{ showTechnical() ? 'Direct lever-to-pad fluid & mechanical linkage without solenoid relief. Highest risk of front tuck or rear skid.' : 'No anti-lock help. Brake too hard and a wheel can lock up and skid.' }}
                   </span>
-                </div>
-                <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
-                  {{ showTechnical() ? 'Direct lever-to-pad fluid & mechanical linkage without solenoid relief. Highest risk of front tuck or rear skid.' : 'No anti-lock help. Brake too hard and a wheel can lock up and skid.' }}
-                </span>
-                <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'none' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
-                  Standard / Budget Trim
-                </div>
-              </button>
+                  <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'none' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
+                    Standard / Budget Trim
+                  </div>
+                </button>
+              </app-brake-preview>
 
               <!-- Single-Channel ABS Option -->
-              <button
-                type="button"
-                (click)="setAbsConfiguration('single_channel_front')"
-                class="p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
-                [ngClass]="absConfiguration() === 'single_channel_front'
-                  ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
-                  : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span class="text-[13px]">Single-Channel ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
-                    Front Only
+              <app-brake-preview kind="abs_single">
+                <button
+                  type="button"
+                  (click)="setAbsConfiguration('single_channel_front')"
+                  class="w-full h-full p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 cursor-pointer transition-all"
+                  [ngClass]="absConfiguration() === 'single_channel_front'
+                    ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs'
+                    : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[13px]">Single-Channel ABS</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                      Front Only
+                    </span>
+                  </div>
+                  <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
+                    {{ showTechnical() ? 'ECU valve modulates front caliper to prevent washout. Rear remains conventional (subject to lockup). Very common in modern commuters.' : 'Helps the front wheel only, so the rear can still lock up. Common on modern commuter scooters.' }}
                   </span>
-                </div>
-                <span class="text-[11px] font-normal text-[var(--ink-2)] leading-relaxed">
-                  {{ showTechnical() ? 'ECU valve modulates front caliper to prevent washout. Rear remains conventional (subject to lockup). Very common in modern commuters.' : 'Helps the front wheel only, so the rear can still lock up. Common on modern commuter scooters.' }}
-                </span>
-                <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'single_channel_front' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
-                  Aerox S / Click / 125-160cc
-                </div>
-              </button>
+                  <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'single_channel_front' ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
+                    Aerox S / Click / 125-160cc
+                  </div>
+                </button>
+              </app-brake-preview>
 
               <!-- Dual-Channel ABS Option -->
-              <button
-                type="button"
-                [disabled]="isRearDrum()"
-                (click)="setAbsConfiguration('dual_channel')"
-                class="p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 transition-all"
-                [ngClass]="[
-                  isRearDrum() ? 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]' : 'cursor-pointer',
-                  absConfiguration() === 'dual_channel' && !isRearDrum() ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : '',
-                  absConfiguration() !== 'dual_channel' && !isRearDrum() ? 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]' : ''
-                ]"
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span class="text-[13px]">Dual-Channel ABS</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
-                    Front & Rear
+              <app-brake-preview kind="abs_dual">
+                <button
+                  type="button"
+                  [disabled]="isRearDrum()"
+                  (click)="setAbsConfiguration('dual_channel')"
+                  class="w-full h-full p-3.5 rounded-xl border text-xs font-bold text-left flex flex-col justify-between gap-2 transition-all"
+                  [ngClass]="[
+                    isRearDrum() ? 'border-[var(--kerb)] bg-[var(--well)] opacity-50 cursor-not-allowed text-[var(--ink-3)]' : 'cursor-pointer',
+                    absConfiguration() === 'dual_channel' && !isRearDrum() ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : '',
+                    absConfiguration() !== 'dual_channel' && !isRearDrum() ? 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]' : ''
+                  ]"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[13px]">Dual-Channel ABS</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-2)]">
+                      Front & Rear
+                    </span>
+                  </div>
+                  <span class="text-[11px] font-normal leading-relaxed" [ngClass]="isRearDrum() ? 'text-[var(--ink-3)]' : 'text-[var(--ink-2)]'">
+                    @if (isRearDrum()) {
+                      {{ showTechnical() ? 'Locked: Mechanical drum lacks hydraulic circuit for ABS solenoid modulation. Select Single-Channel (Front) or Conventional.' : 'Not available with a drum rear brake. Choose Single-Channel or Non-ABS.' }}
+                    } @else {
+                      {{ showTechnical() ? 'Dual-circuit hydraulic ECU modulation. Actively prevents both front wheel tuck and rear wheel lockup simultaneously.' : 'Helps both wheels, so neither one can lock up.' }}
+                    }
                   </span>
-                </div>
-                <span class="text-[11px] font-normal leading-relaxed" [ngClass]="isRearDrum() ? 'text-[var(--ink-3)]' : 'text-[var(--ink-2)]'">
-                  @if (isRearDrum()) {
-                    {{ showTechnical() ? 'Locked: Mechanical drum lacks hydraulic circuit for ABS solenoid modulation. Select Single-Channel (Front) or Conventional.' : 'Not available with a drum rear brake. Choose Single-Channel or Non-ABS.' }}
-                  } @else {
-                    {{ showTechnical() ? 'Dual-circuit hydraulic ECU modulation. Actively prevents both front wheel tuck and rear wheel lockup simultaneously.' : 'Helps both wheels, so neither one can lock up.' }}
-                  }
-                </span>
-                <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'dual_channel' && !isRearDrum() ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
-                  {{ isRearDrum() ? 'Requires Rear Hydraulic Disc' : 'Premium Performance Trim' }}
-                </div>
-              </button>
+                  <div class="pt-1.5 border-t border-[var(--kerb)]/60 text-[10px] font-mono text-[var(--ink-3)] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="absConfiguration() === 'dual_channel' && !isRearDrum() ? 'bg-[var(--line-deep)]' : 'bg-gray-300'"></span>
+                    {{ isRearDrum() ? 'Requires Rear Hydraulic Disc' : 'Premium Performance Trim' }}
+                  </div>
+                </button>
+              </app-brake-preview>
             </div>
           </div>
 
@@ -693,90 +697,6 @@
           </div>
         </section>
 
-        <!-- Stage 5: Tier 2 Advanced Tuning Accordion -->
-        <section class="bg-[var(--surface)] border border-[var(--kerb)] rounded-2xl p-5 shadow-2xs">
-          <button
-            type="button"
-            (click)="isTier2Open.set(!isTier2Open())"
-            class="w-full flex items-center justify-between text-xs font-bold text-[var(--ink)] hover:text-[var(--line-deep)] transition-colors cursor-pointer"
-          >
-            <div class="flex items-center gap-2">
-              <span class="text-[var(--line-deep)]">{{ isTier2Open() ? '▼' : '▶' }}</span>
-              <span>Advanced settings (optional)</span>
-            </div>
-            <span class="text-[11px] text-[var(--ink-2)] font-normal">Auto-calibrated based on category</span>
-          </button>
-
-          @if (isTier2Open()) {
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-[var(--kerb)] text-xs">
-              <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Wheelbase L (m) <app-info-tip term="wheelbase" /></span>
-                <input
-                  type="number"
-                  step="0.02"
-                  min="1.15"
-                  max="1.65"
-                  [ngModel]="wheelbase()"
-                  (ngModelChange)="updateWheelbase($event)"
-                  class="h-8 px-2 border border-[var(--kerb)] rounded-lg font-mono text-xs bg-[var(--well)]"
-                />
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)] flex items-center gap-1.5">CoG Height h (m) <app-info-tip term="cogHeight" /></span>
-                <input
-                  type="number"
-                  step="0.02"
-                  min="0.45"
-                  max="0.75"
-                  [ngModel]="cogHeight()"
-                  (ngModelChange)="updateCogHeight($event)"
-                  class="h-8 px-2 border border-[var(--kerb)] rounded-lg font-mono text-xs bg-[var(--well)]"
-                />
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Rotor Diameter (mm) <app-info-tip term="rotorDiameter" /></span>
-                <input
-                  type="number"
-                  step="10"
-                  min="180"
-                  max="330"
-                  [ngModel]="rotorDiameterMm()"
-                  (ngModelChange)="updateRotorDiameter($event)"
-                  class="h-8 px-2 border border-[var(--kerb)] rounded-lg font-mono text-xs bg-[var(--well)]"
-                />
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Pad Nominal Friction μ <app-info-tip term="padFriction" /></span>
-                <input
-                  type="number"
-                  step="0.02"
-                  min="0.25"
-                  max="0.55"
-                  [ngModel]="padFriction()"
-                  (ngModelChange)="updatePadFriction($event)"
-                  class="h-8 px-2 border border-[var(--kerb)] rounded-lg font-mono text-xs bg-[var(--well)]"
-                />
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <span class="text-[var(--ink-2)] flex items-center gap-1.5">Fluid Boil Temp (°C) <app-info-tip term="fluidBoilTemp" /></span>
-                <input
-                  type="number"
-                  step="5"
-                  min="180"
-                  max="260"
-                  [ngModel]="fluidBoilTemp()"
-                  (ngModelChange)="updateFluidBoilTemp($event)"
-                  class="h-8 px-2 border border-[var(--kerb)] rounded-lg font-mono text-xs bg-[var(--well)]"
-                />
-              </div>
-            </div>
-          }
-        </section>
-
       </div>
     </div>
   </main>
@@ -806,13 +726,12 @@
         </button>
       </div>
 
-      <div class="rounded-xl border border-[var(--kerb)] bg-[var(--concrete)] p-4">
-        <app-vehicle-silhouette [kind]="activeSpriteKey()" class="w-full aspect-[2/1]" />
+      <div class="rounded-xl border border-[var(--kerb)] overflow-hidden">
+        <app-vehicle-silhouette [kind]="activeSpriteKey()" scene class="w-full aspect-[2/1]" />
       </div>
 
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div class="leading-snug">
-          <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
           <span class="text-[13px] font-semibold text-[var(--ink)]">{{ activePreset().models.join(' · ') }}</span>
         </div>
         <div class="flex flex-wrap gap-1.5 font-mono text-[11px] text-[var(--ink)]">
