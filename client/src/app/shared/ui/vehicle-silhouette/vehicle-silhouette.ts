@@ -13,13 +13,13 @@ interface VehiclePhoto {
  * Every archetype must have one, so a missing photo is a compile error rather than a blank card.
  */
 const PHOTOS: Record<SilhouetteKind, VehiclePhoto> = {
-  scooter: { src: 'vehicles/hc125.png', label: 'Honda Click 125' },
-  maxi: { src: 'vehicles/nmax155.png', label: 'Yamaha NMAX 155' },
-  underbone: { src: 'vehicles/hw125.png', label: 'Honda Wave 125' },
-  naked: { src: 'vehicles/kz250.png', label: 'Kawasaki Z250' },
-  supersport: { src: 'vehicles/zx6r.png', label: 'Kawasaki Ninja ZX-6R' },
-  adventure: { src: 'vehicles/g310.png', label: 'BMW G 310 GS' },
-  cruiser: { src: 'vehicles/kvs300.png', label: 'Kawasaki Vulcan S' }
+  scooter: { src: 'vehicles/hc125.webp', label: 'Honda Click 125' },
+  maxi: { src: 'vehicles/nmax155.webp', label: 'Yamaha NMAX 155' },
+  underbone: { src: 'vehicles/hw125.webp', label: 'Honda Wave 125' },
+  naked: { src: 'vehicles/kz250.webp', label: 'Kawasaki Z250' },
+  supersport: { src: 'vehicles/zx6r.webp', label: 'Kawasaki Ninja ZX-6R' },
+  adventure: { src: 'vehicles/g310.webp', label: 'BMW G 310 GS' },
+  cruiser: { src: 'vehicles/kvs300.webp', label: 'Kawasaki Vulcan S' }
 };
 
 /** Side-profile photo of a vehicle archetype, standing on a shared ground line so all models line up. */
