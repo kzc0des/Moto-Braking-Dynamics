@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { GarageService, getMaxSpeedForCc } from '../../../core/services/garage.service';
 import { EMPIRICAL_PRESETS, EmpiricalPresetDescriptor } from '../../../core/models/archetype-defaults';
 import { VehicleSpriteKey, AbsConfiguration } from '../../../core/models/benchmark.types';
+import { VehicleSilhouette } from '../../../shared/ui/vehicle-silhouette/vehicle-silhouette';
 
 export interface FamilyDescriptor {
   key: 'step_through' | 'standard' | 'supersport' | 'extended';
@@ -14,6 +15,8 @@ export interface FamilyDescriptor {
   /** Plain-English description shown by default. */
   plain: string;
   badge: string;
+  /** Representative profile drawn on the family card. */
+  spriteKey: VehicleSpriteKey;
   /** Recognisable production models across the family's presets. */
   models: string[];
 }
@@ -34,7 +37,7 @@ function familyModelSamples(familyKey: FamilyDescriptor['key'], limit = 3): stri
 
 @Component({
   selector: 'app-configure-studio',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VehicleSilhouette],
   templateUrl: './configure-studio.html',
   styleUrl: './configure-studio.css'
 })
@@ -56,6 +59,7 @@ export class ConfigureStudio implements OnInit, OnDestroy {
       desc: 'Rear-biased CoG (b/L ≈ 0.42), low pitch-over, high commuter prevalence',
       plain: 'Scooters and city commuters. Most of the weight sits toward the back, so they rarely tip forward when braking.',
       badge: 'Rear-Biased CoG',
+      spriteKey: 'scooter',
       models: familyModelSamples('step_through')
     },
     {
@@ -64,6 +68,7 @@ export class ConfigureStudio implements OnInit, OnDestroy {
       desc: 'Neutral upright ergonomics (b/L ≈ 0.50), control dynamics benchmark',
       plain: 'Everyday upright bikes. Weight is balanced front to back, so this is the standard reference.',
       badge: 'Neutral Baseline',
+      spriteKey: 'naked',
       models: familyModelSamples('standard')
     },
     {
@@ -72,6 +77,7 @@ export class ConfigureStudio implements OnInit, OnDestroy {
       desc: 'High h/L, short wheelbase, rear lift-off (stoppie) threshold critical',
       plain: 'Sport bikes. Tall and short, so very hard front braking can lift the rear wheel off the ground.',
       badge: 'Stoppie-Prone',
+      spriteKey: 'supersport',
       models: familyModelSamples('supersport')
     },
     {
@@ -80,6 +86,7 @@ export class ConfigureStudio implements OnInit, OnDestroy {
       desc: 'Polar dynamics: long-wheelbase cruiser or tall long-travel adventure fork',
       plain: 'Cruisers and adventure bikes. Long and stretched out, with a tall front fork.',
       badge: 'Polar Geometry',
+      spriteKey: 'adventure',
       models: familyModelSamples('extended')
     }
   ];

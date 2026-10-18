@@ -50,27 +50,19 @@
             }
           </div>
 
-          <!-- Live Animated Sprite Machine Viewport -->
-          <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--concrete)] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden">
-            <div class="w-full flex items-center justify-between z-10">
-              <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)] animate-pulse"></span>
-                {{ activeSpriteKey() }} archetype
-              </span>
-              @if (showTechnical()) {
-                <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface)]/80 border border-[var(--kerb)] text-[var(--ink-3)] font-medium">
-                  112×56 6-FPS Idle
-                </span>
-              }
-            </div>
+          <!-- Archetype Profile Viewport -->
+          <div class="w-full border border-[var(--kerb)] rounded-xl bg-[var(--concrete)] p-3 flex flex-col gap-2">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-2)] font-semibold flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--ok)]"></span>
+              {{ activeSpriteKey() }} archetype
+            </span>
 
-            <div class="bike-idle-stage my-1">
-              <div
-                class="bike-idle-sprite"
-                [style.background-image]="'url(sprites/' + activeSpriteKey() + '_sheet.png)'"
-              ></div>
+            <app-vehicle-silhouette [kind]="activeSpriteKey()" class="studio-preview-bike h-32 w-full" />
+
+            <div class="text-[11px] leading-snug text-center">
+              <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>
+              <span class="font-semibold text-[var(--ink)]">{{ activePreset().models.join(' · ') }}</span>
             </div>
-            <div class="bike-shadow-oval"></div>
           </div>
 
           <!-- Dynamic SVG Schematic Viewport -->
@@ -213,6 +205,7 @@
                 class="p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex flex-col gap-1.5 cursor-pointer"
                 [ngClass]="family() === fam.key ? 'border-[var(--line)] bg-[var(--line-tint)] text-[var(--line-deep)] shadow-2xs' : 'border-[var(--kerb)] bg-[var(--concrete)] text-[var(--ink)] hover:border-[var(--line)]'"
               >
+                <app-vehicle-silhouette [kind]="fam.spriteKey" class="h-20 w-full" />
                 <div class="flex items-center justify-between w-full">
                   <span class="text-[13px] font-bold">{{ fam.label }}</span>
                   @if (showTechnical()) {
@@ -266,13 +259,7 @@
                       {{ preset.displacementCc }}cc
                     </span>
                   </div>
-                  <!-- Sprite Silhouette Thumbnail -->
-                  <div class="w-full h-10 bg-[var(--concrete)] rounded-lg border border-[var(--kerb)]/50 flex items-center justify-center overflow-hidden mb-1.5">
-                    <div
-                      class="preset-thumb-sprite"
-                      [style.background-image]="'url(sprites/' + preset.spriteKey + '_sheet.png)'"
-                    ></div>
-                  </div>
+                  <app-vehicle-silhouette [kind]="preset.spriteKey" class="h-20 w-full mb-1.5" />
 
                   <div class="mb-1.5 leading-snug">
                     <span class="block text-[10px] uppercase tracking-wider font-bold text-[var(--ink-3)]">Real-world equivalents</span>

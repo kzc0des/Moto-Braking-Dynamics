@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+/* Soft ground shadow under the photo. */
+.shadow {
+  fill: rgba(0, 0, 0, 0.45);
+}
