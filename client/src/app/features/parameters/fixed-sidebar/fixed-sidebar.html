@@ -31,8 +31,8 @@
       <span class="inline-flex px-2 py-0.5 rounded-md bg-[var(--well)] text-[var(--ink)] border border-[var(--kerb)] text-[11px] font-semibold break-words">
         {{ vehicleTitle() }}
       </span>
-      <span class="font-mono text-[11px] text-[var(--ink-2)] shrink-0">
-        L = {{ wheelbase() }} m
+      <span class="font-mono text-[11px] text-[var(--ink-2)] shrink-0 inline-flex items-center gap-1">
+        L = {{ wheelbase() }} m <app-info-tip term="wheelbase" />
       </span>
     </div>
   </div>
@@ -60,7 +60,7 @@
     <!-- Specifications: a plain label / value list -->
     <dl class="m-0 rounded-lg bg-[var(--well)] border border-[var(--kerb)] divide-y divide-[var(--kerb)]">
       <div class="flex items-baseline justify-between gap-3 px-3 py-2">
-        <dt class="text-xs text-[var(--ink-2)]">Weight</dt>
+        <dt class="text-xs text-[var(--ink-2)] inline-flex items-center gap-1">Weight <app-info-tip term="totalMass" /></dt>
         <dd class="m-0 text-[13px] font-semibold font-mono text-[var(--ink)]">{{ mass() }} kg</dd>
       </div>
       <div class="flex items-baseline justify-between gap-3 px-3 py-2">
@@ -68,7 +68,7 @@
         <dd class="m-0 text-[13px] font-semibold font-mono text-[var(--ink)]">{{ maxSpeedKmh() }} km/h</dd>
       </div>
       <div class="flex items-baseline justify-between gap-3 px-3 py-2">
-        <dt class="text-xs text-[var(--ink-2)]">Center of gravity</dt>
+        <dt class="text-xs text-[var(--ink-2)] inline-flex items-center gap-1">Center of gravity <app-info-tip term="cogHeight" /></dt>
         <dd class="m-0 text-[13px] font-semibold font-mono text-[var(--ink)]">{{ cogHeight() }} m high</dd>
       </div>
       <div class="flex items-baseline justify-between gap-3 px-3 py-2">
@@ -252,12 +252,14 @@
 
   <!-- 4b. TIRE INFLATION PRESSURE (ADR 0028) -->
   <div class="flex flex-col gap-3 shrink-0 pt-4 border-t border-[var(--kerb)]">
-    <button type="button" (click)="toggleGroup('tire')" [attr.aria-expanded]="isOpen('tire')" class="flex w-full items-center justify-between gap-2 cursor-pointer text-left">
-      <div class="flex items-center gap-1.5">
+    <div class="flex items-center gap-1.5">
+      <button type="button" (click)="toggleGroup('tire')" [attr.aria-expanded]="isOpen('tire')" class="cursor-pointer text-left">
         <span class="text-[15px] font-semibold tracking-tight text-[var(--ink)]">Tire pressure</span>
-      </div>
-      <span class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('tire')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
-    </button>
+      </button>
+      <app-info-tip term="tirePressure" />
+      <!-- Chevron duplicates the title toggle for mouse users; hidden from assistive tech to avoid a second control. -->
+      <button type="button" (click)="toggleGroup('tire')" tabindex="-1" aria-hidden="true" class="ml-auto flex items-center cursor-pointer"><svg class="w-3.5 h-3.5 text-[var(--ink-2)] transition-transform" [class.rotate-180]="isOpen('tire')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></button>
+    </div>
     @if (isOpen('tire')) {
     <div class="flex flex-col gap-2.5">
       <!-- Quick Presets -->

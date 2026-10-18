@@ -5,10 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BenchmarkStore } from '../../../state/benchmark.store';
 import { GarageService } from '../../../core/services/garage.service';
 import { SurfaceSubstrate, SurfaceContaminant, AbsConfiguration } from '../../../core/models/benchmark.types';
+import { InfoTip } from '../../../shared/ui/info-tip/info-tip';
 
 @Component({
   selector: 'app-fixed-sidebar',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, InfoTip],
   templateUrl: './fixed-sidebar.html',
   styleUrl: './fixed-sidebar.css'
 })
