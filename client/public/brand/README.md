@@ -1,10 +1,8 @@
 # Brand assets
 
-Add the supplied vector files here:
+Add the supplied SVG artwork here:
 
-- `logo.svg` — the application logo used in the page headers.
-- `favicon.svg` — the browser tab icon.
+- `favicon.svg` — used as both the application logo in page headers and the browser tab icon.
 
-Keep the artwork as SVG; it scales cleanly in the interface and is supported as a
-favicon by modern browsers. The existing `favicon.ico` remains as a fallback for
-browsers that do not support SVG favicons.
+SVG favicons are supported by modern browsers. The generated `../favicon.ico`
+remains as a fallback for browsers that do not support SVG favicons.
